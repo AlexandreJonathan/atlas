@@ -1,6 +1,5 @@
 import { BookOpen, PieChart, TrendingUp } from "lucide-react";
 import { MOCK_INVESTMENTS } from "../data/mockInvestments";
-import Badge from "../components/ui/Badge";
 import Card from "../components/ui/Card";
 import MiniBarChart from "../components/ui/MiniBarChart";
 import StatCard from "../components/ui/StatCard";
@@ -22,7 +21,6 @@ function InvestmentsPage() {
           <h1>Investimentos</h1>
           <p>Acompanhe e estude — sem pressão para comprar</p>
         </div>
-        <Badge tone="informativa">Dados simulados</Badge>
       </header>
 
       <main className="atlas-page-main">
@@ -36,7 +34,6 @@ function InvestmentsPage() {
             label="Patrimônio investido"
             value={formatarMoeda(patrimonioInvestido)}
             tone="brand"
-            hint="Prévia simulada"
           />
           <StatCard
             icon={<TrendingUp size={20} />}

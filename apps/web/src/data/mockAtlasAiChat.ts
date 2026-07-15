@@ -38,4 +38,4 @@ export const MOCK_ATLAS_AI_MESSAGES: AtlasAiMessage[] = [
 ];
 
 export const MOCK_ATLAS_AI_REPLY =
-  "Esta é uma prévia simulada. Em breve a Atlas Intelligence responderá com base nos seus dados reais — sem alterar suas informações sem você pedir.";
+  "Entendi. Em breve vou conseguir responder com base nos seus dados reais — por enquanto, acompanhe o painel e as recomendações da Home.";

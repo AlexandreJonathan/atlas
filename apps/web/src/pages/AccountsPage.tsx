@@ -19,7 +19,6 @@ function AccountsPage() {
           <h1>Contas</h1>
           <p>Bancos, cartões e saldos em um só lugar</p>
         </div>
-        <Badge tone="informativa">Dados simulados — Open Finance em breve</Badge>
       </header>
 
       <main className="atlas-page-main">
@@ -28,7 +27,6 @@ function AccountsPage() {
           label="Saldo consolidado"
           value={formatarMoeda(saldoConsolidado)}
           tone="brand"
-          hint="Prévia simulada"
         />
 
         <Card elevated className="atlas-page-section" aria-labelledby="bancos-titulo">

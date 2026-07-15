@@ -6,7 +6,6 @@ import {
   MOCK_ATLAS_AI_REPLY,
   type AtlasAiMessage,
 } from "../data/mockAtlasAiChat";
-import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import "./AtlasAIPage.css";
 
@@ -42,7 +41,6 @@ function AtlasAIPage() {
             <p>Seu centro de conversa financeira</p>
           </div>
         </div>
-        <Badge tone="informativa">Prévia simulada — IA real em breve</Badge>
       </header>
 
       <div className="atlas-ai-thread" role="log" aria-live="polite" aria-relevant="additions">
@@ -65,7 +63,7 @@ function AtlasAIPage() {
           type="text"
           value={texto}
           onChange={(evento) => setTexto(evento.target.value)}
-          placeholder="Pergunte algo (resposta simulada)..."
+          placeholder="Pergunte algo..."
           autoComplete="off"
         />
         <Button type="submit" size="sm" aria-label="Enviar mensagem">
