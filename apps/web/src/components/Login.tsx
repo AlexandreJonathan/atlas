@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +7,9 @@ import { getAuthErrorMessage, MENSAGEM_EMAIL_NAO_CONFIRMADO } from "../lib/authE
 import { supabase } from "../lib/supabase";
 import type { LoginFormData } from "../types/auth";
 import { loginSchema } from "../validations/loginSchema";
+import AuthLayout from "./AuthLayout";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 
 function Login() {
   const navigate = useNavigate();
@@ -69,65 +73,69 @@ function Login() {
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1>🚀 Atlas</h1>
-
-        <h2>Bem-vindo de volta</h2>
-
-        <p>Entre para continuar sua jornada financeira.</p>
-
-        <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input type="email" placeholder="Seu e-mail" aria-label="Seu e-mail" {...register("email")} />
-            {errors.email && <span className="erro-campo">{errors.email.message}</span>}
-          </div>
-
-          <div className="campo">
-            <input type="password" placeholder="Sua senha" aria-label="Sua senha" {...register("senha")} />
-            {errors.senha && <span className="erro-campo">{errors.senha.message}</span>}
-          </div>
-
-          <div className="login-links">
-            <Link to="/esqueci-senha">Esqueceu sua senha?</Link>
-          </div>
-
-          {erroGeral && (
-            <span className="erro-geral">
-              {erroGeral}
-              {erroGeral === MENSAGEM_EMAIL_NAO_CONFIRMADO && (
-                <>
-                  {" "}
-                  <button
-                    type="button"
-                    className="link-botao"
-                    onClick={handleReenviarConfirmacao}
-                    disabled={reenviando}
-                  >
-                    {reenviando ? "Reenviando..." : "Reenviar e-mail de confirmação"}
-                  </button>
-                </>
-              )}
-            </span>
-          )}
-
-          {confirmacaoReenviada && (
-            <span className="mensagem-sucesso">
-              E-mail de confirmação reenviado. Verifique sua caixa de entrada.
-            </span>
-          )}
-
-          <button type="submit" disabled={enviando}>
-            {enviando ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
-
+    <AuthLayout
+      title="Bem-vindo de volta"
+      subtitle="Entre para continuar sua jornada financeira."
+      footer={
         <span>
           Ainda não possui conta?
           <Link to="/cadastro">Criar conta</Link>
         </span>
-      </div>
-    </div>
+      }
+    >
+      <form className="atlas-auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Input
+          type="email"
+          placeholder="Seu e-mail"
+          aria-label="Seu e-mail"
+          icon={<Mail size={18} />}
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
+        <Input
+          type="password"
+          placeholder="Sua senha"
+          aria-label="Sua senha"
+          icon={<Lock size={18} />}
+          error={errors.senha?.message}
+          {...register("senha")}
+        />
+
+        <div className="atlas-auth-links">
+          <Link to="/esqueci-senha">Esqueceu sua senha?</Link>
+        </div>
+
+        {erroGeral && (
+          <span className="atlas-erro-geral">
+            {erroGeral}
+            {erroGeral === MENSAGEM_EMAIL_NAO_CONFIRMADO && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  className="atlas-link-botao"
+                  onClick={handleReenviarConfirmacao}
+                  disabled={reenviando}
+                >
+                  {reenviando ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+                </button>
+              </>
+            )}
+          </span>
+        )}
+
+        {confirmacaoReenviada && (
+          <span className="atlas-mensagem-sucesso">
+            E-mail de confirmação reenviado. Verifique sua caixa de entrada.
+          </span>
+        )}
+
+        <Button type="submit" fullWidth loading={enviando}>
+          {enviando ? "Entrando..." : "Entrar"}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }
 

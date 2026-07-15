@@ -1,0 +1,27 @@
+.atlas-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.atlas-summary-cards {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.atlas-summary-chart {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.atlas-summary-chart-titulo {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}

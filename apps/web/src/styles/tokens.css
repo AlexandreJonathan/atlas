@@ -1,0 +1,102 @@
+/*
+ * Atlas Design System — Tokens
+ *
+ * Fonte única de verdade para cor, tipografia, espaçamento, radius, sombra
+ * e movimento. Nenhum componente deve usar valores "mágicos" fora daqui —
+ * ver roadmap/design-system.md para a documentação completa de uso.
+ */
+
+:root {
+  /* ---------- Cor: superfícies (tema escuro) ---------- */
+  --color-bg-canvas: #05070d;
+  --color-bg-canvas-alt: #0a0e1a;
+  --color-bg-surface: #0f1420;
+  --color-bg-surface-hover: #141a2a;
+  --color-bg-elevated: #161c2c;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* ---------- Cor: texto ---------- */
+  --color-text-primary: #f5f7fa;
+  --color-text-secondary: #9aa5b8;
+  --color-text-tertiary: #6b7488;
+  --color-text-on-brand: #ffffff;
+
+  /* ---------- Cor: marca (identidade Atlas) ---------- */
+  --color-brand: #5b5fef;
+  --color-brand-strong: #4347d9;
+  --color-brand-soft: rgba(91, 95, 239, 0.16);
+
+  /* ---------- Cor: semânticas ---------- */
+  --color-success: #2dd4bf;
+  --color-success-soft: rgba(45, 212, 191, 0.16);
+  --color-warning: #f5a524;
+  --color-warning-soft: rgba(245, 165, 36, 0.16);
+  --color-danger: #ff5c72;
+  --color-danger-soft: rgba(255, 92, 114, 0.16);
+  --color-info: #4da3ff;
+  --color-info-soft: rgba(77, 163, 255, 0.16);
+  --color-neutral-soft: rgba(255, 255, 255, 0.1);
+
+  /* ---------- Tipografia ---------- */
+  --font-family-base: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.75rem;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+
+  /* ---------- Espaçamento (escala de 4px) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  /* ---------- Sombra (glow suave, pensada para fundo escuro) ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-glow-brand: 0 0 1px rgba(91, 95, 239, 0.4), 0 12px 40px rgba(91, 95, 239, 0.22);
+
+  /* ---------- Movimento ---------- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 400ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- Z-index ---------- */
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}

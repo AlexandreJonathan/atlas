@@ -1,10 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Receipt } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { useFixedExpenses } from "../../hooks/useFixedExpenses";
 import { getFriendlyErrorMessage } from "../../lib/errorMessages";
 import type { FixedExpenseFormData } from "../../types/fixedExpense";
 import { fixedExpenseSchema } from "../../validations/fixedExpenseSchema";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
 
 type FixedExpensesStepProps = {
   despesasFixas: ReturnType<typeof useFixedExpenses>;
@@ -39,61 +42,61 @@ function FixedExpensesStep({ despesasFixas, onVoltar, onAvancar }: FixedExpenses
   }
 
   return (
-    <div className="onboarding-passo">
-      <h2>🧾 Tem despesas fixas recorrentes?</h2>
+    <div className="atlas-onboarding-step">
+      <span className="atlas-onboarding-step-icon">
+        <Receipt size={26} aria-hidden="true" />
+      </span>
+
+      <h2>Tem despesas fixas recorrentes?</h2>
       <p>Aluguel, assinaturas, financiamentos... Cadastre quantas quiser (ou nenhuma, se preferir fazer isso depois).</p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="campo">
-          <input
-            type="text"
-            placeholder="Descrição (ex: Aluguel)"
-            aria-label="Descrição da despesa fixa"
-            {...register("description")}
-          />
-          {errors.description && <span className="erro-campo">{errors.description.message}</span>}
-        </div>
+        <Input
+          type="text"
+          placeholder="Descrição (ex: Aluguel)"
+          aria-label="Descrição da despesa fixa"
+          error={errors.description?.message}
+          {...register("description")}
+        />
 
-        <div className="campo">
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Valor mensal"
-            aria-label="Valor mensal"
-            {...register("amount")}
-          />
-          {errors.amount && <span className="erro-campo">{errors.amount.message}</span>}
-        </div>
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Valor mensal"
+          aria-label="Valor mensal"
+          error={errors.amount?.message}
+          {...register("amount")}
+        />
 
-        {erroGeral && <span className="erro-geral">{erroGeral}</span>}
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 
-        <div className="onboarding-acoes">
-          <button type="submit" className="btn-secundario" disabled={salvando}>
+        <div className="atlas-onboarding-acoes">
+          <Button type="submit" variant="secondary" loading={salvando}>
             {salvando ? "Adicionando..." : "+ Adicionar despesa"}
-          </button>
+          </Button>
         </div>
       </form>
 
-      {despesasFixas.loading && <p className="estado-carregando">Carregando despesas fixas...</p>}
+      {despesasFixas.loading && <p className="atlas-onboarding-carregando">Carregando despesas fixas...</p>}
 
       {!despesasFixas.loading && despesasFixas.fixedExpenses.length > 0 && (
-        <div className="onboarding-lista">
+        <div className="atlas-onboarding-lista">
           {despesasFixas.fixedExpenses.map((despesa) => (
-            <div className="onboarding-item" key={despesa.id}>
+            <div className="atlas-onboarding-item" key={despesa.id}>
               <span>{despesa.description}</span>
-              <strong>R$ {despesa.amount.toFixed(2)}</strong>
+              <strong className="tabular-nums">R$ {despesa.amount.toFixed(2)}</strong>
             </div>
           ))}
         </div>
       )}
 
-      <div className="onboarding-acoes">
-        <button type="button" className="btn-secundario" onClick={onVoltar}>
+      <div className="atlas-onboarding-acoes">
+        <Button type="button" variant="secondary" onClick={onVoltar}>
           Voltar
-        </button>
-        <button type="button" className="btn-primario" onClick={onAvancar}>
+        </Button>
+        <Button type="button" onClick={onAvancar}>
           Continuar
-        </button>
+        </Button>
       </div>
     </div>
   );

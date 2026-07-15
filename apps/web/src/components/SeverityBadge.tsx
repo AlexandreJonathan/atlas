@@ -1,28 +1,17 @@
-export type SeverityTone = "critica" | "atencao" | "positiva" | "informativa" | "neutra";
+import Badge, { type BadgeTone } from "./ui/Badge";
+
+export type SeverityTone = BadgeTone;
 
 type SeverityBadgeProps = {
   tone: SeverityTone;
   label: string;
 };
 
-const CONFIG: Record<SeverityTone, { icon: string; className: string }> = {
-  critica: { icon: "🔴", className: "severity-critica" },
-  atencao: { icon: "🟡", className: "severity-atencao" },
-  positiva: { icon: "✅", className: "severity-positiva" },
-  informativa: { icon: "ℹ️", className: "severity-informativa" },
-  neutra: { icon: "⚪", className: "severity-neutra" },
-};
-
-// Severidade é sempre comunicada por ícone + texto (nunca só cor), para
-// não depender de percepção de cor (acessibilidade).
+// Wrapper de domínio fino sobre o Badge genérico do Design System — mantém
+// a mesma API (`tone`/`label`) já usada por BillsList, PlanningPanel e
+// AtlasIntelligencePanel, sem precisar alterar nenhum desses lugares.
 function SeverityBadge({ tone, label }: SeverityBadgeProps) {
-  const config = CONFIG[tone];
-
-  return (
-    <span className={`severity-badge ${config.className}`}>
-      <span aria-hidden="true">{config.icon}</span> {label}
-    </span>
-  );
+  return <Badge tone={tone}>{label}</Badge>;
 }
 
 export default SeverityBadge;

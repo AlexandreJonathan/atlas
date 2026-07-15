@@ -1,17 +1,45 @@
-/* Reset mínimo global. Estilos reais da aplicação (cores, tipografia,
-   layout) vivem em App.css e no .css de cada componente — este arquivo
-   era o boilerplate do template inicial do Vite/React (variáveis de tema,
-   #root com largura fixa de 1126px + borda lateral + texto centralizado,
-   seletores #social/.counter nunca usados) e causava um defeito visual
-   real em telas largas (>1126px): duas linhas de borda verticais e área
-   morta nas laterais em vez do layout ocupar a tela inteira. Removido na
-   revisão de qualidade (FAT) por não corresponder a nenhum elemento do
-   Atlas e conflitar com a responsividade até 1920px.
-*/
+/* Reset mínimo global + aplicação dos tokens base (ver styles/tokens.css).
+   Estilos específicos de cada tela vivem nos componentes de
+   src/components/ (e nos componentes reutilizáveis de src/components/ui/). */
 * {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
+  background: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* Números financeiros usam algarismos tabulares para alinhar em colunas
+   (extratos, listas) — ver roadmap/design-system.md. */
+.tabular-nums {
+  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Estado de carregamento em tela cheia — usado por ProtectedRoute,
+   ResetPassword e Dashboard (aguardando status do onboarding). */
+.atlas-page-loader {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  background: var(--color-bg-canvas);
 }

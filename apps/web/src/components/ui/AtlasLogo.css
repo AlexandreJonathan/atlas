@@ -1,0 +1,12 @@
+.atlas-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.atlas-logo-wordmark {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}

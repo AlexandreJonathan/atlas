@@ -1,0 +1,39 @@
+.atlas-progress-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.atlas-progress-ring-track {
+  stroke: var(--color-neutral-soft);
+}
+
+.atlas-progress-ring-fill {
+  transition: stroke-dashoffset var(--duration-slow) var(--ease-standard);
+}
+
+.atlas-progress-ring-fill-brand {
+  stroke: var(--color-brand);
+}
+
+.atlas-progress-ring-fill-success {
+  stroke: var(--color-success);
+}
+
+.atlas-progress-ring-fill-warning {
+  stroke: var(--color-warning);
+}
+
+.atlas-progress-ring-fill-danger {
+  stroke: var(--color-danger);
+}
+
+.atlas-progress-ring-text {
+  position: absolute;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+}

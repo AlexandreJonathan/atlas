@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -6,6 +7,9 @@ import { getAuthErrorMessage } from "../lib/authErrors";
 import { supabase } from "../lib/supabase";
 import type { ForgotPasswordFormData } from "../types/auth";
 import { forgotPasswordSchema } from "../validations/forgotPasswordSchema";
+import AuthLayout from "./AuthLayout";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 
 function ForgotPassword() {
   const [erroGeral, setErroGeral] = useState("");
@@ -47,59 +51,47 @@ function ForgotPassword() {
 
   if (enviado) {
     return (
-      <div className="login-container">
-        <div className="login-card">
-          <h1>🚀 Atlas</h1>
-
-          <h2>Verifique seu e-mail</h2>
-
-          <p>
-            Se este e-mail estiver cadastrado, você receberá em poucos minutos um link para redefinir sua
-            senha.
-          </p>
-
+      <AuthLayout
+        title="Verifique seu e-mail"
+        subtitle="Se este e-mail estiver cadastrado, você receberá em poucos minutos um link para redefinir sua senha."
+        footer={
           <span>
             <Link to="/login">Voltar para o login</Link>
           </span>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1>🚀 Atlas</h1>
-
-        <h2>Esqueceu sua senha?</h2>
-
-        <p>Informe seu e-mail e enviaremos um link para você criar uma nova senha.</p>
-
-        <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input
-              type="email"
-              placeholder="Seu e-mail"
-              aria-label="Seu e-mail"
-              autoFocus
-              {...register("email")}
-            />
-            {errors.email && <span className="erro-campo">{errors.email.message}</span>}
-          </div>
-
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <button type="submit" disabled={enviando}>
-            {enviando ? "Enviando..." : "Enviar link de redefinição"}
-          </button>
-        </form>
-
+    <AuthLayout
+      title="Esqueceu sua senha?"
+      subtitle="Informe seu e-mail e enviaremos um link para você criar uma nova senha."
+      footer={
         <span>
           Lembrou a senha?
           <Link to="/login">Entrar</Link>
         </span>
-      </div>
-    </div>
+      }
+    >
+      <form className="atlas-auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Input
+          type="email"
+          placeholder="Seu e-mail"
+          aria-label="Seu e-mail"
+          icon={<Mail size={18} />}
+          autoFocus
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
+
+        <Button type="submit" fullWidth loading={enviando}>
+          {enviando ? "Enviando..." : "Enviar link de redefinição"}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }
 

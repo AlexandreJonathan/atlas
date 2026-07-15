@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +7,9 @@ import { getAuthErrorMessage } from "../lib/authErrors";
 import { supabase } from "../lib/supabase";
 import type { ResetPasswordFormData } from "../types/auth";
 import { resetPasswordSchema } from "../validations/resetPasswordSchema";
+import AuthLayout from "./AuthLayout";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 
 type EstadoLink = "verificando" | "valido" | "invalido";
 
@@ -83,80 +87,61 @@ function ResetPassword() {
   }
 
   if (estadoLink === "verificando") {
-    return <div className="carregando">Verificando link...</div>;
+    return <div className="atlas-page-loader">Verificando link...</div>;
   }
 
   if (estadoLink === "invalido") {
     return (
-      <div className="login-container">
-        <div className="login-card">
-          <h1>🚀 Atlas</h1>
-
-          <h2>Link inválido ou expirado</h2>
-
-          <p>Este link de redefinição de senha não é mais válido. Solicite um novo.</p>
-
+      <AuthLayout
+        title="Link inválido ou expirado"
+        subtitle="Este link de redefinição de senha não é mais válido. Solicite um novo."
+        footer={
           <span>
             <Link to="/esqueci-senha">Esqueci minha senha</Link>
           </span>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   if (sucesso) {
     return (
-      <div className="login-container">
-        <div className="login-card">
-          <h1>🚀 Atlas</h1>
-
-          <h2>Senha redefinida!</h2>
-
-          <p>Sua senha foi alterada com sucesso. Redirecionando para o seu painel...</p>
-        </div>
-      </div>
+      <AuthLayout
+        title="Senha redefinida!"
+        subtitle="Sua senha foi alterada com sucesso. Redirecionando para o seu painel..."
+      />
     );
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1>🚀 Atlas</h1>
+    <AuthLayout title="Crie uma nova senha" subtitle="Escolha uma nova senha para sua conta.">
+      <form className="atlas-auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Input
+          type="password"
+          placeholder="Nova senha"
+          aria-label="Nova senha"
+          icon={<Lock size={18} />}
+          autoFocus
+          error={errors.senha?.message}
+          {...register("senha")}
+        />
 
-        <h2>Crie uma nova senha</h2>
+        <Input
+          type="password"
+          placeholder="Confirme a nova senha"
+          aria-label="Confirme a nova senha"
+          icon={<Lock size={18} />}
+          error={errors.confirmarSenha?.message}
+          {...register("confirmarSenha")}
+        />
 
-        <p>Escolha uma nova senha para sua conta.</p>
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 
-        <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input
-              type="password"
-              placeholder="Nova senha"
-              aria-label="Nova senha"
-              autoFocus
-              {...register("senha")}
-            />
-            {errors.senha && <span className="erro-campo">{errors.senha.message}</span>}
-          </div>
-
-          <div className="campo">
-            <input
-              type="password"
-              placeholder="Confirme a nova senha"
-              aria-label="Confirme a nova senha"
-              {...register("confirmarSenha")}
-            />
-            {errors.confirmarSenha && <span className="erro-campo">{errors.confirmarSenha.message}</span>}
-          </div>
-
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <button type="submit" disabled={enviando}>
-            {enviando ? "Salvando..." : "Salvar nova senha"}
-          </button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit" fullWidth loading={enviando}>
+          {enviando ? "Salvando..." : "Salvar nova senha"}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }
 

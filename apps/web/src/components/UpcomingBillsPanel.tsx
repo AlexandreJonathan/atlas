@@ -1,8 +1,12 @@
+import { CalendarClock } from "lucide-react";
 import { useState } from "react";
 import type { useBills } from "../hooks/useBills";
 import type { BillType } from "../types/bill";
 import BillModal from "./BillModal";
 import BillsList from "./BillsList";
+import "./Panels.css";
+import Button from "./ui/Button";
+import Card from "./ui/Card";
 
 type UpcomingBillsPanelProps = {
   contas: ReturnType<typeof useBills>;
@@ -19,16 +23,23 @@ function UpcomingBillsPanel({ contas }: UpcomingBillsPanelProps) {
   );
 
   return (
-    <section className="painel" aria-labelledby="contas-titulo">
-      <div className="painel-header">
-        <h2 id="contas-titulo">📅 Contas a vencer</h2>
-        <div className="painel-acoes">
-          <button onClick={() => setModalAberto("a_pagar")}>+ Conta a Pagar</button>
-          <button onClick={() => setModalAberto("a_receber")}>+ Conta a Receber</button>
+    <Card elevated className="atlas-panel" aria-labelledby="contas-titulo">
+      <div className="atlas-panel-header">
+        <span className="atlas-panel-title" id="contas-titulo">
+          <CalendarClock size={20} aria-hidden="true" />
+          Contas a vencer
+        </span>
+        <div className="atlas-panel-actions">
+          <Button size="sm" variant="secondary" onClick={() => setModalAberto("a_pagar")}>
+            + A Pagar
+          </Button>
+          <Button size="sm" variant="secondary" onClick={() => setModalAberto("a_receber")}>
+            + A Receber
+          </Button>
         </div>
       </div>
 
-      {contas.actionError && <p className="erro-geral erro-acao">{contas.actionError}</p>}
+      {contas.actionError && <p className="atlas-panel-erro-acao">{contas.actionError}</p>}
 
       <BillsList
         bills={contasParaExibir}
@@ -46,7 +57,7 @@ function UpcomingBillsPanel({ contas }: UpcomingBillsPanelProps) {
           onSalvar={(dados) => contas.criar({ type: modalAberto, ...dados })}
         />
       )}
-    </section>
+    </Card>
   );
 }
 

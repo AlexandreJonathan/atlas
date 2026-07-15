@@ -1,0 +1,114 @@
+.atlas-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard);
+}
+
+.atlas-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+
+.atlas-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.atlas-btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Tamanhos */
+.atlas-btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.atlas-btn-md {
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-md);
+}
+
+.atlas-btn-lg {
+  padding: var(--space-4) var(--space-7);
+  font-size: var(--font-size-lg);
+}
+
+.atlas-btn-full {
+  width: 100%;
+}
+
+/* Variantes */
+.atlas-btn-primary {
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-strong) 100%);
+  color: var(--color-text-on-brand);
+  box-shadow: var(--shadow-glow-brand);
+}
+
+.atlas-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.atlas-btn-secondary {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.atlas-btn-secondary:hover:not(:disabled) {
+  background: var(--color-bg-surface-hover);
+  border-color: var(--color-text-tertiary);
+}
+
+.atlas-btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.atlas-btn-ghost:hover:not(:disabled) {
+  background: var(--color-neutral-soft);
+  color: var(--color-text-primary);
+}
+
+.atlas-btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger-soft);
+}
+
+.atlas-btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
+/* Loading */
+.atlas-btn-loading .atlas-btn-content {
+  opacity: 0.6;
+}
+
+.atlas-btn-spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: atlas-spin var(--duration-slow) linear infinite;
+}
+
+@keyframes atlas-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

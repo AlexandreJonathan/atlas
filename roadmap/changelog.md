@@ -4,6 +4,51 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 7] — Atlas Premium Experience (Design System + Dashboard 2.0)
+
+Missão exclusivamente visual/UX (Fases 1 a 5 do plano da missão): criação do Design System oficial da Atlas e redesenho completo de Auth, Onboarding, Dashboard e da nova identidade "Atlas Intelligence" — nenhuma alteração de regra de negócio, banco de dados, RLS ou autenticação. Detalhes completos em `roadmap/sprint-07.md` e `roadmap/design-system.md`.
+
+### Adicionado
+- `src/styles/tokens.css`: tokens de cor, tipografia (`Inter Variable`), espaçamento, radius, sombra e motion — importado uma única vez em `main.tsx`.
+- Dependências `lucide-react` (ícones) e `@fontsource-variable/inter` (fonte self-hosted).
+- `src/components/ui/`: `Button`, `Card`, `Input`, `Modal`, `Badge`, `ProgressRing`, `MiniBarChart`, `StatCard`, `AtlasLogo` (novos) + `ProgressBar` (migrado de `components/`).
+- `roadmap/design-system.md`: documentação completa do Design System.
+- `src/components/AuthLayout.tsx`/`.css`: shell compartilhado de Login/Cadastro/Recuperação de senha.
+- `src/components/Panels.css`: estilos compartilhados dos painéis e listas do Dashboard.
+- `src/components/AtlasIntelligencePanel.tsx`/`.css` (renomeado de `RecommendationsPanel.tsx`) e `src/lib/atlasIntelligenceCopy.ts` (função pura de saudação + resumo conversacional a partir das recomendações já calculadas).
+
+### Alterado
+- `Login.tsx`, `Register.tsx`, `ForgotPassword.tsx`, `ResetPassword.tsx`: migrados para `AuthLayout` + `Input`/`Button` do Design System, com ícones; lógica de formulário/validação/Supabase Auth inalterada.
+- `OnboardingWizard.tsx` + os 6 passos: migrados para `Card`/`Button`/`Input`/`ProgressBar` do Design System, com um ícone por passo no lugar de emoji; lógica de navegação/persistência/guard inalterada.
+- `Dashboard.tsx`: reorganizado com cabeçalho (logo + saudação personalizada + prévia da Atlas Intelligence) e hierarquia clara de seções; `Dashboard.css` reduzido de ~570 para ~110 linhas.
+- `FinancialSummaryCards.tsx`: cards simples substituídos por `StatCard` + `MiniBarChart` (receitas x despesas do mês).
+- `PlanningPanel.tsx`: ganhou um `ProgressRing` de saúde financeira do mês (mesmo dado que já define o `risco` calculado por `planningEngine.ts`).
+- `PlanningPanel.tsx`, `UpcomingBillsPanel.tsx`, `GoalsPanel.tsx`, `FixedExpensesPanel.tsx`, `TransactionsList.tsx`, `BillsList.tsx`, `GoalsList.tsx`, `FixedExpensesList.tsx`: migrados para `Card`/`Button`/ícones, com hover state e entrada em stagger sutil nas listas.
+- `TransactionModal.tsx`, `BillModal.tsx`, `GoalModal.tsx`, `FinancialProfileModal.tsx`, `FixedExpenseModal.tsx`: migrados para o `Modal` compartilhado (`components/ui/Modal.tsx`) + `Input`/`Button`.
+- `SeverityBadge.tsx`: passou a ser um wrapper fino sobre `Badge` (ícones `lucide-react` no lugar de emoji), mesma API pública.
+- `AsyncStateView.tsx`: mesma API pública, loading agora com skeleton shimmer.
+- `index.html`: `<title>` genérico do template ("web") substituído por "Atlas — Organização financeira pessoal".
+
+### Removido
+- `App.css`: removido por completo (bloco de landing page morto identificado na FAT + classes ainda em uso migradas para `AuthLayout.css` antes da remoção).
+- `public/icons.svg`: nunca referenciado por nenhum componente (identificado na FAT).
+- Todos os emojis usados como "ícone" (~15 ocorrências) substituídos por ícones `lucide-react`.
+
+### Decisões de arquitetura
+- "Sparkline" do plano original foi implementado como `MiniBarChart` (comparação de valores agregados): os dados disponíveis (`receitasDoMes`/`despesasDoMes`) são agregados mensais, não uma série temporal diária — um gráfico de barras comparativo reflete os dados reais sem inventar histórico.
+- Todas as classes CSS de `components/ui/` usam o prefixo `atlas-`, separando claramente o Design System novo de qualquer classe legada durante a migração.
+- Tema 100% escuro nesta sprint (evolução da paleta navy já existente) — alternância clara/escura fica no backlog.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso (aviso de bundle >500 kB já existente antes desta sprint, não agravado de forma relevante).
+
+### Documentação
+- `roadmap/sprint-07.md` e `roadmap/design-system.md` criados.
+- `roadmap/backlog.md` e `roadmap/arquitetura.md` atualizados.
+
+---
+
 ## [Sprint 6] — Alpha Readiness
 
 Sprint focada em remover os bloqueadores identificados na Auditoria de Produto (ver seção abaixo) para o primeiro Alpha privado: recuperação de senha, confirmação de e-mail, responsividade completa, onboarding guiado e preparação de deploy.
@@ -39,6 +84,21 @@ Sprint focada em remover os bloqueadores identificados na Auditoria de Produto (
 ### Validado
 - `npm run lint` — sem erros.
 - `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Migrations Aplicadas em Produção] — Banco real do Supabase sincronizado
+
+Após o primeiro deploy na Vercel, o onboarding falhava com `PGRST205` (`relation "public.onboarding_status" does not exist`). Investigação encontrou que **nenhuma das 6 migrations havia sido aplicada** ao projeto Supabase real (o banco estava vazio — só existiam os 2 usuários já cadastrados via Auth, sem nenhuma tabela do domínio da aplicação).
+
+### Ações realizadas
+- As 6 migrations de `supabase/migrations/` foram aplicadas, em ordem, diretamente no banco de produção via conexão Postgres (Session/Transaction pooler, já que a conexão direta IPv6 não era alcançável na rede utilizada).
+- Confirmado no próprio banco: as 6 tabelas existem, com Row Level Security **ON** e as 4 policies esperadas (`SELECT`/`INSERT`/`UPDATE`/`DELETE`, todas restritas a `auth.uid() = user_id`) em cada uma — total de 24 policies.
+- Validação end-to-end de escrita: simulada uma gravação real em `onboarding_status` como um dos usuários já cadastrados, com o role `authenticated` e o claim JWT (`auth.uid()`) configurados exatamente como o Supabase faz em produção — `INSERT`/`UPSERT`, `SELECT` e `UPDATE` funcionaram corretamente respeitando o RLS. A transação foi revertida (`ROLLBACK`) ao final, sem deixar dados de teste.
+- Nenhuma alteração de código nesta entrada — puramente operacional (infraestrutura do banco de produção).
+
+### Nota para o fundador
+Nenhuma migration precisa ser reaplicada manualmente — o banco de produção já reflete o schema completo esperado pela aplicação. Se novas migrations forem criadas no futuro, seguir o mesmo processo documentado em `docs/deploy.md`/`docs/guia-deploy-fundador.md`.
 
 ---
 

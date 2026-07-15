@@ -66,12 +66,13 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 > **"Experiência do Usuário, Responsividade e Deploy"**: escopo original planejado para o número "Sprint 5" (ver histórico em `roadmap/changelog.md`), reagendado quando a Sprint 5 passou a cobrir o "Planejamento Financeiro Inteligente" (mesmo precedente da Sprint 4). A responsividade e a preparação de deploy foram retomadas e concluídas na Sprint 6 (Alpha Readiness); os demais itens desta seção permanecem para uma sprint futura.
 
 - ✅ ~~Tornar a aplicação responsiva (mobile-first)~~ — concluído na Sprint 6: Login/Cadastro/telas de senha/onboarding/Dashboard/painéis/listas/modais revisados entre 320px e 1920px. Recomenda-se, ainda assim, um teste manual em ao menos um dispositivo mobile real antes do Alpha (ver `docs/deploy.md`)
-- 🟡 Criar design system consolidado (tokens de cor, tipografia, espaçamento)
-- 🟡 Adicionar feedback visual de loading e erros nas requisições
-- 🟢 Modo claro/escuro (dark mode) configurável pelo usuário
+- ✅ ~~Criar design system consolidado (tokens de cor, tipografia, espaçamento)~~ — concluído na Sprint 7 (`src/styles/tokens.css` + `src/components/ui/` + `roadmap/design-system.md`)
+- ✅ ~~Adicionar feedback visual de loading e erros nas requisições~~ — já existia (`AsyncStateView`) desde a Sprint 4; refinado na Sprint 7 com skeleton shimmer
+- 🟢 Modo claro/escuro (dark mode) configurável pelo usuário — a Atlas é 100% tema escuro desde a Sprint 7 (Design System); alternância clara/escura ainda não implementada
 - ✅ ~~Acessibilidade (ARIA, navegação por teclado, contraste) — estender `aria-label` para `Login.tsx`/`Register.tsx`~~ — concluído na Auto Code Review da Missão Alpha Ready: modais e o wizard de onboarding já possuem `role="dialog"`/`aria-modal`; `ProgressBar` e a barra de progresso do onboarding usam `role="progressbar"`; severidade sempre com ícone+texto (`SeverityBadge`); `Login.tsx`/`Register.tsx` passaram a ter `aria-label` em todos os campos, no mesmo padrão já usado pelo restante da aplicação
-- 🟢 Revisar contraste de cores (WCAG AA) de forma sistemática — hoje os tons foram escolhidos visualmente, sem auditoria formal de contraste
+- 🟡 Revisar contraste de cores (WCAG AA) de forma sistemática com a nova paleta do Design System (Sprint 7) — os tons foram escolhidos visualmente, sem auditoria formal de contraste ainda
 - 🟡 Permitir revisitar/editar manualmente os dados coletados no onboarding (hoje só é possível pelos painéis normais do Dashboard após concluído — funcional, mas sem um link direto de volta ao wizard)
+- 🟢 Code-splitting dos 5 modais e do `OnboardingWizard` via `React.lazy` — oportunidade natural após a Sprint 7 (todos os modais compartilham `components/ui/Modal.tsx`), para mitigar o aviso de bundle >500 kB
 
 ## 7. Infraestrutura e DevOps
 
@@ -83,14 +84,14 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 
 ## 8.1 Limpeza de Código Morto (identificado na FAT)
 
-- 🟢 `App.css` mantém um bloco de classes de uma landing page antiga (`.hero`, `.header`, `nav`, `.actions`, `.btn-login`, `.btn-primary`, `.tag`, `.hero-button`) não utilizado por nenhum componente atual — inofensivo (já sobrescrito onde colide com estilos reais), mas deve ser removido na próxima refatoração de estilos para reduzir confusão.
-- 🟢 `public/icons.svg` não é referenciado por nenhum componente — avaliar remoção ou uso futuro.
+- ✅ ~~`App.css` mantém um bloco de classes de uma landing page antiga (`.hero`, `.header`, `nav`, `.actions`, `.btn-login`, `.btn-primary`, `.tag`, `.hero-button`) não utilizado por nenhum componente atual~~ — removido por completo na Sprint 7 (as classes ainda em uso foram migradas para `AuthLayout.css`).
+- ✅ ~~`public/icons.svg` não é referenciado por nenhum componente~~ — removido na Sprint 7.
 
 ## 8. Estado Global e Arquitetura de Front-end
 
 - 🟡 Avaliar necessidade de gerenciador de estado global (Context API, Zustand ou Redux) à medida que a aplicação cresce
 - 🟢 Introduzir camada de cache de dados (React Query / TanStack Query) — mitigaria a necessidade atual de repassar `useTransactions`/`useBills`/`useGoals`/`useFinancialProfile`/`useFixedExpenses` como props a partir de `Dashboard.tsx` para evitar buscas duplicadas
-- 🟢 `npm run build` alerta que o bundle único (`index-*.js`) já passa de 500 kB minificado; avaliar code-splitting (ex: `React.lazy` nos modais `TransactionModal`/`BillModal`/`GoalModal`/`FinancialProfileModal`/`FixedExpenseModal`, carregados só quando abertos) quando o crescimento da aplicação justificar
+- 🟢 `npm run build` alerta que o bundle único (`index-*.js`) já passa de 500 kB minificado; ver seção 6 para o plano de code-splitting via `React.lazy`
 
 ---
 

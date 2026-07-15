@@ -10,7 +10,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { session, loading } = useAuth();
 
   if (loading) {
-    return <div className="carregando">Carregando...</div>;
+    return <div className="atlas-page-loader">Carregando...</div>;
   }
 
   if (!session) {

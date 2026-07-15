@@ -1,0 +1,64 @@
+.atlas-mini-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.atlas-mini-bar-row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.atlas-mini-bar-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.atlas-mini-bar-track {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-soft);
+  overflow: hidden;
+}
+
+.atlas-mini-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-standard);
+}
+
+.atlas-mini-bar-fill-brand {
+  background: var(--color-brand);
+}
+
+.atlas-mini-bar-fill-success {
+  background: var(--color-success);
+}
+
+.atlas-mini-bar-fill-warning {
+  background: var(--color-warning);
+}
+
+.atlas-mini-bar-fill-danger {
+  background: var(--color-danger);
+}
+
+.atlas-mini-bar-fill-info {
+  background: var(--color-info);
+}
+
+.atlas-mini-bar-value {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-align: right;
+}
+
+@media (max-width: 360px) {
+  .atlas-mini-bar-row {
+    grid-template-columns: 56px 1fr auto;
+  }
+}

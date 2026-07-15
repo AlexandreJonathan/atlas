@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { getFriendlyErrorMessage } from "../lib/errorMessages";
 import type { BillFormData, BillType } from "../types/bill";
 import { billSchema } from "../validations/billSchema";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
+import Modal from "./ui/Modal";
 
 type BillModalProps = {
   tipo: BillType;
@@ -27,17 +30,6 @@ function BillModal({ tipo, onFechar, onSalvar }: BillModalProps) {
     resolver: zodResolver(billSchema),
   });
 
-  useEffect(() => {
-    function handleKeyDown(evento: KeyboardEvent) {
-      if (evento.key === "Escape") {
-        onFechar();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onFechar]);
-
   async function onSubmit(dados: BillFormData) {
     setErroGeral("");
     setSalvando(true);
@@ -57,51 +49,40 @@ function BillModal({ tipo, onFechar, onSalvar }: BillModalProps) {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="bill-modal-titulo">
-        <h2 id="bill-modal-titulo">{TITULOS[tipo]}</h2>
+    <Modal titleId="bill-modal-titulo" title={TITULOS[tipo]} onClose={onFechar}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="atlas-auth-form">
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Valor"
+          aria-label="Valor"
+          autoFocus
+          error={errors.amount?.message}
+          {...register("amount")}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Valor"
-              aria-label="Valor"
-              autoFocus
-              {...register("amount")}
-            />
-            {errors.amount && <span className="erro-campo">{errors.amount.message}</span>}
-          </div>
+        <Input
+          type="text"
+          placeholder="Descrição"
+          aria-label="Descrição"
+          error={errors.description?.message}
+          {...register("description")}
+        />
 
-          <div className="campo">
-            <input
-              type="text"
-              placeholder="Descrição"
-              aria-label="Descrição"
-              {...register("description")}
-            />
-            {errors.description && <span className="erro-campo">{errors.description.message}</span>}
-          </div>
+        <Input type="date" aria-label="Data de vencimento" error={errors.dueDate?.message} {...register("dueDate")} />
 
-          <div className="campo">
-            <input type="date" aria-label="Data de vencimento" {...register("dueDate")} />
-            {errors.dueDate && <span className="erro-campo">{errors.dueDate.message}</span>}
-          </div>
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <div className="modal-buttons">
-            <button type="button" onClick={onFechar} disabled={salvando}>
-              Cancelar
-            </button>
-            <button type="submit" disabled={salvando}>
-              {salvando ? "Salvando..." : "Salvar"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="atlas-modal-actions">
+          <Button type="button" variant="secondary" onClick={onFechar} disabled={salvando}>
+            Cancelar
+          </Button>
+          <Button type="submit" loading={salvando}>
+            {salvando ? "Salvando..." : "Salvar"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

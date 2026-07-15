@@ -89,11 +89,12 @@ Qualquer provedor de hosting estático/CDN com suporte a SPA (fallback de todas 
 
 Avaliação do bundle de produção atual, documentada para decisão futura (nenhuma otimização foi aplicada agora, por estar fora do escopo desta missão):
 
-- `dist/assets/index-*.js`: **587 kB** minificado (**~165 kB** gzip) — Vite/Rollup emite um aviso de "chunk maior que 500 kB". Não impede o deploy (a Vercel serve o arquivo normalmente, e o cache imutável do `vercel.json` mitiga o custo em visitas repetidas), mas é a maior oportunidade de otimização de performance de carregamento inicial.
-- `dist/assets/index-*.css`: **~12 kB** (**~2.6 kB** gzip) — tamanho saudável, sem preocupação.
-- **Code-splitting candidato**: os modais (`TransactionModal`, `BillModal`, `GoalModal`, `FinancialProfileModal`, `FixedExpenseModal`) e o `OnboardingWizard` são bons candidatos a `React.lazy`/`import()` dinâmico, pois só são necessários depois de uma interação do usuário (clique em "+ Nova...") ou apenas no primeiro acesso — já registrado em `roadmap/backlog.md`, seção 8.
-- **Assets estáticos**: apenas `favicon.svg` (referenciado) e `icons.svg` (não referenciado — ver `roadmap/backlog.md`, seção 8.1); nenhuma imagem pesada (JPEG/PNG) no projeto.
-- **Cache**: antes desta missão não havia nenhuma diretiva de cache HTTP explícita para os assets publicados; `vercel.json` (seção 5) fecha essa lacuna sem exigir mudança de código.
+- `dist/assets/index-*.js`: **~599 kB** minificado (**~170 kB** gzip, após o Design System da Sprint 7 — `lucide-react` é tree-shakeable, então o impacto foi pequeno) — Vite/Rollup emite um aviso de "chunk maior que 500 kB". Não impede o deploy (a Vercel serve o arquivo normalmente, e o cache imutável do `vercel.json` mitiga o custo em visitas repetidas), mas é a maior oportunidade de otimização de performance de carregamento inicial.
+- `dist/assets/index-*.css`: **~27 kB** (**~5 kB** gzip, após a Sprint 7) — tamanho ainda saudável, sem preocupação.
+- **Fonte self-hosted**: `@fontsource-variable/inter` (Sprint 7) adiciona ~7 arquivos `.woff2` (um por subconjunto de caracteres, ~10–85 kB cada) — carregados pelo navegador só quando necessário (`unicode-range`), sem custo para o bundle JS/CSS.
+- **Code-splitting candidato**: os modais (`TransactionModal`, `BillModal`, `GoalModal`, `FinancialProfileModal`, `FixedExpenseModal`, todos hoje construídos sobre `components/ui/Modal.tsx`) e o `OnboardingWizard` são bons candidatos a `React.lazy`/`import()` dinâmico, pois só são necessários depois de uma interação do usuário (clique em "+ Nova...") ou apenas no primeiro acesso — já registrado em `roadmap/backlog.md`, seção 6.
+- **Assets estáticos**: apenas `favicon.svg` (referenciado); `icons.svg`, que não era referenciado por nenhum componente, foi removido na Sprint 7. Nenhuma imagem pesada (JPEG/PNG) no projeto.
+- **Cache**: `vercel.json` (seção 5) já cobre `/assets/*` com cache imutável de longa duração.
 
 ## 6. Checklist de Deploy
 

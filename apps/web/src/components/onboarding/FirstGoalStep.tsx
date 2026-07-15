@@ -1,10 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Target } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { useGoals } from "../../hooks/useGoals";
 import { getFriendlyErrorMessage } from "../../lib/errorMessages";
 import type { GoalFormData } from "../../types/goal";
 import { goalSchema } from "../../validations/goalSchema";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
 
 type FirstGoalStepProps = {
   metas: ReturnType<typeof useGoals>;
@@ -43,58 +46,61 @@ function FirstGoalStep({ metas, onVoltar, onAvancar }: FirstGoalStepProps) {
   }
 
   return (
-    <div className="onboarding-passo">
-      <h2>🎯 Que tal já criar sua primeira meta?</h2>
+    <div className="atlas-onboarding-step">
+      <span className="atlas-onboarding-step-icon">
+        <Target size={26} aria-hidden="true" />
+      </span>
+
+      <h2>Que tal já criar sua primeira meta?</h2>
       <p>Uma viagem, uma reserva maior, um objeto que você quer comprar. É opcional — você pode criar depois no Dashboard.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="campo">
-          <input type="text" placeholder="Nome da meta" aria-label="Nome da meta" {...register("title")} />
-          {errors.title && <span className="erro-campo">{errors.title.message}</span>}
-        </div>
+        <Input
+          type="text"
+          placeholder="Nome da meta"
+          aria-label="Nome da meta"
+          error={errors.title?.message}
+          {...register("title")}
+        />
 
-        <div className="campo">
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Valor da meta"
-            aria-label="Valor da meta"
-            {...register("targetAmount")}
-          />
-          {errors.targetAmount && <span className="erro-campo">{errors.targetAmount.message}</span>}
-        </div>
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Valor da meta"
+          aria-label="Valor da meta"
+          error={errors.targetAmount?.message}
+          {...register("targetAmount")}
+        />
 
-        <div className="campo">
-          <input type="date" aria-label="Prazo (opcional)" {...register("targetDate")} />
-        </div>
+        <Input type="date" aria-label="Prazo (opcional)" {...register("targetDate")} />
 
-        {erroGeral && <span className="erro-geral">{erroGeral}</span>}
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 
-        <div className="onboarding-acoes">
-          <button type="submit" className="btn-secundario" disabled={salvando}>
+        <div className="atlas-onboarding-acoes">
+          <Button type="submit" variant="secondary" loading={salvando}>
             {salvando ? "Criando..." : "+ Criar meta"}
-          </button>
+          </Button>
         </div>
       </form>
 
       {!metas.loading && metas.goals.length > 0 && (
-        <div className="onboarding-lista">
+        <div className="atlas-onboarding-lista">
           {metas.goals.map((goal) => (
-            <div className="onboarding-item" key={goal.id}>
+            <div className="atlas-onboarding-item" key={goal.id}>
               <span>{goal.title}</span>
-              <strong>R$ {goal.targetAmount.toFixed(2)}</strong>
+              <strong className="tabular-nums">R$ {goal.targetAmount.toFixed(2)}</strong>
             </div>
           ))}
         </div>
       )}
 
-      <div className="onboarding-acoes">
-        <button type="button" className="btn-secundario" onClick={onVoltar}>
+      <div className="atlas-onboarding-acoes">
+        <Button type="button" variant="secondary" onClick={onVoltar}>
           Voltar
-        </button>
-        <button type="button" className="btn-primario" onClick={onAvancar}>
+        </Button>
+        <Button type="button" onClick={onAvancar}>
           Continuar
-        </button>
+        </Button>
       </div>
     </div>
   );

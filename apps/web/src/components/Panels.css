@@ -1,0 +1,223 @@
+/*
+ * Estilos compartilhados pelos painéis do Dashboard 2.0 (PlanningPanel,
+ * UpcomingBillsPanel, GoalsPanel, FixedExpensesPanel) e pelas listas
+ * (TransactionsList, BillsList, GoalsList, FixedExpensesList) — evita
+ * repetir a mesma folha de estilo em 8 arquivos. Cada componente ainda
+ * importa este arquivo individualmente (`import "./Panels.css"`), mas o
+ * conteúdo vive em um único lugar. Ver roadmap/design-system.md.
+ */
+
+.atlas-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.atlas-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.atlas-panel-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.atlas-panel-title svg {
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+
+.atlas-panel-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.atlas-panel-cards {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.atlas-planning-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.atlas-panel-erro-acao {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+/* Estados ad-hoc de painéis que não usam AsyncStateView (ex: PlanningPanel,
+   que tem um quarto estado — "não configurado" — além de
+   loading/erro/conteúdo). */
+.atlas-panel-estado-vazio {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+.atlas-panel-estado-erro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+/* Listas de itens (contas, metas, despesas fixas, movimentações) */
+.atlas-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.atlas-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-canvas-alt);
+  border: 1px solid var(--color-border-subtle);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+  animation: atlas-list-row-in var(--duration-slow) var(--ease-standard) backwards;
+}
+
+.atlas-list-row:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+.atlas-list-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.atlas-list-row-icon-success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.atlas-list-row-icon-danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.atlas-list-row-icon-brand {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.atlas-list-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  text-align: left;
+  flex: 1;
+  min-width: 120px;
+}
+
+.atlas-list-row-info small {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+}
+
+.atlas-list-row-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.atlas-list-row-value-success {
+  color: var(--color-success);
+}
+
+.atlas-list-row-value-danger {
+  color: var(--color-danger);
+}
+
+.atlas-list-row-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.atlas-list-row-actions input {
+  width: 120px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+}
+
+.atlas-list-row-actions input:focus {
+  outline: none;
+  border-color: var(--color-brand);
+}
+
+.atlas-list-row-fill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  width: 100%;
+}
+
+@keyframes atlas-list-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-list-row {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .atlas-panel-actions {
+    width: 100%;
+  }
+
+  .atlas-panel-actions > * {
+    flex: 1;
+  }
+
+  .atlas-list-row-actions {
+    width: 100%;
+  }
+
+  .atlas-list-row-actions input {
+    width: 100%;
+  }
+}

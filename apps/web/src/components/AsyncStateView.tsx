@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Button from "./ui/Button";
+import "./AsyncStateView.css";
 
 type AsyncStateViewProps = {
   loading: boolean;
@@ -11,8 +13,9 @@ type AsyncStateViewProps = {
 };
 
 // Centraliza o padrão "carregando / erro com nova tentativa / vazio /
-// conteúdo" usado por TransactionsList, BillsList e GoalsList — extraído
-// para evitar três cópias quase idênticas do mesmo condicional.
+// conteúdo" usado por TransactionsList, BillsList, GoalsList e
+// FixedExpensesList — mesma API de antes desta missão, só o visual mudou
+// (skeleton no lugar de texto simples de carregamento).
 function AsyncStateView({
   loading,
   error,
@@ -23,22 +26,29 @@ function AsyncStateView({
   children,
 }: AsyncStateViewProps) {
   if (loading) {
-    return <p className="estado-carregando">{loadingMessage}</p>;
+    return (
+      <div className="atlas-async-loading" role="status" aria-live="polite">
+        <span className="atlas-skeleton-row" />
+        <span className="atlas-skeleton-row" />
+        <span className="atlas-skeleton-row atlas-skeleton-row-short" />
+        <span className="atlas-async-loading-texto">{loadingMessage}</span>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="estado-erro">
+      <div className="atlas-async-erro">
         <p>{error}</p>
-        <button className="btn-tentar-novamente" onClick={onRetry}>
+        <Button variant="secondary" size="sm" onClick={onRetry}>
           Tentar novamente
-        </button>
+        </Button>
       </div>
     );
   }
 
   if (isEmpty) {
-    return <p className="estado-vazio">{emptyMessage}</p>;
+    return <p className="atlas-async-vazio">{emptyMessage}</p>;
   }
 
   return <>{children}</>;

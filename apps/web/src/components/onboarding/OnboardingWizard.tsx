@@ -4,6 +4,9 @@ import type { useFixedExpenses } from "../../hooks/useFixedExpenses";
 import type { useGoals } from "../../hooks/useGoals";
 import type { useOnboarding } from "../../hooks/useOnboarding";
 import { getFriendlyErrorMessage } from "../../lib/errorMessages";
+import AtlasLogo from "../ui/AtlasLogo";
+import Card from "../ui/Card";
+import ProgressBar from "../ui/ProgressBar";
 import FinishStep from "./FinishStep";
 import FirstGoalStep from "./FirstGoalStep";
 import FixedExpensesStep from "./FixedExpensesStep";
@@ -92,27 +95,31 @@ function OnboardingWizard({ onboarding, perfil, despesasFixas, metas, onPularPor
   }
 
   return (
-    <div className="onboarding-overlay">
-      <div className="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboarding-titulo">
-        <div className="onboarding-progresso">
+    <div className="atlas-onboarding-overlay">
+      <Card
+        elevated
+        glow
+        padding="lg"
+        className="atlas-onboarding-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="onboarding-titulo"
+      >
+        <div className="atlas-onboarding-brand">
+          <AtlasLogo size={32} />
+        </div>
+
+        <div className="atlas-onboarding-progresso">
           <span id="onboarding-titulo">
             Passo {passo} de {onboarding.totalPassos}
           </span>
-          <div
-            className="onboarding-barra"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={onboarding.totalPassos}
-            aria-valuenow={passo}
-          >
-            <div
-              className="onboarding-barra-fill"
-              style={{ width: `${(passo / onboarding.totalPassos) * 100}%` }}
-            />
-          </div>
+          <ProgressBar
+            value={passo / onboarding.totalPassos}
+            label={`Progresso do onboarding: passo ${passo} de ${onboarding.totalPassos}`}
+          />
         </div>
 
-        {erro && <p className="erro-geral">{erro}</p>}
+        {erro && <p className="atlas-erro-geral">{erro}</p>}
 
         {passo === 1 && <WelcomeStep onAvancar={() => irPara(2)} />}
 
@@ -156,11 +163,11 @@ function OnboardingWizard({ onboarding, perfil, despesasFixas, metas, onPularPor
         )}
 
         {passo < 6 && (
-          <button type="button" className="onboarding-pular" onClick={onPularPorAgora}>
+          <button type="button" className="atlas-onboarding-pular" onClick={onPularPorAgora}>
             Pular por agora (você pode retomar no próximo acesso)
           </button>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

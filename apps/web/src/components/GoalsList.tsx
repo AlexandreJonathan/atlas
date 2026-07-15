@@ -1,8 +1,11 @@
+import { Target } from "lucide-react";
 import { useState } from "react";
 import type { Goal } from "../types/goal";
 import { goalContributionSchema } from "../validations/goalSchema";
 import AsyncStateView from "./AsyncStateView";
-import ProgressBar from "./ProgressBar";
+import "./Panels.css";
+import Button from "./ui/Button";
+import ProgressBar from "./ui/ProgressBar";
 
 type GoalsListProps = {
   goals: Goal[];
@@ -51,45 +54,55 @@ function GoalsList({ goals, loading, error, onAportar, onRemover, onTentarNovame
       onRetry={onTentarNovamente}
       loadingMessage="Carregando metas..."
     >
-      {goals.map((goal) => {
-        const progresso = goal.targetAmount > 0 ? goal.currentAmount / goal.targetAmount : 0;
+      <div className="atlas-list">
+        {goals.map((goal, indice) => {
+          const progresso = goal.targetAmount > 0 ? goal.currentAmount / goal.targetAmount : 0;
 
-        return (
-          <div className="meta-item" key={goal.id}>
-            <div className="meta-info">
-              <strong>{goal.title}</strong>
-              <span>
-                R$ {goal.currentAmount.toFixed(2)} de R$ {goal.targetAmount.toFixed(2)}
+          return (
+            <div
+              className="atlas-list-row"
+              key={goal.id}
+              style={{ animationDelay: `${Math.min(indice, 8) * 40}ms` }}
+            >
+              <span className="atlas-list-row-icon atlas-list-row-icon-brand" aria-hidden="true">
+                <Target size={18} />
               </span>
-            </div>
 
-            <ProgressBar value={progresso} label={`Progresso da meta ${goal.title}`} />
+              <div className="atlas-list-row-fill">
+                <div className="atlas-list-row-info">
+                  <span>{goal.title}</span>
+                  <small className="tabular-nums">
+                    R$ {goal.currentAmount.toFixed(2)} de R$ {goal.targetAmount.toFixed(2)}
+                  </small>
+                </div>
 
-            <div className="meta-acoes-wrapper">
-              <div className="meta-acoes">
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Valor do aporte"
-                  aria-label={`Registrar aporte para ${goal.title}`}
-                  value={aportes[goal.id] ?? ""}
-                  disabled={salvandoAporte[goal.id]}
-                  onChange={(evento) =>
-                    setAportes((atual) => ({ ...atual, [goal.id]: evento.target.value }))
-                  }
-                />
-                <button onClick={() => handleAportar(goal.id)} disabled={salvandoAporte[goal.id]}>
-                  {salvandoAporte[goal.id] ? "Aportando..." : "Aportar"}
-                </button>
-                <button className="btn-remover" onClick={() => onRemover(goal.id)}>
-                  Remover
-                </button>
+                <ProgressBar value={progresso} label={`Progresso da meta ${goal.title}`} />
+
+                <div className="atlas-list-row-actions">
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Valor do aporte"
+                    aria-label={`Registrar aporte para ${goal.title}`}
+                    value={aportes[goal.id] ?? ""}
+                    disabled={salvandoAporte[goal.id]}
+                    onChange={(evento) =>
+                      setAportes((atual) => ({ ...atual, [goal.id]: evento.target.value }))
+                    }
+                  />
+                  <Button size="sm" loading={salvandoAporte[goal.id]} onClick={() => handleAportar(goal.id)}>
+                    Aportar
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onRemover(goal.id)}>
+                    Remover
+                  </Button>
+                </div>
+                {errosAporte[goal.id] && <span className="atlas-field-error">{errosAporte[goal.id]}</span>}
               </div>
-              {errosAporte[goal.id] && <span className="erro-campo">{errosAporte[goal.id]}</span>}
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </AsyncStateView>
   );
 }

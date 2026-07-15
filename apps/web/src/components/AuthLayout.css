@@ -1,0 +1,128 @@
+.atlas-auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-5);
+  background: radial-gradient(circle at 20% 10%, var(--color-brand-soft), transparent 45%),
+    radial-gradient(circle at 85% 90%, var(--color-success-soft), transparent 40%), var(--color-bg-canvas);
+}
+
+.atlas-auth-card {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  animation: atlas-auth-card-in var(--duration-slow) var(--ease-standard);
+}
+
+.atlas-auth-brand {
+  display: flex;
+  justify-content: center;
+}
+
+.atlas-auth-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.atlas-auth-heading h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.atlas-auth-heading p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.atlas-auth-footer {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.atlas-auth-footer a {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  margin-left: var(--space-1);
+}
+
+.atlas-auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.atlas-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.atlas-auth-links {
+  display: flex;
+  justify-content: flex-end;
+  font-size: var(--font-size-sm);
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.atlas-auth-links a {
+  color: var(--color-info);
+  text-decoration: none;
+}
+
+.atlas-auth-links a:hover {
+  text-decoration: underline;
+}
+
+.atlas-mensagem-sucesso {
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.atlas-erro-geral {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.atlas-link-botao {
+  background: none;
+  border: none;
+  color: var(--color-info);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  padding: 0;
+  font-family: inherit;
+}
+
+.atlas-link-botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes atlas-auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .atlas-auth-heading h1 {
+    font-size: var(--font-size-xl);
+  }
+}

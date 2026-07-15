@@ -1,3 +1,6 @@
+import { CheckCircle2 } from "lucide-react";
+import Button from "../ui/Button";
+
 type FinishStepProps = {
   rendaMensal: number | null;
   reservaMinima: number | null;
@@ -16,33 +19,37 @@ function FinishStep({
   onConcluir,
 }: FinishStepProps) {
   return (
-    <div className="onboarding-passo">
-      <h2>✅ Tudo pronto!</h2>
+    <div className="atlas-onboarding-step">
+      <span className="atlas-onboarding-step-icon">
+        <CheckCircle2 size={26} aria-hidden="true" />
+      </span>
+
+      <h2>Tudo pronto!</h2>
       <p>Confira o que configuramos. Você pode ajustar tudo isso a qualquer momento no Dashboard.</p>
 
-      <div className="onboarding-resumo">
-        <div>
+      <div className="atlas-onboarding-resumo">
+        <div className="atlas-onboarding-resumo-linha">
           <span>Renda mensal</span>
-          <strong>R$ {(rendaMensal ?? 0).toFixed(2)}</strong>
+          <strong className="tabular-nums">R$ {(rendaMensal ?? 0).toFixed(2)}</strong>
         </div>
-        <div>
+        <div className="atlas-onboarding-resumo-linha">
           <span>Reserva mínima</span>
-          <strong>R$ {(reservaMinima ?? 0).toFixed(2)}</strong>
+          <strong className="tabular-nums">R$ {(reservaMinima ?? 0).toFixed(2)}</strong>
         </div>
-        <div>
+        <div className="atlas-onboarding-resumo-linha">
           <span>Despesas fixas</span>
-          <strong>R$ {totalDespesasFixas.toFixed(2)}</strong>
+          <strong className="tabular-nums">R$ {totalDespesasFixas.toFixed(2)}</strong>
         </div>
-        <div>
+        <div className="atlas-onboarding-resumo-linha">
           <span>Metas criadas</span>
-          <strong>{totalMetas}</strong>
+          <strong className="tabular-nums">{totalMetas}</strong>
         </div>
       </div>
 
-      <div className="onboarding-acoes">
-        <button type="button" className="btn-primario" onClick={onConcluir} disabled={processando}>
+      <div className="atlas-onboarding-acoes">
+        <Button type="button" onClick={onConcluir} loading={processando}>
           {processando ? "Finalizando..." : "Concluir e começar a usar o Atlas"}
-        </button>
+        </Button>
       </div>
     </div>
   );

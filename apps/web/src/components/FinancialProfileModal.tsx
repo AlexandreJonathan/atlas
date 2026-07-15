@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { getFriendlyErrorMessage } from "../lib/errorMessages";
 import type { FinancialProfile, FinancialProfileFormData } from "../types/financialProfile";
 import { financialProfileSchema } from "../validations/financialProfileSchema";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
+import Modal from "./ui/Modal";
 
 type FinancialProfileModalProps = {
   perfilAtual: FinancialProfile | null;
@@ -26,17 +29,6 @@ function FinancialProfileModal({ perfilAtual, onFechar, onSalvar }: FinancialPro
     },
   });
 
-  useEffect(() => {
-    function handleKeyDown(evento: KeyboardEvent) {
-      if (evento.key === "Escape") {
-        onFechar();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onFechar]);
-
   async function onSubmit(dados: FinancialProfileFormData) {
     setErroGeral("");
     setSalvando(true);
@@ -55,47 +47,39 @@ function FinancialProfileModal({ perfilAtual, onFechar, onSalvar }: FinancialPro
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-titulo">
-        <h2 id="profile-modal-titulo">Planejamento Financeiro</h2>
+    <Modal titleId="profile-modal-titulo" title="Planejamento Financeiro" onClose={onFechar}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="atlas-auth-form">
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Renda mensal (salário ou renda prevista)"
+          aria-label="Renda mensal"
+          autoFocus
+          error={errors.monthlyIncome?.message}
+          {...register("monthlyIncome")}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Renda mensal (salário ou renda prevista)"
-              aria-label="Renda mensal"
-              autoFocus
-              {...register("monthlyIncome")}
-            />
-            {errors.monthlyIncome && <span className="erro-campo">{errors.monthlyIncome.message}</span>}
-          </div>
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="Reserva mínima desejada"
+          aria-label="Reserva mínima"
+          error={errors.minimumReserve?.message}
+          {...register("minimumReserve")}
+        />
 
-          <div className="campo">
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Reserva mínima desejada"
-              aria-label="Reserva mínima"
-              {...register("minimumReserve")}
-            />
-            {errors.minimumReserve && <span className="erro-campo">{errors.minimumReserve.message}</span>}
-          </div>
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <div className="modal-buttons">
-            <button type="button" onClick={onFechar} disabled={salvando}>
-              Cancelar
-            </button>
-            <button type="submit" disabled={salvando}>
-              {salvando ? "Salvando..." : "Salvar"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="atlas-modal-actions">
+          <Button type="button" variant="secondary" onClick={onFechar} disabled={salvando}>
+            Cancelar
+          </Button>
+          <Button type="submit" loading={salvando}>
+            {salvando ? "Salvando..." : "Salvar"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
 

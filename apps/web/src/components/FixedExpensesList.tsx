@@ -1,5 +1,8 @@
+import { Receipt } from "lucide-react";
 import type { FixedExpense } from "../types/fixedExpense";
 import AsyncStateView from "./AsyncStateView";
+import "./Panels.css";
+import Button from "./ui/Button";
 
 type FixedExpensesListProps = {
   fixedExpenses: FixedExpense[];
@@ -25,17 +28,29 @@ function FixedExpensesList({
       onRetry={onTentarNovamente}
       loadingMessage="Carregando despesas fixas..."
     >
-      {fixedExpenses.map((item) => (
-        <div className="despesa-fixa-item" key={item.id}>
-          <div className="despesa-fixa-info">
-            <span>{item.description}</span>
+      <div className="atlas-list">
+        {fixedExpenses.map((item, indice) => (
+          <div
+            className="atlas-list-row"
+            key={item.id}
+            style={{ animationDelay: `${Math.min(indice, 8) * 40}ms` }}
+          >
+            <span className="atlas-list-row-icon atlas-list-row-icon-brand" aria-hidden="true">
+              <Receipt size={18} />
+            </span>
+
+            <div className="atlas-list-row-info">
+              <span>{item.description}</span>
+            </div>
+
+            <strong className="atlas-list-row-value tabular-nums">R$ {item.amount.toFixed(2)}</strong>
+
+            <Button variant="ghost" size="sm" onClick={() => onRemover(item.id)}>
+              Remover
+            </Button>
           </div>
-          <strong>R$ {item.amount.toFixed(2)}</strong>
-          <button className="btn-remover" onClick={() => onRemover(item.id)}>
-            Remover
-          </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </AsyncStateView>
   );
 }

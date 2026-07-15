@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +7,9 @@ import { getAuthErrorMessage } from "../lib/authErrors";
 import { supabase } from "../lib/supabase";
 import type { RegisterFormData } from "../types/auth";
 import { registerSchema } from "../validations/registerSchema";
+import AuthLayout from "./AuthLayout";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 
 function Register() {
   const navigate = useNavigate();
@@ -82,76 +86,84 @@ function Register() {
 
   if (cadastroPendente) {
     return (
-      <div className="login-container">
-        <div className="login-card">
-          <h1>🚀 Atlas</h1>
-
-          <h2>Confirme seu e-mail</h2>
-
-          <p>
+      <AuthLayout
+        title="Confirme seu e-mail"
+        subtitle={
+          <>
             Enviamos um link de confirmação para <strong>{emailCadastrado}</strong>. Abra seu e-mail e clique
             no link para ativar sua conta antes de entrar.
-          </p>
-
-          {confirmacaoReenviada && (
-            <span className="mensagem-sucesso">
-              E-mail reenviado. Verifique sua caixa de entrada (e a pasta de spam).
-            </span>
-          )}
-
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <button type="button" onClick={handleReenviarConfirmacao} disabled={reenviando}>
-            {reenviando ? "Reenviando..." : "Reenviar e-mail de confirmação"}
-          </button>
-
+          </>
+        }
+        footer={
           <span>
             Já confirmou?
             <Link to="/login">Entrar</Link>
           </span>
+        }
+      >
+        <div className="atlas-auth-form">
+          {confirmacaoReenviada && (
+            <span className="atlas-mensagem-sucesso">
+              E-mail reenviado. Verifique sua caixa de entrada (e a pasta de spam).
+            </span>
+          )}
+
+          {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
+
+          <Button type="button" variant="secondary" fullWidth loading={reenviando} onClick={handleReenviarConfirmacao}>
+            {reenviando ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+          </Button>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1>🚀 Atlas</h1>
-
-        <h2>Criar conta</h2>
-
-        <p>Comece hoje sua organização financeira.</p>
-
-        <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="campo">
-            <input type="text" placeholder="Seu nome" aria-label="Seu nome" {...register("nome")} />
-            {errors.nome && <span className="erro-campo">{errors.nome.message}</span>}
-          </div>
-
-          <div className="campo">
-            <input type="email" placeholder="Seu e-mail" aria-label="Seu e-mail" {...register("email")} />
-            {errors.email && <span className="erro-campo">{errors.email.message}</span>}
-          </div>
-
-          <div className="campo">
-            <input type="password" placeholder="Crie uma senha" aria-label="Crie uma senha" {...register("senha")} />
-            {errors.senha && <span className="erro-campo">{errors.senha.message}</span>}
-          </div>
-
-          {erroGeral && <span className="erro-geral">{erroGeral}</span>}
-
-          <button type="submit" disabled={enviando}>
-            {enviando ? "Criando conta..." : "Criar conta"}
-          </button>
-        </form>
-
+    <AuthLayout
+      title="Criar conta"
+      subtitle="Comece hoje sua organização financeira."
+      footer={
         <span>
           Já possui conta?
           <Link to="/login">Entrar</Link>
         </span>
-      </div>
-    </div>
+      }
+    >
+      <form className="atlas-auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Input
+          type="text"
+          placeholder="Seu nome"
+          aria-label="Seu nome"
+          icon={<User size={18} />}
+          error={errors.nome?.message}
+          {...register("nome")}
+        />
+
+        <Input
+          type="email"
+          placeholder="Seu e-mail"
+          aria-label="Seu e-mail"
+          icon={<Mail size={18} />}
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
+        <Input
+          type="password"
+          placeholder="Crie uma senha"
+          aria-label="Crie uma senha"
+          icon={<Lock size={18} />}
+          error={errors.senha?.message}
+          {...register("senha")}
+        />
+
+        {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
+
+        <Button type="submit" fullWidth loading={enviando}>
+          {enviando ? "Criando conta..." : "Criar conta"}
+        </Button>
+      </form>
+    </AuthLayout>
   );
 }
 
