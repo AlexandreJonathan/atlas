@@ -1,0 +1,42 @@
+.atlas-invest-teaser {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.atlas-invest-teaser .atlas-home-block-header {
+  margin-bottom: var(--space-2);
+}
+
+.atlas-invest-teaser .atlas-home-block-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.atlas-invest-teaser .atlas-home-block-header h2 svg {
+  color: var(--color-brand);
+}
+
+.atlas-invest-teaser-valor {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.atlas-invest-teaser-delta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+}
+
+.atlas-invest-teaser-disclaimer {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}

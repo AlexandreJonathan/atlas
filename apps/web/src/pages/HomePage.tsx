@@ -1,20 +1,18 @@
 import { useState } from "react";
 import AtlasIntelligencePanel from "../components/AtlasIntelligencePanel";
 import BillModal from "../components/BillModal";
-import FixedExpensesPanel from "../components/FixedExpensesPanel";
-import GoalModal from "../components/GoalModal";
-import GoalsPanel from "../components/GoalsPanel";
-import HomeHeader from "../components/home/HomeHeader";
 import AtlasPulse from "../components/home/AtlasPulse";
+import BillsTimeline from "../components/home/BillsTimeline";
+import GoalsFocus from "../components/home/GoalsFocus";
+import HomeHeader from "../components/home/HomeHeader";
+import InvestmentsTeaser from "../components/home/InvestmentsTeaser";
+import PlanningSnapshot from "../components/home/PlanningSnapshot";
 import QuickActions, { type QuickActionId } from "../components/home/QuickActions";
+import TransactionsPreview from "../components/home/TransactionsPreview";
 import WealthHero from "../components/home/WealthHero";
 import "../components/Panels.css";
-import PlanningPanel from "../components/PlanningPanel";
+import GoalModal from "../components/GoalModal";
 import TransactionModal from "../components/TransactionModal";
-import TransactionsList from "../components/TransactionsList";
-import UpcomingBillsPanel from "../components/UpcomingBillsPanel";
-import Card from "../components/ui/Card";
-import MiniBarChart from "../components/ui/MiniBarChart";
 import { MOCK_INVESTMENTS } from "../data/mockInvestments";
 import { useAuth } from "../hooks/useAuth";
 import { useBills } from "../hooks/useBills";
@@ -25,12 +23,9 @@ import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
 import { useRecommendations } from "../hooks/useRecommendations";
 import { useTransactions } from "../hooks/useTransactions";
+import { triggerMicrointeraction } from "../lib/microinteractions";
 import type { TransactionType } from "../types/transaction";
 import "./HomePage.css";
-
-function formatarMoeda(valor: number): string {
-  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 
 type ModalAberto =
   | { kind: "transaction"; tipo: TransactionType }
@@ -86,47 +81,29 @@ function HomePage() {
 
         <AtlasIntelligencePanel estado={recomendacoes} />
 
-        <UpcomingBillsPanel contas={contas} />
+        <BillsTimeline contas={contas} />
 
-        <GoalsPanel metas={metas} />
+        <GoalsFocus metas={metas} />
 
-        <Card elevated className="atlas-home-section" aria-labelledby="movimentacoes-titulo">
-          <h2 id="movimentacoes-titulo" className="atlas-home-section-titulo">
-            Últimas movimentações
-          </h2>
-          {transacoes.actionError && <p className="atlas-panel-erro-acao">{transacoes.actionError}</p>}
-          <TransactionsList
-            transactions={transacoes.transactions}
-            loading={transacoes.loading}
-            error={transacoes.error}
-            onRemover={transacoes.remover}
-            onTentarNovamente={transacoes.recarregar}
-          />
-        </Card>
+        <InvestmentsTeaser />
 
-        <Card elevated className="atlas-home-section" aria-labelledby="evolucao-titulo">
-          <h2 id="evolucao-titulo" className="atlas-home-section-titulo">
-            Evolução financeira
-          </h2>
-          <p className="atlas-home-section-hint">Receitas e despesas do mês atual</p>
-          <MiniBarChart
-            items={[
-              { label: "Receitas", value: resumo.receitasDoMes, tone: "success" },
-              { label: "Despesas", value: resumo.despesasDoMes, tone: "danger" },
-            ]}
-            formatValue={formatarMoeda}
-          />
-        </Card>
+        <PlanningSnapshot
+          perfil={perfil}
+          planejamento={planejamento}
+          despesasFixas={despesasFixas}
+        />
 
-        <PlanningPanel perfil={perfil} planejamento={planejamento} />
-        <FixedExpensesPanel despesasFixas={despesasFixas} />
+        <TransactionsPreview transacoes={transacoes} />
       </main>
 
       {modalAberto?.kind === "transaction" && (
         <TransactionModal
           tipo={modalAberto.tipo}
           onFechar={() => setModalAberto(null)}
-          onSalvar={(dados) => transacoes.adicionar({ type: modalAberto.tipo, ...dados })}
+          onSalvar={async (dados) => {
+            await transacoes.adicionar({ type: modalAberto.tipo, ...dados });
+            triggerMicrointeraction("success");
+          }}
         />
       )}
 
@@ -134,12 +111,21 @@ function HomePage() {
         <BillModal
           tipo="a_pagar"
           onFechar={() => setModalAberto(null)}
-          onSalvar={(dados) => contas.criar({ type: "a_pagar", ...dados })}
+          onSalvar={async (dados) => {
+            await contas.criar({ type: "a_pagar", ...dados });
+            triggerMicrointeraction("success");
+          }}
         />
       )}
 
       {modalAberto?.kind === "goal" && (
-        <GoalModal onFechar={() => setModalAberto(null)} onSalvar={(dados) => metas.criar(dados)} />
+        <GoalModal
+          onFechar={() => setModalAberto(null)}
+          onSalvar={async (dados) => {
+            await metas.criar(dados);
+            triggerMicrointeraction("success");
+          }}
+        />
       )}
     </div>
   );

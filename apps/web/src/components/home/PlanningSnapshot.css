@@ -1,0 +1,49 @@
+.atlas-planning-snapshot {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.atlas-planning-snapshot .atlas-home-block-header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.atlas-planning-snapshot .atlas-home-block-header h2 svg {
+  color: var(--color-brand);
+}
+
+.atlas-planning-snapshot-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.atlas-planning-snapshot-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.atlas-planning-snapshot-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.atlas-planning-snapshot-copy strong {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+.atlas-planning-snapshot-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}

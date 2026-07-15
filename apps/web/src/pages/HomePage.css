@@ -13,22 +13,43 @@
   gap: var(--space-7);
 }
 
-.atlas-home-section {
+.atlas-home-block-header {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-.atlas-home-section-titulo {
-  font-size: var(--font-size-lg);
+.atlas-home-block-header h2 {
+  margin: 0;
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
-.atlas-home-section-hint {
+.atlas-home-block-muted {
+  margin: 0;
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
-  margin: 0;
+}
+
+.atlas-home-block-erro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.atlas-home-block-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-brand);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
 }
 
 @media (min-width: 640px) {
