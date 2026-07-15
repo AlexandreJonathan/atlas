@@ -51,6 +51,16 @@ atlas/
 │       │   │   ├── layout/
 │       │   │   │   ├── AppShell.tsx / .css
 │       │   │   │   └── BottomNavigation.tsx / .css
+│       │   │   ├── home/
+│       │   │   │   ├── HomeHeader.tsx / .css
+│       │   │   │   ├── WealthHero.tsx / .css
+│       │   │   │   ├── AtlasPulse.tsx / .css
+│       │   │   │   ├── QuickActions.tsx / .css
+│       │   │   │   ├── BillsTimeline.tsx / .css
+│       │   │   │   ├── GoalsFocus.tsx / .css
+│       │   │   │   ├── InvestmentsTeaser.tsx / .css
+│       │   │   │   ├── PlanningSnapshot.tsx / .css
+│       │   │   │   └── TransactionsPreview.tsx / .css
 │       │   │   ├── Login.tsx
 │       │   │   ├── Register.tsx
 │       │   │   ├── ForgotPassword.tsx
@@ -115,6 +125,7 @@ atlas/
 │       │   │   ├── recommendationEngine.ts
 │       │   │   ├── planningEngine.ts
 │       │   │   ├── atlasIntelligenceCopy.ts
+│       │   │   ├── atlasPulse.ts
 │       │   │   └── microinteractions/
 │       │   │       ├── types.ts
 │       │   │       └── index.ts
