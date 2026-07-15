@@ -1,0 +1,52 @@
+.atlas-pulse {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  animation: atlas-home-rise var(--duration-slow) var(--ease-standard) 60ms backwards;
+}
+
+.atlas-pulse-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: var(--radius-full);
+}
+
+.atlas-pulse-dot-positiva {
+  background: var(--color-success);
+  box-shadow: 0 0 0 4px var(--color-success-soft);
+}
+
+.atlas-pulse-dot-atencao {
+  background: var(--color-warning);
+  box-shadow: 0 0 0 4px var(--color-warning-soft);
+}
+
+.atlas-pulse-dot-informativa {
+  background: var(--color-info);
+  box-shadow: 0 0 0 4px var(--color-info-soft);
+}
+
+.atlas-pulse-dot-marca {
+  background: var(--color-brand);
+  box-shadow: 0 0 0 4px var(--color-brand-soft);
+}
+
+.atlas-pulse-text {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-pulse {
+    animation: none;
+  }
+}

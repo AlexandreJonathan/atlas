@@ -5,6 +5,7 @@ import FixedExpensesPanel from "../components/FixedExpensesPanel";
 import GoalModal from "../components/GoalModal";
 import GoalsPanel from "../components/GoalsPanel";
 import HomeHeader from "../components/home/HomeHeader";
+import AtlasPulse from "../components/home/AtlasPulse";
 import QuickActions, { type QuickActionId } from "../components/home/QuickActions";
 import WealthHero from "../components/home/WealthHero";
 import "../components/Panels.css";
@@ -72,6 +73,13 @@ function HomePage() {
           saldoDisponivel={resumo.saldo}
           receitasDoMes={resumo.receitasDoMes}
           despesasDoMes={resumo.despesasDoMes}
+        />
+
+        <AtlasPulse
+          contas={contas}
+          transacoes={transacoes}
+          planejamento={planejamento}
+          saldo={resumo.saldo}
         />
 
         <QuickActions onAction={handleQuickAction} />
