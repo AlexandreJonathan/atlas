@@ -1,0 +1,77 @@
+.atlas-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.atlas-quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.atlas-quick-action:active {
+  transform: scale(0.96);
+}
+
+.atlas-quick-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  transition:
+    background var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.atlas-quick-action-icon-receita {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.atlas-quick-action-icon-despesa {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.atlas-quick-action-icon-conta {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.atlas-quick-action-icon-meta {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+
+.atlas-quick-action-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 640px) {
+  .atlas-quick-actions {
+    gap: var(--space-5);
+  }
+
+  .atlas-quick-action-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .atlas-quick-action-label {
+    font-size: var(--font-size-sm);
+  }
+}

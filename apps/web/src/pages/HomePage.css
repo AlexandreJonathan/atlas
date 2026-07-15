@@ -13,16 +13,6 @@
   gap: var(--space-7);
 }
 
-.atlas-home-shortcuts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.atlas-home-shortcuts > * {
-  width: 100%;
-}
-
 .atlas-home-section {
   display: flex;
   flex-direction: column;
@@ -45,10 +35,6 @@
   .atlas-home {
     max-width: 560px;
     padding: var(--space-6) var(--space-5);
-  }
-
-  .atlas-home-shortcuts {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
 

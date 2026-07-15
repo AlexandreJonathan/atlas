@@ -1,4 +1,3 @@
-import { ArrowDownLeft, ArrowUpRight, Receipt, Target } from "lucide-react";
 import { useState } from "react";
 import AtlasIntelligencePanel from "../components/AtlasIntelligencePanel";
 import BillModal from "../components/BillModal";
@@ -6,13 +5,13 @@ import FixedExpensesPanel from "../components/FixedExpensesPanel";
 import GoalModal from "../components/GoalModal";
 import GoalsPanel from "../components/GoalsPanel";
 import HomeHeader from "../components/home/HomeHeader";
+import QuickActions, { type QuickActionId } from "../components/home/QuickActions";
 import WealthHero from "../components/home/WealthHero";
 import "../components/Panels.css";
 import PlanningPanel from "../components/PlanningPanel";
 import TransactionModal from "../components/TransactionModal";
 import TransactionsList from "../components/TransactionsList";
 import UpcomingBillsPanel from "../components/UpcomingBillsPanel";
-import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import MiniBarChart from "../components/ui/MiniBarChart";
 import { MOCK_INVESTMENTS } from "../data/mockInvestments";
@@ -56,6 +55,13 @@ function HomePage() {
   const nome = user?.user_metadata?.nome as string | undefined;
   const patrimonioTotal = resumo.saldo + MOCK_INVESTMENTS.patrimonioInvestido;
 
+  function handleQuickAction(id: QuickActionId) {
+    if (id === "receita") setModalAberto({ kind: "transaction", tipo: "receita" });
+    else if (id === "despesa") setModalAberto({ kind: "transaction", tipo: "despesa" });
+    else if (id === "conta") setModalAberto({ kind: "bill" });
+    else setModalAberto({ kind: "goal" });
+  }
+
   return (
     <div className="atlas-home">
       <HomeHeader nome={nome} email={user?.email} />
@@ -68,28 +74,7 @@ function HomePage() {
           despesasDoMes={resumo.despesasDoMes}
         />
 
-        <section className="atlas-home-shortcuts" aria-label="Atalhos rápidos">
-          <Button size="sm" onClick={() => setModalAberto({ kind: "transaction", tipo: "receita" })}>
-            <ArrowUpRight size={16} aria-hidden="true" />
-            Adicionar Receita
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => setModalAberto({ kind: "transaction", tipo: "despesa" })}
-          >
-            <ArrowDownLeft size={16} aria-hidden="true" />
-            Adicionar Despesa
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => setModalAberto({ kind: "bill" })}>
-            <Receipt size={16} aria-hidden="true" />
-            Pagar Conta
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => setModalAberto({ kind: "goal" })}>
-            <Target size={16} aria-hidden="true" />
-            Metas
-          </Button>
-        </section>
+        <QuickActions onAction={handleQuickAction} />
 
         <AtlasIntelligencePanel estado={recomendacoes} />
 
