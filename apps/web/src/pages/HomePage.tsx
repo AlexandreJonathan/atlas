@@ -1,12 +1,20 @@
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Landmark,
-  Receipt,
-  Target,
-  Wallet,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowDownLeft, ArrowUpRight, Receipt, Target } from "lucide-react";
+import { useState } from "react";
+import AtlasIntelligencePanel from "../components/AtlasIntelligencePanel";
+import BillModal from "../components/BillModal";
+import FixedExpensesPanel from "../components/FixedExpensesPanel";
+import GoalModal from "../components/GoalModal";
+import GoalsPanel from "../components/GoalsPanel";
+import HomeHeader from "../components/home/HomeHeader";
+import WealthHero from "../components/home/WealthHero";
+import "../components/Panels.css";
+import PlanningPanel from "../components/PlanningPanel";
+import TransactionModal from "../components/TransactionModal";
+import TransactionsList from "../components/TransactionsList";
+import UpcomingBillsPanel from "../components/UpcomingBillsPanel";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import MiniBarChart from "../components/ui/MiniBarChart";
 import { MOCK_INVESTMENTS } from "../data/mockInvestments";
 import { useAuth } from "../hooks/useAuth";
 import { useBills } from "../hooks/useBills";
@@ -17,22 +25,7 @@ import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
 import { useRecommendations } from "../hooks/useRecommendations";
 import { useTransactions } from "../hooks/useTransactions";
-import { gerarAtlasIntelligenceCopy, saudacaoPorHorario } from "../lib/atlasIntelligenceCopy";
 import type { TransactionType } from "../types/transaction";
-import AtlasIntelligencePanel from "../components/AtlasIntelligencePanel";
-import BillModal from "../components/BillModal";
-import FixedExpensesPanel from "../components/FixedExpensesPanel";
-import GoalModal from "../components/GoalModal";
-import GoalsPanel from "../components/GoalsPanel";
-import "../components/Panels.css";
-import PlanningPanel from "../components/PlanningPanel";
-import TransactionModal from "../components/TransactionModal";
-import TransactionsList from "../components/TransactionsList";
-import UpcomingBillsPanel from "../components/UpcomingBillsPanel";
-import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
-import MiniBarChart from "../components/ui/MiniBarChart";
-import StatCard from "../components/ui/StatCard";
 import "./HomePage.css";
 
 function formatarMoeda(valor: number): string {
@@ -60,41 +53,20 @@ function HomePage() {
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
-  const atlasCopy = useMemo(
-    () => gerarAtlasIntelligenceCopy(recomendacoes.recomendacoes),
-    [recomendacoes.recomendacoes],
-  );
-
-  const primeiroNome = (user?.user_metadata?.nome as string | undefined)?.split(" ")[0];
-  const saudacao = saudacaoPorHorario(new Date().getHours());
+  const nome = user?.user_metadata?.nome as string | undefined;
   const patrimonioTotal = resumo.saldo + MOCK_INVESTMENTS.patrimonioInvestido;
 
   return (
     <div className="atlas-home">
-      <header className="atlas-home-header">
-        <h1>
-          {saudacao}
-          {primeiroNome ? `, ${primeiroNome}` : ""}.
-        </h1>
-        {!recomendacoes.loading && <p>{atlasCopy.resumo}</p>}
-      </header>
+      <HomeHeader nome={nome} email={user?.email} />
 
       <main className="atlas-home-main">
-        <section className="atlas-home-hero-stats" aria-label="Patrimônio e saldo">
-          <StatCard
-            icon={<Landmark size={20} />}
-            label="Patrimônio total"
-            value={formatarMoeda(patrimonioTotal)}
-            tone="brand"
-            hint="Saldo + investimentos simulados"
-          />
-          <StatCard
-            icon={<Wallet size={20} />}
-            label="Saldo disponível"
-            value={formatarMoeda(resumo.saldo)}
-            tone={resumo.saldo < 0 ? "danger" : "success"}
-          />
-        </section>
+        <WealthHero
+          patrimonioTotal={patrimonioTotal}
+          saldoDisponivel={resumo.saldo}
+          receitasDoMes={resumo.receitasDoMes}
+          despesasDoMes={resumo.despesasDoMes}
+        />
 
         <section className="atlas-home-shortcuts" aria-label="Atalhos rápidos">
           <Button size="sm" onClick={() => setModalAberto({ kind: "transaction", tipo: "receita" })}>
