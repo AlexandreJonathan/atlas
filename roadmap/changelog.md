@@ -4,6 +4,25 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 9] — Atlas Premium Home (UX First)
+
+Redesenho completo da Home mobile-first: Hero premium, Atlas Pulse, Intelligence conversacional, seções de síntese. Sem alteração de banco/auth/engines. UX aprovada em `roadmap/ux-home-premium.md`.
+
+### Adicionado
+- `src/components/home/`: `HomeHeader`, `WealthHero`, `AtlasPulse`, `QuickActions`, `BillsTimeline`, `GoalsFocus`, `InvestmentsTeaser`, `PlanningSnapshot`, `TransactionsPreview`.
+- `src/lib/atlasPulse.ts`: seleção de uma mensagem inteligente por heurística local.
+- `roadmap/sprint-09.md`, proposta UX em `roadmap/ux-home-premium.md`.
+
+### Alterado
+- `HomePage.tsx`: nova composição e hierarquia; despesas fixas só dentro de Planejamento.
+- `AtlasIntelligencePanel`: layout conversacional (bolhas) + link para `/atlas-ia`.
+- Contas / Investimentos / Atlas IA: removidos badges/hints de “dados simulados”.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 8] — Atlas Experience 2.0 (Nova Arquitetura do Aplicativo)
 
 Missão de navegação/UX: a Atlas deixa de ser uma página única e passa a funcionar como app com Bottom Navigation e 5 abas. Sem Open Finance real, sem IA real, sem alteração de banco ou autenticação. Detalhes em `roadmap/sprint-08.md`.
