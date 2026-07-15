@@ -4,7 +4,7 @@
 
 O Atlas é uma aplicação web de organização financeira pessoal, composta por um front-end SPA (Single Page Application) construído com React, TypeScript e Vite, e por um backend gerenciado via Supabase (autenticação e banco de dados Postgres). O projeto está estruturado como um monorepo, com o front-end residindo em `apps/web`.
 
-Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado.
+Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com mocks estruturais para Open Finance, investimentos e chat de IA — sem integrações reais ainda.
 
 ## 2. Stack Tecnológica
 
@@ -48,13 +48,14 @@ atlas/
 │       │   │   │   ├── StatCard.tsx / .css
 │       │   │   │   ├── AtlasLogo.tsx / .css
 │       │   │   │   └── index.ts
+│       │   │   ├── layout/
+│       │   │   │   ├── AppShell.tsx / .css
+│       │   │   │   └── BottomNavigation.tsx / .css
 │       │   │   ├── Login.tsx
 │       │   │   ├── Register.tsx
 │       │   │   ├── ForgotPassword.tsx
 │       │   │   ├── ResetPassword.tsx
 │       │   │   ├── AuthLayout.tsx / .css
-│       │   │   ├── Dashboard.tsx
-│       │   │   ├── Dashboard.css
 │       │   │   ├── ProtectedRoute.tsx
 │       │   │   ├── TransactionModal.tsx
 │       │   │   ├── TransactionsList.tsx
@@ -83,6 +84,16 @@ atlas/
 │       │   │       ├── FixedExpensesStep.tsx
 │       │   │       ├── FirstGoalStep.tsx
 │       │   │       └── FinishStep.tsx
+│       │   ├── pages/
+│       │   │   ├── HomePage.tsx / .css
+│       │   │   ├── AccountsPage.tsx / .css
+│       │   │   ├── InvestmentsPage.tsx / .css
+│       │   │   ├── AtlasAIPage.tsx / .css
+│       │   │   └── ProfilePage.tsx / .css
+│       │   ├── data/
+│       │   │   ├── mockOpenFinance.ts
+│       │   │   ├── mockInvestments.ts
+│       │   │   └── mockAtlasAiChat.ts
 │       │   ├── contexts/
 │       │   │   └── AuthContext.tsx
 │       │   ├── hooks/
@@ -103,7 +114,10 @@ atlas/
 │       │   │   ├── dateUtils.ts
 │       │   │   ├── recommendationEngine.ts
 │       │   │   ├── planningEngine.ts
-│       │   │   └── atlasIntelligenceCopy.ts
+│       │   │   ├── atlasIntelligenceCopy.ts
+│       │   │   └── microinteractions/
+│       │   │       ├── types.ts
+│       │   │       └── index.ts
 │       │   ├── services/
 │       │   │   ├── transactionsService.ts
 │       │   │   ├── billsService.ts
@@ -205,26 +219,32 @@ Biblioteca de componentes reutilizáveis que sustenta toda a UI a partir da Spri
 - **`Button`**, **`Card`**, **`Input`**, **`Modal`**, **`Badge`**, **`ProgressBar`**, **`ProgressRing`**, **`MiniBarChart`**, **`StatCard`**, **`AtlasLogo`**.
 - Todas as classes CSS usam o prefixo `atlas-`. `Input` é compatível com `register()` do `react-hook-form` (encaminha `ref` via `forwardRef`).
 
-### 6.2 Componentes de domínio
+### 6.2 Shell e páginas (Sprint 8)
+
+- **`AppShell.tsx`**: layout autenticado com Bottom Navigation + `<Outlet />`; decide onboarding vs. app.
+- **`BottomNavigation.tsx`**: abas Início / Contas / Investimentos / Atlas IA / Perfil.
+- **`HomePage.tsx`**: Home moderna (substitui o antigo `Dashboard.tsx`); orquestra hooks financeiros e painéis existentes.
+- **`AccountsPage.tsx`**, **`InvestmentsPage.tsx`**, **`AtlasAIPage.tsx`**, **`ProfilePage.tsx`**: abas preparatórias (mocks em `src/data/`).
+
+### 6.3 Componentes de domínio
 
 - **`AuthLayout.tsx`** (Sprint 7): shell compartilhado por `Login`/`Register`/`ForgotPassword`/`ResetPassword` (logo, título, subtítulo, formulário, rodapé).
-- **`Login.tsx`** / **`Register.tsx`**: formulários de autenticação (`react-hook-form` + `zod`); tratam também os estados de e-mail não confirmado e cadastro pendente de confirmação (Sprint 6); migrados para `AuthLayout`/`Input`/`Button` na Sprint 7.
+- **`Login.tsx`** / **`Register.tsx`**: formulários de autenticação (`react-hook-form` + `zod`); tratam também os estados de e-mail não confirmado e cadastro pendente de confirmação (Sprint 6); migrados para `AuthLayout`/`Input`/`Button` na Sprint 7. Após sucesso, navegam para `/inicio`.
 - **`ForgotPassword.tsx`** / **`ResetPassword.tsx`** (Sprint 6): fluxo de recuperação de senha via Supabase Auth.
-- **`onboarding/OnboardingWizard.tsx`** (+ `WelcomeStep`, `IncomeStep`, `ReserveStep`, `FixedExpensesStep`, `FirstGoalStep`, `FinishStep`) (Sprint 6, migrado para o Design System na Sprint 7): wizard de primeiro acesso, substitui o `Dashboard.tsx` normal enquanto o onboarding não é concluído. Recebe os hooks `useFinancialProfile`/`useFixedExpenses`/`useGoals` já carregados pelo `Dashboard.tsx` (sem refetch).
-- **`Dashboard.tsx`**: orquestrador/layout da tela principal pós-login. Não contém lógica de negócio própria — chama `useTransactions`, `useBills`, `useGoals`, `useFinancialProfile` e `useFixedExpenses` uma única vez (evitando requisições duplicadas dos mesmos dados) e repassa os resultados como props para os widgets abaixo. Desde a Sprint 7, o cabeçalho exibe uma saudação personalizada (`user_metadata.nome`, quando disponível) e uma prévia de uma linha da Atlas Intelligence.
-- **`AtlasIntelligencePanel.tsx`** (Sprint 7; antes `RecommendationsPanel.tsx`): exibe as recomendações geradas por `useRecommendations`, cada uma com severidade (`SeverityBadge`) e mensagem, precedidas por uma saudação + resumo conversacional gerado por `src/lib/atlasIntelligenceCopy.ts` — identidade visual de destaque (glow de marca, ícone de "cérebro").
-- **`FinancialSummaryCards.tsx`**: `StatCard`s de saldo, receitas, despesas e "quanto posso gastar" (`useFinancialSummary`) + `MiniBarChart` comparando receitas x despesas do mês (Sprint 7).
-- **`PlanningPanel.tsx`** (+ `FinancialProfileModal.tsx`): `StatCard`s de "quanto posso gastar hoje", "quanto precisa guardar" e "saldo previsto até o fim do mês", um `ProgressRing` de saúde financeira do mês (Sprint 7) e um selo de risco financeiro (`SeverityBadge`). Enquanto o usuário não configura renda/reserva mínima, mostra uma chamada para ação em vez de números (Sprint 5).
-- **`FixedExpensesPanel.tsx`** (+ `FixedExpensesList.tsx`, `FixedExpenseModal.tsx`): despesas fixas recorrentes usadas no cálculo do planejamento financeiro (Sprint 5).
-- **`UpcomingBillsPanel.tsx`** (+ `BillsList.tsx`, `BillModal.tsx`): contas a pagar/receber vencidas ou vencendo em breve, com ação "marcar como paga".
-- **`GoalsPanel.tsx`** (+ `GoalsList.tsx`, `GoalModal.tsx`): metas financeiras com barra de progresso (`ProgressBar`) e aporte inline.
-- **`TransactionsList.tsx`**: lista de movimentações recentes; refatorado na Sprint 4 para usar `AsyncStateView`.
-- **`TransactionModal.tsx`** / **`BillModal.tsx`** / **`GoalModal.tsx`** / **`FinancialProfileModal.tsx`** / **`FixedExpenseModal.tsx`**: modais de criação/edição, todos construídos sobre o `Modal` compartilhado do Design System (`role="dialog"`, `aria-modal`, fechamento via `Esc`/clique fora, foco inicial).
-- **`Panels.css`** (Sprint 7): estilos compartilhados de cabeçalho de painel e linha de lista, usado pelos 4 painéis e pelas 4 listas — evita duplicar a mesma folha de estilo em 8 arquivos.
-- **`AsyncStateView.tsx`**: componente reutilizável que centraliza o padrão "carregando / erro com nova tentativa / vazio / conteúdo", usado por `TransactionsList`, `BillsList`, `GoalsList` e `FixedExpensesList`.
-- **`SeverityBadge.tsx`**: wrapper fino sobre `Badge` (Sprint 7); selo de severidade (crítica/atenção/positiva/informativa/neutra) sempre com ícone + texto, usado por `AtlasIntelligencePanel`, `BillsList` e `PlanningPanel` (risco financeiro).
-- **`ProtectedRoute.tsx`**: componente de guarda de rota, valida sessão real do Supabase via `useAuth`.
-
+- **`onboarding/OnboardingWizard.tsx`** (+ `WelcomeStep`, `IncomeStep`, `ReserveStep`, `FixedExpensesStep`, `FirstGoalStep`, `FinishStep`) (Sprint 6, Design System na Sprint 7): wizard de primeiro acesso, renderizado pelo `AppShell` enquanto o onboarding não é concluído.
+- **`AtlasIntelligencePanel.tsx`** (Sprint 7; antes `RecommendationsPanel.tsx`): exibe as recomendações geradas por `useRecommendations`, cada uma com severidade (`SeverityBadge`) e mensagem, precedidas por uma saudação + resumo conversacional gerado por `src/lib/atlasIntelligenceCopy.ts`.
+- **`FinancialSummaryCards.tsx`**: `StatCard`s + `MiniBarChart` (ainda disponível; a Home Sprint 8 usa `StatCard`/`MiniBarChart` diretamente na nova hierarquia).
+- **`PlanningPanel.tsx`** (+ `FinancialProfileModal.tsx`): planejamento financeiro do mês (Sprint 5), com `ProgressRing` (Sprint 7).
+- **`FixedExpensesPanel.tsx`** (+ `FixedExpensesList.tsx`, `FixedExpenseModal.tsx`): despesas fixas recorrentes.
+- **`UpcomingBillsPanel.tsx`** (+ `BillsList.tsx`, `BillModal.tsx`): contas a pagar/receber vencidas ou vencendo em breve.
+- **`GoalsPanel.tsx`** (+ `GoalsList.tsx`, `GoalModal.tsx`): metas financeiras com barra de progresso e aporte inline.
+- **`TransactionsList.tsx`**: lista de movimentações recentes.
+- **`TransactionModal.tsx`** / **`BillModal.tsx`** / **`GoalModal.tsx`** / **`FinancialProfileModal.tsx`** / **`FixedExpenseModal.tsx`**: modais sobre o `Modal` do Design System.
+- **`Panels.css`** (Sprint 7): estilos compartilhados de painéis e listas.
+- **`AsyncStateView.tsx`**: padrão loading/erro/vazio/conteúdo.
+- **`SeverityBadge.tsx`**: wrapper sobre `Badge`.
+- **`ProtectedRoute.tsx`**: guarda de rota via `useAuth`.
+- **`src/lib/microinteractions/`** (Sprint 8): contrato no-op para feedback futuro (animação/som/vibração).
 ## 7. Persistência de Dados Financeiros
 
 - **Tabela `transactions`**: `id`, `user_id`, `type` (`receita`/`despesa`), `description`, `amount`, `created_at`.

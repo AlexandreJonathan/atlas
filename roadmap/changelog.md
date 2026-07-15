@@ -4,6 +4,34 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 8] — Atlas Experience 2.0 (Nova Arquitetura do Aplicativo)
+
+Missão de navegação/UX: a Atlas deixa de ser uma página única e passa a funcionar como app com Bottom Navigation e 5 abas. Sem Open Finance real, sem IA real, sem alteração de banco ou autenticação. Detalhes em `roadmap/sprint-08.md`.
+
+### Adicionado
+- `src/components/layout/AppShell.tsx` + `BottomNavigation.tsx` (shell autenticado + nav inferior fixa).
+- Páginas: `src/pages/HomePage.tsx`, `AccountsPage.tsx`, `InvestmentsPage.tsx`, `AtlasAIPage.tsx`, `ProfilePage.tsx`.
+- Mocks tipados: `src/data/mockOpenFinance.ts`, `mockInvestments.ts`, `mockAtlasAiChat.ts`.
+- `src/lib/microinteractions/` — API no-op para animações/sons/vibração futuras.
+- Rotas `/inicio`, `/contas`, `/investimentos`, `/atlas-ia`, `/perfil`; redirects de `/` e `/dashboard` → `/inicio`.
+
+### Alterado
+- `App.tsx`: rotas aninhadas sob `ProtectedRoute` + `AppShell`.
+- Login/Cadastro/Redefinir senha navegam para `/inicio`.
+- `saudacaoPorHorario` exportada de `atlasIntelligenceCopy.ts` para a saudação da Home.
+- Onboarding permanece no `AppShell` (substitui o app até concluir/adiar).
+
+### Removido
+- `Dashboard.tsx` / `Dashboard.css` — substituídos por `HomePage` + shell.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+### Documentação
+- `roadmap/sprint-08.md` criado; `arquitetura.md`, `backlog.md`, `docs/deploy.md` atualizados.
+
+---
+
 ## [Sprint 7] — Atlas Premium Experience (Design System + Dashboard 2.0)
 
 Missão exclusivamente visual/UX (Fases 1 a 5 do plano da missão): criação do Design System oficial da Atlas e redesenho completo de Auth, Onboarding, Dashboard e da nova identidade "Atlas Intelligence" — nenhuma alteração de regra de negócio, banco de dados, RLS ou autenticação. Detalhes completos em `roadmap/sprint-07.md` e `roadmap/design-system.md`.

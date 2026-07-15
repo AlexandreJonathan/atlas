@@ -100,7 +100,7 @@ Abra o endereço da Vercel num navegador (de preferência também no celular) e 
 - [ ] Cadastrar uma conta a pagar.
 - [ ] Clicar em "Esqueci minha senha", verificar se o e-mail chega, e redefinir a senha pelo link.
 - [ ] Sair (logout) e entrar novamente.
-- [ ] Recarregar a página estando em `/dashboard` (não deve dar erro nem tela em branco).
+- [ ] Recarregar a página estando em `/inicio` (não deve dar erro nem tela em branco).
 - [ ] Testar tudo isso pelo celular também.
 
 Se tudo funcionar, a Atlas está publicada e pronta para uso real. 🎉
@@ -113,7 +113,7 @@ Se tudo funcionar, a Atlas está publicada e pronta para uso real. 🎉
 |---|---|---|
 | Site abre mas mostra aviso "Supabase não está configurado" | Variáveis de ambiente erradas ou não salvas na Vercel | Vercel → seu projeto → "Settings" → "Environment Variables" → confirmar os dois valores → "Redeploy" |
 | Link de "esqueci minha senha" não funciona (dá erro ou volta ao login) | Redirect URL não configurada no Supabase | Repetir o Passo 6 com o endereço exato (sem erro de digitação, incluindo `/redefinir-senha`) |
-| Recarregar a página em `/dashboard` mostra erro 404 | Configuração de rewrite não aplicada | Confirmar que o arquivo `apps/web/vercel.json` existe no repositório e que "Root Directory" está configurado como `apps/web` (Passo 5) |
+| Recarregar a página em `/inicio` mostra erro 404 | Configuração de rewrite não aplicada | Confirmar que o arquivo `apps/web/vercel.json` existe no repositório e que "Root Directory" está configurado como `apps/web` (Passo 5) |
 | Cadastro funciona mas login diz "e-mail não confirmado" e o e-mail nunca chega | Provedor de e-mail do Supabase (modo gratuito tem limite de envios) | Em "Confirm email", pode desligar temporariamente para os primeiros testes, ou configurar um provedor de e-mail próprio (SMTP) nas configurações avançadas de Authentication |
 
 ---

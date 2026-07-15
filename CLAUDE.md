@@ -18,12 +18,12 @@ O projeto é desenvolvido de forma incremental, em sprints, com cada etapa docum
 ## 3. Arquitetura Atual
 
 - **Estrutura**: monorepo, com o front-end em `apps/web` (React + TypeScript + Vite).
-- **Roteamento**: `react-router-dom` (`BrowserRouter` configurado em `main.tsx`; rotas declarativas em `App.tsx`).
-- **Autenticação**: Supabase Auth (`@supabase/supabase-js`), com sessão gerenciada via `AuthContext`/`useAuth` (`src/contexts`, `src/hooks`) e rotas protegidas por `ProtectedRoute.tsx`.
-- **Formulários**: `react-hook-form` + `zod` (`src/validations`), com tipos centralizados em `src/types`.
-- **Cliente de API externo**: `src/lib/supabase.ts` (client único, configurado via variáveis de ambiente do Vite).
-- **Estado**: local por componente (`useState`); ainda sem gerenciador de estado global nem persistência de dados financeiros em backend (previsto no roadmap).
-- **Estilo**: CSS puro por componente, sem design system consolidado ainda.
+- **Roteamento**: `react-router-dom` (`BrowserRouter` em `main.tsx`; rotas em `App.tsx`). App autenticado sob `AppShell` + Bottom Navigation (`/inicio`, `/contas`, `/investimentos`, `/atlas-ia`, `/perfil`). `/dashboard` redireciona para `/inicio`.
+- **Autenticação**: Supabase Auth (`@supabase/supabase-js`), com sessão via `AuthContext`/`useAuth` e rotas protegidas por `ProtectedRoute.tsx`.
+- **Formulários**: `react-hook-form` + `zod` (`src/validations`), tipos em `src/types`.
+- **Cliente de API**: `src/lib/supabase.ts` (client único, via env Vite).
+- **Estado**: local por componente/hooks; mocks tipados em `src/data/` para Contas/Investimentos/Atlas IA (Sprint 8).
+- **Estilo**: Design System (`src/styles/tokens.css` + `src/components/ui/`), CSS por componente.
 
 A descrição completa e atualizada da arquitetura vive em [`roadmap/arquitetura.md`](./roadmap/arquitetura.md) — este documento deve ser a fonte detalhada; este `CLAUDE.md` mantém apenas um resumo de alto nível.
 

@@ -33,7 +33,7 @@ input {
 }
 
 /* Estado de carregamento em tela cheia — usado por ProtectedRoute,
-   ResetPassword e Dashboard (aguardando status do onboarding). */
+   ResetPassword e AppShell (aguardando status do onboarding). */
 .atlas-page-loader {
   min-height: 100vh;
   display: flex;

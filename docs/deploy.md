@@ -82,7 +82,7 @@ Qualquer provedor de hosting estático/CDN com suporte a SPA (fallback de todas 
   - Build command: `npm run build`
   - Output directory: `dist`
   - Variáveis de ambiente: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
-  - Ambos já fazem fallback de SPA automaticamente para projetos Vite/React detectados; `apps/web/vercel.json` torna esse comportamento explícito (regra de rewrite `/(.*) → /index.html`, necessária para rotas como `/dashboard` funcionarem em um recarregamento direto do navegador, já que o roteamento é 100% client-side via `react-router-dom`) e define `Cache-Control` de longa duração e imutável para `/assets/*` (arquivos com hash no nome gerados pelo Vite a cada build — seguro cachear "para sempre") e `no-cache`/`must-revalidate` para `index.html` (garante que o usuário sempre recebe a referência aos arquivos da versão mais recente após um novo deploy, evitando servir um `index.html` antigo apontando para assets que não existem mais).
+  - Ambos já fazem fallback de SPA automaticamente para projetos Vite/React detectados; `apps/web/vercel.json` torna esse comportamento explícito (regra de rewrite `/(.*) → /index.html`, necessária para rotas como `/inicio` ou `/perfil` funcionarem em um recarregamento direto do navegador, já que o roteamento é 100% client-side via `react-router-dom`) e define `Cache-Control` de longa duração e imutável para `/assets/*` (arquivos com hash no nome gerados pelo Vite a cada build — seguro cachear "para sempre") e `no-cache`/`must-revalidate` para `index.html` (garante que o usuário sempre recebe a referência aos arquivos da versão mais recente após um novo deploy, evitando servir um `index.html` antigo apontando para assets que não existem mais).
 - **HTTPS obrigatório**: tanto Vercel quanto Netlify fornecem TLS automático; qualquer outra hospedagem deve garantir HTTPS antes de convidar usuários reais (formulários de login/senha nunca devem tramitar em HTTP puro).
 
 ## 5.1 Performance do Build (revisado, não otimizado nesta missão)
@@ -105,7 +105,7 @@ Avaliação do bundle de produção atual, documentada para decisão futura (nen
 - [ ] Variáveis `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas no ambiente de build de produção (nunca a `service_role`).
 - [ ] "Root Directory" do projeto na plataforma de hospedagem configurado como `apps/web` (o repositório não tem `package.json` na raiz — é `apps/web` que contém a aplicação real).
 - [ ] `npm run lint` e `npm run build` executados sem erros a partir de uma checkout limpa (não só localmente).
-- [ ] Deploy publicado com HTTPS e fallback de SPA funcionando (`apps/web/vercel.json` já define a regra de rewrite `/(.*) → /index.html` para Vercel) — testar recarregar a página em `/dashboard` diretamente pela URL.
+- [ ] Deploy publicado com HTTPS e fallback de SPA funcionando (`apps/web/vercel.json` já define a regra de rewrite `/(.*) → /index.html` para Vercel) — testar recarregar a página em `/inicio` (e em `/perfil`) diretamente pela URL.
 - [ ] Teste manual completo em produção: cadastro → (confirmação de e-mail, se habilitada) → login → esqueci minha senha → redefinição → onboarding guiado → transações/contas/metas/planejamento → logout.
 - [ ] Teste manual em pelo menos um dispositivo mobile real (não apenas emulação) para os fluxos de login/cadastro/onboarding.
 - [ ] Canal definido para os alpha testers reportarem bugs/feedback (ex: formulário, e-mail dedicado, ou canal de chat).

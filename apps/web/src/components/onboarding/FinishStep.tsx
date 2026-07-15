@@ -25,7 +25,7 @@ function FinishStep({
       </span>
 
       <h2>Tudo pronto!</h2>
-      <p>Confira o que configuramos. Você pode ajustar tudo isso a qualquer momento no Dashboard.</p>
+      <p>Confira o que configuramos. Você pode ajustar tudo isso a qualquer momento no Início.</p>
 
       <div className="atlas-onboarding-resumo">
         <div className="atlas-onboarding-resumo-linha">

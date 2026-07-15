@@ -48,7 +48,7 @@ function Login() {
       return;
     }
 
-    navigate("/dashboard");
+    navigate("/inicio");
   }
 
   async function handleReenviarConfirmacao() {

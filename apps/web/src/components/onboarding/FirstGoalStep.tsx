@@ -52,7 +52,7 @@ function FirstGoalStep({ metas, onVoltar, onAvancar }: FirstGoalStepProps) {
       </span>
 
       <h2>Que tal já criar sua primeira meta?</h2>
-      <p>Uma viagem, uma reserva maior, um objeto que você quer comprar. É opcional — você pode criar depois no Dashboard.</p>
+      <p>Uma viagem, uma reserva maior, um objeto que você quer comprar. É opcional — você pode criar depois no Início.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Input

@@ -83,7 +83,7 @@ function ResetPassword() {
     }
 
     setSucesso(true);
-    setTimeout(() => navigate("/dashboard"), 1500);
+    setTimeout(() => navigate("/inicio"), 1500);
   }
 
   if (estadoLink === "verificando") {

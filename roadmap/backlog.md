@@ -71,8 +71,13 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - 🟢 Modo claro/escuro (dark mode) configurável pelo usuário — a Atlas é 100% tema escuro desde a Sprint 7 (Design System); alternância clara/escura ainda não implementada
 - ✅ ~~Acessibilidade (ARIA, navegação por teclado, contraste) — estender `aria-label` para `Login.tsx`/`Register.tsx`~~ — concluído na Auto Code Review da Missão Alpha Ready: modais e o wizard de onboarding já possuem `role="dialog"`/`aria-modal`; `ProgressBar` e a barra de progresso do onboarding usam `role="progressbar"`; severidade sempre com ícone+texto (`SeverityBadge`); `Login.tsx`/`Register.tsx` passaram a ter `aria-label` em todos os campos, no mesmo padrão já usado pelo restante da aplicação
 - 🟡 Revisar contraste de cores (WCAG AA) de forma sistemática com a nova paleta do Design System (Sprint 7) — os tons foram escolhidos visualmente, sem auditoria formal de contraste ainda
-- 🟡 Permitir revisitar/editar manualmente os dados coletados no onboarding (hoje só é possível pelos painéis normais do Dashboard após concluído — funcional, mas sem um link direto de volta ao wizard)
-- 🟢 Code-splitting dos 5 modais e do `OnboardingWizard` via `React.lazy` — oportunidade natural após a Sprint 7 (todos os modais compartilham `components/ui/Modal.tsx`), para mitigar o aviso de bundle >500 kB
+- 🟡 Permitir revisitar/editar manualmente os dados coletados no onboarding (hoje só é possível pelos painéis normais da Home após concluído — funcional, mas sem um link direto de volta ao wizard)
+- ✅ ~~Navegação por abas (Bottom Navigation) e arquitetura multi-página~~ — concluído na Sprint 8 (`AppShell` + 5 abas: Início, Contas, Investimentos, Atlas IA, Perfil)
+- 🟡 Implementar `triggerMicrointeraction` (animação/som/haptic) — arquitetura no-op criada na Sprint 8 (`src/lib/microinteractions/`)
+- 🟢 Code-splitting das páginas das abas e dos 5 modais/`OnboardingWizard` via `React.lazy` — para mitigar o aviso de bundle >500 kB
+- 🔴 Open Finance real (conectar bancos) — tela Contas preparada com mock na Sprint 8
+- 🔴 IA real (LLM) na aba Atlas IA — chat premium com mensagens simuladas na Sprint 8
+- 🟡 Investimentos reais (somente leitura/estudo primeiro; a Atlas não vende investimentos) — estrutura mock na Sprint 8
 
 ## 7. Infraestrutura e DevOps
 
@@ -90,7 +95,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 ## 8. Estado Global e Arquitetura de Front-end
 
 - 🟡 Avaliar necessidade de gerenciador de estado global (Context API, Zustand ou Redux) à medida que a aplicação cresce
-- 🟢 Introduzir camada de cache de dados (React Query / TanStack Query) — mitigaria a necessidade atual de repassar `useTransactions`/`useBills`/`useGoals`/`useFinancialProfile`/`useFixedExpenses` como props a partir de `Dashboard.tsx` para evitar buscas duplicadas
+- 🟢 Introduzir camada de cache de dados (React Query / TanStack Query) — mitigaria buscas duplicadas quando `AppShell` (onboarding) e `HomePage` carregam os mesmos hooks de perfil/metas/despesas fixas
 - 🟢 `npm run build` alerta que o bundle único (`index-*.js`) já passa de 500 kB minificado; ver seção 6 para o plano de code-splitting via `React.lazy`
 
 ---

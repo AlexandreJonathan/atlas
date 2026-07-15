@@ -11,7 +11,7 @@ export type AtlasIntelligenceCopy = {
 // Missão 04). Nenhuma regra de negócio nova: zero I/O, zero cálculo
 // financeiro — apenas transforma dados que já existem em uma saudação e um
 // resumo em linguagem natural.
-function saudacaoPorHorario(hora: number): string {
+export function saudacaoPorHorario(hora: number): string {
   if (hora < 12) return "Bom dia";
   if (hora < 18) return "Boa tarde";
   return "Boa noite";

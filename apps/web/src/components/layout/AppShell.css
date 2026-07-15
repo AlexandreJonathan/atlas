@@ -1,0 +1,12 @@
+.atlas-app-shell {
+  min-height: 100vh;
+  background: var(--color-bg-canvas);
+  display: flex;
+  flex-direction: column;
+}
+
+.atlas-app-shell-content {
+  flex: 1;
+  /* Espaço para a Bottom Navigation fixa + safe area */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}

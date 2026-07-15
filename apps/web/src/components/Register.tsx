@@ -57,7 +57,7 @@ function Register() {
     // uma tela dedicada avisando que é preciso confirmar o e-mail antes de
     // entrar, com opção de reenvio.
     if (data.session) {
-      navigate("/dashboard");
+      navigate("/inicio");
       return;
     }
 
