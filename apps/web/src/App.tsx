@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 
-import Login from "./components/Login";
-import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
+import ForgotPassword from "./components/ForgotPassword";
+import Login from "./components/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Register from "./components/Register";
+import ResetPassword from "./components/ResetPassword";
+
 function App() {
-  const [tela, setTela] = useState("dashboard");
-  console.log(tela);
   return (
-    <>
-      {tela === "login" ? (
-        <Login irParaCadastro={() => setTela("cadastro")} entrar={() => setTela("dashboard")} />
-      ) : tela === "cadastro" ? (
-        <Register voltarLogin={() => setTela("login")} />
-      ) : (
-        <Dashboard />
-      )}
-    </>
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<Register />} />
+      <Route path="/esqueci-senha" element={<ForgotPassword />} />
+      <Route path="/redefinir-senha" element={<ResetPassword />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 

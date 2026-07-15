@@ -1,0 +1,275 @@
+# Arquitetura — Atlas
+
+## 1. Visão Geral
+
+O Atlas é uma aplicação web de organização financeira pessoal, composta por um front-end SPA (Single Page Application) construído com React, TypeScript e Vite, e por um backend gerenciado via Supabase (autenticação e banco de dados Postgres). O projeto está estruturado como um monorepo, com o front-end residindo em `apps/web`.
+
+Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`).
+
+## 2. Stack Tecnológica
+
+| Camada              | Tecnologia            | Versão   |
+|---------------------|------------------------|----------|
+| Linguagem           | TypeScript             | ~6.0.2   |
+| Framework UI        | React                  | ^19.2.7  |
+| Bundler / Dev Server| Vite                   | ^8.1.1   |
+| Roteamento          | react-router-dom       | ^7.18.1  |
+| Formulários/validação | react-hook-form + zod | ^7.81.0 / ^4.4.3 |
+| Backend / Auth / Dados | Supabase (`@supabase/supabase-js`) | ^2.110.2 |
+| Lint                | ESLint + typescript-eslint | ^10.6.0 / ^8.62.0 |
+| Estilo              | CSS puro (arquivos `.css` por componente) | — |
+
+Nenhuma biblioteca de datas (`date-fns`/`dayjs`) foi adicionada — cálculos de vencimento usam utilitários próprios (`src/lib/dateUtils.ts`) sobre `Date` nativo, suficiente para o volume e a complexidade atuais.
+
+## 3. Estrutura de Diretórios
+
+```
+atlas/
+├── CLAUDE.md
+├── apps/
+│   └── web/
+│       ├── public/
+│       │   └── icons.svg
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── Login.tsx
+│       │   │   ├── Register.tsx
+│       │   │   ├── ForgotPassword.tsx
+│       │   │   ├── ResetPassword.tsx
+│       │   │   ├── Dashboard.tsx
+│       │   │   ├── Dashboard.css
+│       │   │   ├── ProtectedRoute.tsx
+│       │   │   ├── TransactionModal.tsx
+│       │   │   ├── TransactionsList.tsx
+│       │   │   ├── FinancialSummaryCards.tsx
+│       │   │   ├── RecommendationsPanel.tsx
+│       │   │   ├── UpcomingBillsPanel.tsx
+│       │   │   ├── BillsList.tsx
+│       │   │   ├── BillModal.tsx
+│       │   │   ├── GoalsPanel.tsx
+│       │   │   ├── GoalsList.tsx
+│       │   │   ├── GoalModal.tsx
+│       │   │   ├── AsyncStateView.tsx
+│       │   │   ├── ProgressBar.tsx
+│       │   │   ├── SeverityBadge.tsx
+│       │   │   ├── PlanningPanel.tsx
+│       │   │   ├── FinancialProfileModal.tsx
+│       │   │   ├── FixedExpensesPanel.tsx
+│       │   │   ├── FixedExpensesList.tsx
+│       │   │   ├── FixedExpenseModal.tsx
+│       │   │   └── onboarding/
+│       │   │       ├── OnboardingWizard.tsx
+│       │   │       ├── OnboardingWizard.css
+│       │   │       ├── WelcomeStep.tsx
+│       │   │       ├── IncomeStep.tsx
+│       │   │       ├── ReserveStep.tsx
+│       │   │       ├── FixedExpensesStep.tsx
+│       │   │       ├── FirstGoalStep.tsx
+│       │   │       └── FinishStep.tsx
+│       │   ├── contexts/
+│       │   │   └── AuthContext.tsx
+│       │   ├── hooks/
+│       │   │   ├── useAuth.ts
+│       │   │   ├── useTransactions.ts
+│       │   │   ├── useBills.ts
+│       │   │   ├── useGoals.ts
+│       │   │   ├── useFinancialSummary.ts
+│       │   │   ├── useRecommendations.ts
+│       │   │   ├── useFinancialProfile.ts
+│       │   │   ├── useFixedExpenses.ts
+│       │   │   ├── usePlanning.ts
+│       │   │   └── useOnboarding.ts
+│       │   ├── lib/
+│       │   │   ├── supabase.ts
+│       │   │   ├── authErrors.ts
+│       │   │   ├── errorMessages.ts
+│       │   │   ├── dateUtils.ts
+│       │   │   ├── recommendationEngine.ts
+│       │   │   └── planningEngine.ts
+│       │   ├── services/
+│       │   │   ├── transactionsService.ts
+│       │   │   ├── billsService.ts
+│       │   │   ├── goalsService.ts
+│       │   │   ├── financialProfileService.ts
+│       │   │   ├── fixedExpensesService.ts
+│       │   │   └── onboardingService.ts
+│       │   ├── types/
+│       │   │   ├── auth.ts
+│       │   │   ├── transaction.ts
+│       │   │   ├── bill.ts
+│       │   │   ├── goal.ts
+│       │   │   ├── recommendation.ts
+│       │   │   ├── financialProfile.ts
+│       │   │   ├── fixedExpense.ts
+│       │   │   ├── planning.ts
+│       │   │   └── onboarding.ts
+│       │   ├── validations/
+│       │   │   ├── loginSchema.ts
+│       │   │   ├── registerSchema.ts
+│       │   │   ├── forgotPasswordSchema.ts
+│       │   │   ├── resetPasswordSchema.ts
+│       │   │   ├── transactionSchema.ts
+│       │   │   ├── billSchema.ts
+│       │   │   ├── goalSchema.ts
+│       │   │   ├── financialProfileSchema.ts
+│       │   │   └── fixedExpenseSchema.ts
+│       │   ├── App.tsx
+│       │   ├── App.css
+│       │   ├── main.tsx
+│       │   ├── index.css
+│       │   └── vite-env.d.ts
+│       ├── index.html
+│       ├── package.json
+│       ├── .env.example
+│       ├── vite.config.ts
+│       ├── vercel.json
+│       ├── tsconfig.json
+│       ├── tsconfig.app.json
+│       ├── tsconfig.node.json
+│       └── eslint.config.js
+├── supabase/
+│   └── migrations/
+│       ├── 20260712210000_create_transactions_table.sql
+│       ├── 20260712220000_create_bills_table.sql
+│       ├── 20260712220100_create_goals_table.sql
+│       ├── 20260714000000_create_financial_profiles_table.sql
+│       ├── 20260714000100_create_fixed_expenses_table.sql
+│       └── 20260714100000_create_onboarding_status_table.sql
+├── docs/
+│   ├── deploy.md
+│   └── guia-deploy-fundador.md
+├── packages/
+└── roadmap/
+    ├── arquitetura.md
+    ├── backlog.md
+    ├── changelog.md
+    └── sprint-0X.md
+```
+
+## 4. Roteamento
+
+O roteamento é gerenciado pelo `react-router-dom` v7, utilizando `BrowserRouter`. A configuração ocorre em duas camadas:
+
+- **`main.tsx`**: envolve a aplicação com `<AuthProvider>` e `<BrowserRouter>`, definindo o contexto de autenticação e o ponto único de entrada para o roteamento.
+- **`App.tsx`**: define as rotas via `<Routes>` / `<Route>`, sem qualquer lógica de navegação baseada em estado local (`useState`).
+
+### Mapa de rotas atual
+
+| Rota               | Componente        | Acesso     |
+|--------------------|--------------------|------------|
+| `/`                | Redirect → `/dashboard` | Público |
+| `/login`           | `Login`            | Público    |
+| `/cadastro`        | `Register`         | Público    |
+| `/esqueci-senha`   | `ForgotPassword`   | Público (Sprint 6) |
+| `/redefinir-senha` | `ResetPassword`    | Público, mas exige uma sessão de recuperação válida (link do Supabase Auth) — ver seção 5 (Sprint 6) |
+| `/dashboard`       | `Dashboard`         | Protegido (`ProtectedRoute`); exibe o onboarding guiado em vez do conteúdo normal enquanto não for concluído (Sprint 6) |
+
+## 5. Autenticação
+
+A autenticação é real, via **Supabase Auth**:
+
+- `Login.tsx` chama `supabase.auth.signInWithPassword`.
+- `Register.tsx` chama `supabase.auth.signUp`, armazenando o nome informado em `user_metadata`.
+- A sessão é gerenciada globalmente por `AuthContext`/`useAuth` (`src/contexts/AuthContext.tsx`, `src/hooks/useAuth.ts`), que escuta `supabase.auth.onAuthStateChange` e expõe `user`, `session`, `loading` e `signOut`.
+- `ProtectedRoute.tsx` consome `useAuth()` e redireciona para `/login` quando não há sessão ativa (após o carregamento inicial ser resolvido).
+- Logout real disponível no `Dashboard.tsx` (botão "Sair"), via `signOut()`, com `try/finally` garantindo o redirecionamento mesmo se a chamada falhar.
+- Não há mais nenhum uso de `localStorage` para controle de autenticação — a persistência de sessão entre recarregamentos é feita pelo próprio SDK do Supabase (comportamento padrão da biblioteca).
+- Erros de autenticação são traduzidos para mensagens amigáveis via `src/lib/authErrors.ts`.
+- **Recuperação de senha (Sprint 6)**: `ForgotPassword.tsx` chama `supabase.auth.resetPasswordForEmail(email, { redirectTo })`, sempre exibindo a mesma mensagem de sucesso (evita revelar quais e-mails estão cadastrados). `ResetPassword.tsx` aguarda o evento `PASSWORD_RECOVERY` de `onAuthStateChange` (com fallback via `getSession()` e timeout de 4s para tratar link inválido/expirado) antes de permitir `supabase.auth.updateUser({ password })`. Exige configurar a "Redirect URL" correspondente no projeto Supabase (ver `docs/deploy.md`).
+- **Confirmação de e-mail (Sprint 6)**: `Register.tsx` verifica se `signUp` retornou uma sessão imediata; se não (confirmação exigida pelo projeto), mostra uma tela dedicada com o e-mail cadastrado e permite reenviar a confirmação (`supabase.auth.resend`). `Login.tsx` oferece o mesmo reenvio quando o erro de login é especificamente "e-mail não confirmado" (`MENSAGEM_EMAIL_NAO_CONFIRMADO`, exportada por `authErrors.ts`).
+
+## 6. Componentes Principais
+
+- **`Login.tsx`** / **`Register.tsx`**: formulários de autenticação (`react-hook-form` + `zod`); tratam também os estados de e-mail não confirmado e cadastro pendente de confirmação (Sprint 6).
+- **`ForgotPassword.tsx`** / **`ResetPassword.tsx`** (Sprint 6): fluxo de recuperação de senha via Supabase Auth.
+- **`onboarding/OnboardingWizard.tsx`** (+ `WelcomeStep`, `IncomeStep`, `ReserveStep`, `FixedExpensesStep`, `FirstGoalStep`, `FinishStep`) (Sprint 6): wizard de primeiro acesso, substitui o `Dashboard.tsx` normal enquanto o onboarding não é concluído. Recebe os hooks `useFinancialProfile`/`useFixedExpenses`/`useGoals` já carregados pelo `Dashboard.tsx` (sem refetch).
+- **`Dashboard.tsx`**: orquestrador/layout da tela principal pós-login. Não contém lógica de negócio própria — chama `useTransactions`, `useBills`, `useGoals`, `useFinancialProfile` e `useFixedExpenses` uma única vez (evitando requisições duplicadas dos mesmos dados) e repassa os resultados como props para os widgets abaixo.
+- **`RecommendationsPanel.tsx`**: exibe as recomendações geradas por `useRecommendations`, cada uma com severidade (`SeverityBadge`) e mensagem.
+- **`FinancialSummaryCards.tsx`**: cards de saldo, receitas, despesas e "quanto posso gastar" (`useFinancialSummary`).
+- **`PlanningPanel.tsx`** (+ `FinancialProfileModal.tsx`): cards de "quanto posso gastar hoje", "quanto precisa guardar" e "saldo previsto até o fim do mês", mais um selo de risco financeiro (`SeverityBadge`). Enquanto o usuário não configura renda/reserva mínima, mostra uma chamada para ação em vez de números (Sprint 5).
+- **`FixedExpensesPanel.tsx`** (+ `FixedExpensesList.tsx`, `FixedExpenseModal.tsx`): despesas fixas recorrentes usadas no cálculo do planejamento financeiro (Sprint 5).
+- **`UpcomingBillsPanel.tsx`** (+ `BillsList.tsx`, `BillModal.tsx`): contas a pagar/receber vencidas ou vencendo em breve, com ação "marcar como paga".
+- **`GoalsPanel.tsx`** (+ `GoalsList.tsx`, `GoalModal.tsx`): metas financeiras com barra de progresso (`ProgressBar`) e aporte inline.
+- **`TransactionsList.tsx`**: lista de movimentações recentes; refatorado na Sprint 4 para usar `AsyncStateView`.
+- **`TransactionModal.tsx`** / **`BillModal.tsx`** / **`GoalModal.tsx`** / **`FinancialProfileModal.tsx`** / **`FixedExpenseModal.tsx`**: modais de criação/edição, todos com `role="dialog"`, `aria-modal`, fechamento via `Esc` e foco inicial.
+- **`AsyncStateView.tsx`**: componente reutilizável que centraliza o padrão "carregando / erro com nova tentativa / vazio / conteúdo", usado por `TransactionsList`, `BillsList`, `GoalsList` e `FixedExpensesList`.
+- **`ProgressBar.tsx`**: barra de progresso acessível (`role="progressbar"`, `aria-value*`), usada por `GoalsList`.
+- **`SeverityBadge.tsx`**: selo de severidade (crítica/atenção/positiva/informativa/neutra) sempre com ícone + texto, usado por `RecommendationsPanel`, `BillsList` e `PlanningPanel` (risco financeiro).
+- **`ProtectedRoute.tsx`**: componente de guarda de rota, valida sessão real do Supabase via `useAuth`.
+
+## 7. Persistência de Dados Financeiros
+
+- **Tabela `transactions`**: `id`, `user_id`, `type` (`receita`/`despesa`), `description`, `amount`, `created_at`.
+- **Tabela `bills`** (Sprint 4): `id`, `user_id`, `type` (`a_pagar`/`a_receber`), `description`, `amount`, `due_date`, `status` (`pendente`/`pago`), `paid_at`, `created_at`.
+- **Tabela `goals`** (Sprint 4): `id`, `user_id`, `title`, `target_amount`, `current_amount`, `target_date`, `created_at`. Progresso (%) e "concluída" são derivados no front-end (`current_amount / target_amount`), não armazenados.
+- **Tabela `financial_profiles`** (Sprint 5): `user_id` (chave primária, 1:1 com `auth.users`), `monthly_income`, `minimum_reserve`, `updated_at`. Salva via `upsert` (sem distinguir criação de atualização).
+- **Tabela `fixed_expenses`** (Sprint 5): `id`, `user_id`, `description`, `amount`, `created_at`. Sem coluna de vencimento — despesa mensal recorrente por definição; o valor total é sempre considerado "a ocorrer" no cálculo do mês.
+- **Tabela `onboarding_status`** (Sprint 6): `user_id` (chave primária, 1:1 com `auth.users`), `current_step` (1 a 6), `completed_at` (nulo até a conclusão), `updated_at`. Salva via `upsert`, mesmo padrão de `financial_profiles`.
+- **Segurança**: Row Level Security habilitada em todas as seis tabelas; cada usuário só acessa suas próprias linhas (`auth.uid() = user_id`). Migrações versionadas em `supabase/migrations/`. Operações de update/delete também filtram explicitamente por `user_id` na query (defesa em profundidade além do RLS, adotada na revisão da Sprint 4).
+- **Camadas de serviço**: `transactionsService.ts`, `billsService.ts`, `goalsService.ts`, `financialProfileService.ts`, `fixedExpensesService.ts`, `onboardingService.ts` — cada uma isola todo o acesso direto ao client do Supabase para seu domínio (`list*`, `create*`, `delete*`, além de `markBillAsPaid`/`updateGoalProgress`/`getProfile`/`upsertProfile`/`getStatus`/`upsertStatus`). Todas usam o helper único `getSupabaseClient()` (`lib/supabase.ts`).
+- **Sem dados mockados**: nenhuma movimentação, conta, meta, perfil ou despesa fixa é simulada; tudo é lido/escrito no Supabase.
+- **Limitações atuais**: edição (update) de movimentações e despesas fixas ainda não implementada na UI; contas pagas não geram automaticamente uma movimentação; metas não têm histórico individual de aportes (só o valor acumulado).
+
+## 8. Inteligência do Dashboard (Sprint 4)
+
+- **`useFinancialSummary.ts`**: compõe os retornos já obtidos de `useTransactions` e `useBills` (recebidos como parâmetros, não rechamados) para derivar `quantoPossoGastar = saldo - totalPendenteAPagar`.
+- **`useRecommendations.ts`**: compõe `useFinancialSummary` + `useBills` + `useGoals` num `DashboardSnapshot` e delega a geração das recomendações a um `RecommendationProvider`.
+- **`src/lib/recommendationEngine.ts`**: motor de regras síncrono e sem I/O (`gerarRecomendacoes`), cobrindo saldo negativo, contas vencidas/vencendo em breve, gastos do mês acima da renda do mês e metas quase concluídas/concluídas. Sempre retorna ao menos uma recomendação (fallback "tudo certo" ou "sem dados suficientes").
+- **Estratégia de IA futura**: `RecommendationProvider = (snapshot) => Promise<Recommendation[]>` é o contrato estável consumido por `useRecommendations`. Hoje `ruleBasedRecommendationProvider` só empacota o motor síncrono numa Promise; uma futura `aiRecommendationProvider` (Supabase Edge Function, mantendo a chave de IA no servidor) pode substituí-la sem qualquer mudança nos componentes de UI.
+- **Degradação de erros**: se `useBills` ou `useGoals` estiverem em estado de erro, `useRecommendations` exclui essa fonte do snapshot em vez de falhar por completo — as recomendações continuam sendo geradas com as fontes disponíveis.
+
+## 9. Planejamento Financeiro (Sprint 5)
+
+- **`useFinancialProfile.ts`**: busca o perfil do usuário (renda mensal + reserva mínima); `profile` pode ser `null` quando ainda não configurado — tratado como estado vazio, não como erro. `salvar()` faz o `upsert` via `financialProfileService.ts`.
+- **`useFixedExpenses.ts`**: lista as despesas fixas recorrentes do usuário e deriva `totalDespesasFixas` (soma), com o mesmo padrão `error`/`actionError` dos demais hooks de domínio.
+- **`usePlanning.ts`**: compõe `useFinancialProfile` + `useFixedExpenses` + fatias de `useFinancialSummary`/`useBills`/`useGoals` num `PlanningSnapshot` e delega ao `PlanningProvider`. Mantém um `hojeISO` em estado, atualizado a cada 5 minutos via `setInterval`, para que "dias restantes no mês" não fique parado enquanto a aba fica aberta sem nenhum dado mudar.
+- **`src/lib/planningEngine.ts`**: motor de regras síncrono e sem I/O (`calcularPlanejamento`), que deriva:
+  - **Saldo previsto até o fim do mês** = saldo atual + renda ainda a receber no mês − despesas fixas − contas a pagar pendentes.
+  - **Quanto pode gastar hoje** = max(0, saldo previsto − reserva mínima) ÷ dias restantes no mês.
+  - **Quanto precisa guardar este mês** = reserva faltante (se a reserva mínima ainda não foi atingida) + aporte mensal necessário para as metas com prazo (`targetDate`) definido.
+  - **Risco financeiro** (`baixo`/`medio`/`alto`): comparação do saldo previsto com a reserva mínima (abaixo de 50% da reserva ou negativo = `alto`; entre 50% e 100% = `medio`; igual ou acima = `baixo`).
+- **Estratégia de IA futura**: `PlanningProvider = (snapshot) => Promise<PlanningResult>` é o contrato estável consumido por `usePlanning` — mesmo espírito do `RecommendationProvider`. Hoje `ruleBasedPlanningProvider` só empacota o motor síncrono numa Promise; uma futura `aiPlanningProvider` (Supabase Edge Function usando o histórico real de transações para prever gastos variáveis) pode substituí-la sem qualquer mudança na UI.
+- **Integração com recomendações**: `DashboardSnapshot` (recommendationEngine.ts) ganhou o campo opcional `risco`; quando `usePlanning` calcula risco `alto`, uma recomendação crítica adicional é gerada. Essa integração não bloqueia a geração das demais recomendações enquanto o planejamento ainda carrega — o snapshot memoizado é recalculado automaticamente quando o resultado do planejamento chega.
+
+## 9.1 Onboarding Guiado (Sprint 6)
+
+- **`useOnboarding.ts`**: busca o progresso do usuário (`onboarding_status`); se não existir nenhum registro **e** o usuário já tiver um perfil financeiro configurado (usuário anterior à Sprint 6), grava automaticamente um status "concluído" (backfill) em vez de exibir o wizard do zero. Expõe `passoAtual`, `completo`, `avancarPara(step)` e `concluir()`.
+- **`components/onboarding/OnboardingWizard.tsx`**: renderizado por `Dashboard.tsx` no lugar do conteúdo normal enquanto `!onboarding.completo`. Recebe os hooks `useFinancialProfile`/`useFixedExpenses`/`useGoals` já carregados pelo `Dashboard.tsx` (sem refetch) e orquestra 6 passos (`WelcomeStep` → `IncomeStep` → `ReserveStep` → `FixedExpensesStep` → `FirstGoalStep` → `FinishStep`).
+- Renda mensal e reserva mínima ficam em estado local do wizard (`rendaMensal`/`reservaMinima`) durante os passos 2 e 3, e só são persistidas em `financial_profiles` numa única chamada a `perfil.salvar(...)` ao confirmar o passo 3 — evita gravar um perfil parcial/inválido.
+- O passo atual é persistido a cada avanço (`onboarding.avancarPara`), permitindo retomar exatamente de onde o usuário parou numa sessão futura. O botão "Pular por agora" é um estado **local** do `Dashboard.tsx` (não persistido): o onboarding volta a aparecer no próximo acesso até ser efetivamente concluído.
+- `Dashboard.tsx` exibe um estado de carregamento explícito enquanto `onboarding.loading` (que também espera `useFinancialProfile` resolver) — evita mostrar o Dashboard completo "piscando" por trás do wizard.
+
+## 10. Estado da Aplicação
+
+O estado de autenticação é gerenciado globalmente via `AuthContext`/`useAuth`. Cada domínio financeiro tem seu próprio hook dedicado (`useTransactions`, `useBills`, `useGoals`, `useFinancialProfile`, `useFixedExpenses`), todos seguindo o mesmo padrão: `loading`/`error` (falha ao carregar a lista) separado de `actionError` (falha numa ação como remover/pagar/aportar), evitando que uma falha de ação esconda dados já carregados.
+
+`Dashboard.tsx` é o único ponto que chama os cinco hooks de domínio (mais `useOnboarding`, que depende do resultado de `useFinancialProfile`); os hooks agregadores (`useFinancialSummary`, `useRecommendations`, `usePlanning`) recebem os dados já carregados como parâmetros, e cada widget (`RecommendationsPanel`, `FinancialSummaryCards`, `PlanningPanel`, `UpcomingBillsPanel`, `GoalsPanel`, `FixedExpensesPanel`, `TransactionsList`) renderiza seu próprio estado de carregamento/erro/vazio — a falha ou lentidão de uma fonte não trava nem esconde as demais seções. A única exceção deliberada é o "gate" do onboarding (seção 9.1): antes de decidir entre wizard e Dashboard completo, um carregamento bloqueante é exibido, para evitar uma alternância visual entre os dois.
+
+Não há, ainda, um gerenciador de estado global genérico (Redux, Zustand) — a combinação de Context API (auth) + hooks dedicados por domínio tem sido suficiente até este estágio do projeto, embora repassar os hooks como props a partir do Dashboard já sinalize que uma camada de cache/contexto (React Query, etc.) passa a valer a pena se mais widgets independentes compartilharem os mesmos dados.
+
+## 11. Build e Qualidade
+
+- **Build**: `tsc -b && vite build` — checagem de tipos seguida de build de produção via Vite.
+- **Lint**: ESLint com regras recomendadas de TypeScript, React Hooks (incluindo `set-state-in-effect`) e React Refresh (`eslint.config.js`).
+- **Dev server**: `vite` com HMR (Hot Module Replacement).
+
+## 12. Limitações Conhecidas da Arquitetura Atual
+
+- Edição (update) de movimentações financeiras e despesas fixas ainda não implementada na UI.
+- Não há categorização de receitas/despesas nem orçamento mensal por categoria.
+- Contas pagas (`bills`) não geram automaticamente uma movimentação (`transactions`) — domínios desacoplados por decisão de escopo.
+- Metas não têm histórico individual de aportes, apenas o valor acumulado (`current_amount`).
+- Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" do planejamento financeiro (sem ritmo mensal calculável).
+- Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
+- Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
+- Não há testes automatizados (unitários, integração ou E2E) — o checklist de deploy (`docs/deploy.md`) depende de verificação manual.
+- Não há monitoramento de erros em produção (Sentry ou similar).
+- Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.
+- Não há gerenciamento de estado global genérico nem camada de cache/dados (React Query, etc.).
+- Estilos são escritos em CSS puro, sem sistema de design consolidado.
+- Não há tabela de perfis (`profiles`) própria — dados adicionais de usuário (como nome) ficam apenas em `user_metadata` do Supabase Auth.
+- Não há um link direto para revisitar o wizard de onboarding após concluído (os mesmos dados podem ser editados pelos painéis normais do Dashboard).
+
+## 13. Próximos Passos Arquiteturais
+
+Ver `backlog.md` para o roadmap de evolução (IA real nas recomendações e no planejamento financeiro, histórico de aportes, edição de movimentações/despesas fixas, categorização, testes automatizados, monitoramento de erros, paginação, design system, deploy automatizado). O checklist de deploy manual para o primeiro Alpha privado está em `docs/deploy.md`.

@@ -121,7 +121,7 @@ p{
 }
 
 .login-card{
-  width:420px;
+  width:min(420px, 92vw);
   background:#111827;
   padding:40px;
   border-radius:20px;
@@ -161,6 +161,39 @@ p{
   color:#94a3b8;
 }
 
+.login-form{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.campo{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.erro-campo{
+  color:#f87171;
+  font-size:13px;
+  text-align:left;
+}
+
+.erro-geral{
+  color:#f87171;
+  font-size:14px;
+  text-align:center;
+}
+
+.carregando{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#94a3b8;
+  font-size:18px;
+}
+
 .login-card button{
   padding:16px;
   border:none;
@@ -184,4 +217,51 @@ p{
 .login-card a{
   color:#38bdf8;
   text-decoration:none;
+}
+
+.login-links{
+  display:flex;
+  justify-content:flex-end;
+  font-size:14px;
+  margin-top:-8px;
+}
+
+.mensagem-sucesso{
+  color:#7ef0be;
+  font-size:14px;
+  text-align:center;
+}
+
+.link-botao{
+  background:none;
+  border:none;
+  color:#38bdf8;
+  text-decoration:underline;
+  cursor:pointer;
+  font-size:13px;
+  padding:0;
+}
+
+.link-botao:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+@media (max-width:480px){
+  .login-card{
+    padding:28px 22px;
+    gap:16px;
+  }
+
+  .login-card h1{
+    font-size:32px;
+  }
+
+  .login-card h2{
+    font-size:22px;
+  }
+
+  .login-card p{
+    font-size:14px;
+  }
 }

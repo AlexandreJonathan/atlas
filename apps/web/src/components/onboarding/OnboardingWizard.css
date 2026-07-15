@@ -1,0 +1,188 @@
+.onboarding-overlay {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #071d53, #0d3d9c);
+  padding: 24px;
+}
+
+.onboarding-card {
+  width: min(560px, 100%);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  color: white;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+}
+
+.onboarding-progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #b8d6ff;
+}
+
+.onboarding-barra {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.onboarding-barra-fill {
+  height: 100%;
+  background: #4de1ff;
+  transition: width 0.3s;
+}
+
+.onboarding-passo {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.onboarding-passo h2 {
+  font-size: 26px;
+}
+
+.onboarding-passo p {
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.onboarding-passo form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onboarding-card input {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #1e293b;
+  color: white;
+  font-size: 15px;
+}
+
+.onboarding-card input::placeholder {
+  color: #94a3b8;
+}
+
+.onboarding-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.onboarding-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.onboarding-acoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.onboarding-acoes button {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.onboarding-acoes .btn-primario {
+  background: #2563eb;
+  color: white;
+}
+
+.onboarding-acoes .btn-primario:hover {
+  background: #1d4ed8;
+}
+
+.onboarding-acoes .btn-secundario {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.onboarding-acoes .btn-secundario:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.onboarding-acoes button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.onboarding-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 18px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.onboarding-resumo div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.onboarding-pular {
+  align-self: center;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .onboarding-overlay {
+    padding: 16px;
+  }
+
+  .onboarding-card {
+    padding: 24px 20px;
+    gap: 18px;
+  }
+
+  .onboarding-passo h2 {
+    font-size: 21px;
+  }
+
+  .onboarding-acoes {
+    flex-direction: column;
+  }
+
+  .onboarding-acoes button {
+    width: 100%;
+    min-width: 0;
+  }
+}

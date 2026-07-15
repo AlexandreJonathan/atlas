@@ -1,0 +1,309 @@
+# Changelog — Atlas
+
+Todas as alterações relevantes do projeto são documentadas neste arquivo, em ordem cronológica inversa (mais recente primeiro).
+
+Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
+
+## [Sprint 6] — Alpha Readiness
+
+Sprint focada em remover os bloqueadores identificados na Auditoria de Produto (ver seção abaixo) para o primeiro Alpha privado: recuperação de senha, confirmação de e-mail, responsividade completa, onboarding guiado e preparação de deploy.
+
+### Adicionado
+- Recuperação de senha completa via Supabase Auth: `src/components/ForgotPassword.tsx` (`/esqueci-senha`) e `src/components/ResetPassword.tsx` (`/redefinir-senha`), com `src/validations/forgotPasswordSchema.ts` e `src/validations/resetPasswordSchema.ts`.
+- Fluxo de confirmação de e-mail tratado em todos os estados: `Register.tsx` diferencia sessão imediata (confirmação desabilitada) de cadastro pendente (mostra tela dedicada com reenvio); `Login.tsx` oferece reenvio quando o erro é especificamente "e-mail não confirmado".
+- `MENSAGEM_EMAIL_NAO_CONFIRMADO` e novas mensagens amigáveis em `src/lib/authErrors.ts` (senha igual à anterior, link expirado/inválido, limite de tentativas, sessão ausente).
+- Onboarding guiado de primeiro acesso: tabela `onboarding_status` no Supabase com RLS (`supabase/migrations/20260714100000_create_onboarding_status_table.sql`), `src/services/onboardingService.ts`, `src/hooks/useOnboarding.ts` (com estratégia de backfill para usuários que já tinham dados configurados antes desta sprint) e `src/components/onboarding/` (`OnboardingWizard` + 6 passos: `WelcomeStep`, `IncomeStep`, `ReserveStep`, `FixedExpensesStep`, `FirstGoalStep`, `FinishStep`).
+- `monthlyIncomeSchema`/`minimumReserveSchema` em `src/validations/financialProfileSchema.ts` (derivados via `.pick()` do schema completo, reaproveitados pelos passos 2 e 3 do onboarding).
+- `docs/deploy.md`: guia e checklist completo de deploy (migrações, configuração de Auth no Supabase, variáveis de ambiente, build, hospedagem).
+
+### Alterado
+- `Dashboard.tsx`: passou a chamar `useOnboarding` e a decidir entre exibir o wizard de onboarding ou o Dashboard completo, com um estado de carregamento explícito antes dessa decisão.
+- `App.css`: `.login-card` deixou de ter largura fixa (420px) e passou a ser responsiva (`width: min(420px, 92vw)`), usada por Login, Cadastro e as duas novas telas de senha; novas classes `.login-links`, `.mensagem-sucesso`, `.link-botao`.
+- `Dashboard.css`: novo bloco de media queries (≤600px e ≤480px) revisando padding, largura de cards, modais/painéis e empilhamento de ações em telas estreitas, garantindo uso entre 320px e 1920px.
+- `App.tsx`: novas rotas públicas `/esqueci-senha` e `/redefinir-senha`.
+
+### Decisões de arquitetura
+- Progresso do onboarding persistido no Supabase (não em `localStorage`), consistente entre dispositivos e sobrevivendo a recarregamentos — mesmo padrão de perfil financeiro/despesas fixas.
+- Renda mensal e reserva mínima ficam em estado local do wizard até o passo 3 ser confirmado, quando são salvas juntas em uma única chamada a `financial_profiles` (evita salvar um perfil parcialmente inválido).
+- "Pular por agora" no onboarding é um estado local de sessão (não persistido) — o wizard volta a aparecer no próximo acesso até ser efetivamente concluído.
+- Redefinição de senha não revela se um e-mail está ou não cadastrado (mesma mensagem de sucesso em ambos os casos), mitigando enumeração de usuários.
+
+### Corrigido
+- `react-hooks/set-state-in-effect` em `ResetPassword.tsx`, usando o mesmo padrão (`Promise.resolve().then(...)`) já estabelecido em outros hooks do projeto.
+
+### Documentação
+- `roadmap/sprint-06.md` criado.
+- `roadmap/backlog.md` e `roadmap/arquitetura.md` atualizados com os novos domínios, rotas, componentes e dívidas técnicas identificadas.
+- `docs/deploy.md` criado.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Primeiro Deploy Oficial] — Preparação de publicação (Vercel)
+
+Missão exclusivamente de preparação de deploy (DevOps/Release), sem novas funcionalidades: revisão de toda a configuração de produção, criação da configuração explícita para Vercel e de um guia de deploy não-técnico para o fundador.
+
+### Adicionado
+- `apps/web/vercel.json`: rewrite `/(.*) → /index.html` (fallback de SPA explícito, para as rotas do `react-router-dom` funcionarem em recarregamentos diretos) e `headers` de cache (`/assets/*` com `Cache-Control: public, max-age=31536000, immutable` — seguro porque o Vite gera nomes de arquivo com hash a cada build; `/index.html` com `no-cache, must-revalidate`, para nunca servir uma referência antiga a assets que não existem mais após um novo deploy).
+- `docs/guia-deploy-fundador.md`: guia passo a passo sem jargão técnico, cobrindo criação/configuração do projeto Supabase (migrações, Authentication), criação de conta e projeto na Vercel, configuração de variáveis de ambiente, publicação, teste em produção e uma tabela de problemas comuns com solução.
+
+### Alterado
+- `docs/deploy.md`: nova seção "5.1 Performance do Build" documentando (sem otimizar) o tamanho atual do bundle (587 kB JS / ~165 kB gzip) e os candidatos a code-splitting (modais e `OnboardingWizard`, via `React.lazy`); checklist de deploy (seção 6) atualizado com o item "Root Directory = apps/web" e referência ao `vercel.json`; link para o novo guia do fundador adicionado no topo.
+- `roadmap/arquitetura.md`: árvore de diretórios atualizada com `vercel.json` e `docs/guia-deploy-fundador.md`.
+
+### Verificado (sem alterações necessárias)
+- **Vite/build**: `vite.config.ts` minimalista e correto (sem `base` customizado, adequado para deploy na raiz de um domínio); build de produção gera `dist/` corretamente; nenhuma configuração insegura encontrada.
+- **`.env.example`**: contém apenas placeholders vazios (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`), nenhuma credencial real; `.gitignore` confirmado ignorando `.env`/`.env.*` e `dist/` (verificado com `git check-ignore`).
+- **`console.*` em produção**: apenas dois pontos no código, ambos intencionais e apropriados para produção — `lib/supabase.ts` (`console.warn` quando as variáveis de ambiente não estão configuradas) e `lib/errorMessages.ts` (`console.error` para depuração de erros reais, sempre acompanhado de uma mensagem amigável na UI). Nenhum `console.log` de debug esquecido.
+- **Supabase Storage**: não utilizado por nenhuma funcionalidade do produto — nenhuma configuração de bucket/política de Storage necessária para este deploy.
+- **RLS**: reconfirmado habilitado e correto nas 6 tabelas (checklist detalhado em `docs/deploy.md`, seção 2.1).
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso (mesmo aviso de bundle >500 kB já documentado, não bloqueante).
+
+### Veredito
+A Atlas está pronta para o primeiro deploy público. As pendências restantes são 100% operacionais e de responsabilidade exclusiva do fundador (criar os projetos Supabase/Vercel, aplicar migrações, configurar variáveis e URLs) — nenhuma pendência de código.
+
+---
+
+## [FAT — Founder Acceptance Test] — Validação de qualidade pré-uso real
+
+Missão exclusivamente de validação (QA/arquitetura/segurança/produto), sem novas funcionalidades: revisão completa de todos os fluxos, UX, responsividade (320px–1920px), performance, segurança e arquitetura, respondendo à pergunta "um usuário comum consegue usar a Atlas por 30 dias sem dificuldades?". Três problemas reais foram encontrados e corrigidos.
+
+### Corrigido
+- `src/index.css`: arquivo ainda era o boilerplate original do template Vite/React (nunca adaptado ao layout real da Atlas) — o seletor `#root` tinha `width: 1126px` (com `max-width: 100%`) e `border-inline: 1px solid`, o que **limitava visivelmente toda a aplicação a uma coluna de 1126px com bordas verticais visíveis em qualquer tela mais larga que isso** (ex: 1920px), deixando uma área morta nas laterais em vez do layout ocupar a tela inteira — problema direto para o critério de responsividade "até 1920px". Também continha variáveis de tema, modo escuro e seletores (`.counter`, `#social`) nunca usados por nenhum componente real. Arquivo reduzido a um reset mínimo (`box-sizing`, `margin` do `body`); o bundle de CSS caiu de 13.72 kB para 11.97 kB, confirmando que o código morto estava sendo enviado para produção.
+- `components/onboarding/OnboardingWizard.tsx`: recarregar a página exatamente no passo 3 (reserva mínima) perdia a renda mensal informada no passo 2 (mantida apenas em estado local até a confirmação do passo 3), fazendo a confirmação da reserva salvar `monthlyIncome: 0` — valor que viola a constraint do banco (`monthly_income > 0`) — e exibir um erro genérico sem explicação, sem indicar ao usuário que precisava voltar e reinformar a renda. Adicionado um guard que detecta esse estado (`passo === 3` sem `rendaMensal` local) e retorna automaticamente ao passo 2.
+- `hooks/useTransactions.ts`: `receitas`/`despesas`/`receitasDoMes`/`despesasDoMes` eram recalculados (filter+reduce sobre a lista inteira) em todo re-render, em vez de memoizados como o padrão já usado em `useBills`/`useGoals`/`useFixedExpenses`. Envolvidos em `useMemo`, por consistência e para evitar recomputo em renders não relacionados a `transactions`.
+
+### Verificado (sem alterações necessárias)
+- Todos os fluxos (cadastro, login, logout, recuperação de senha, confirmação de e-mail, onboarding, transações, contas, metas, planejamento, recomendações) percorridos manualmente ponta a ponta sem outros bugs funcionais encontrados.
+- RLS, variáveis de ambiente e ausência de credenciais no código confirmados novamente sem regressões.
+- Responsividade das telas de negócio (Login/Cadastro/Dashboard/painéis/modais/listas) confirmada consistente entre 320px e 1920px após a correção do `#root`.
+- Arquitetura (organização de pastas, separação de responsabilidades, nomenclatura) seguindo consistentemente o padrão estabelecido nas sprints anteriores; nenhuma duplicação problemática além de convenções intencionais já documentadas.
+
+### Observações registradas no backlog (não corrigidas nesta missão, sem impacto no uso real)
+- `App.css` mantém um bloco de classes de uma landing page antiga (`.hero`, `.header`, `nav`, `.btn-primary`, etc.) não utilizado por nenhum componente atual — código morto inofensivo (já sobrescrito onde colide), candidato a limpeza futura.
+- `public/icons.svg` não é referenciado por nenhum componente.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+### Veredito
+Nenhum problema encontrado impede o uso real pelo fundador. Ver `roadmap/backlog.md` para os itens de infraestrutura (migrações em produção, monitoramento de erros) que continuam pendentes antes de convidar usuários externos além do fundador.
+
+---
+
+## [Sprint 6 — Auto Code Review] — Ajustes técnicos pós-implementação
+
+Revisão técnica completa do código da Sprint 6 (Missão "Alpha Ready"): duplicação, RLS, segurança, acessibilidade, performance, tipagem, responsividade e aderência ao padrão das sprints anteriores. Todo o escopo funcional (recuperação de senha, confirmação de e-mail, responsividade, onboarding guiado, preparação de deploy) já estava implementado; a revisão focou em validar a corretude e fechar lacunas pontuais.
+
+### Corrigido
+- `components/Login.tsx` e `components/Register.tsx`: campos de e-mail/senha/nome não tinham `aria-label` (dependiam só do `placeholder`, que desaparece durante a digitação e não é lido de forma consistente por todos os leitores de tela) — único ponto da aplicação ainda sem esse padrão, já adotado por `ForgotPassword.tsx`, `ResetPassword.tsx` e todos os modais/formulários das sprints anteriores. Adicionado `aria-label` em todos os campos dos dois formulários.
+
+### Verificado (sem alterações necessárias)
+- RLS habilitado e correto nas 6 tabelas (`transactions`, `bills`, `goals`, `financial_profiles`, `fixed_expenses`, `onboarding_status`), com políticas de `select`/`insert`/`update`/`delete` restritas a `auth.uid() = user_id`; updates/deletes também filtram por `user_id` na query (defesa em profundidade).
+- Nenhuma credencial ou segredo exposto no código; `.env`/`.env.*` corretamente ignorados pelo Git (exceto `.env.example`).
+- Fluxo de recuperação de senha (`ForgotPassword`/`ResetPassword`) não permite enumeração de e-mails cadastrados (mesma mensagem de sucesso em qualquer caso) e trata link inválido/expirado com uma tela dedicada.
+- Responsividade revisada em todas as telas listadas no escopo (Login, Cadastro, recuperação de senha, onboarding, Dashboard, painéis, listas, modais) entre 320px e 1920px — sem overflow horizontal identificado nas larguras testadas.
+- Onboarding (`useOnboarding`) trata corretamente o backfill de usuários com perfil financeiro pré-existente e persiste o progresso no Supabase (não em `localStorage`), sobrevivendo a recarregamentos.
+- Tipagem estrita em todo o código novo, sem uso de `any`; formulários usam `z.infer` dos schemas correspondentes.
+- Sem duplicação problemática: o padrão repetido entre `services/*.ts` (mapeamento de linha, `getSupabaseClient()`) é uma convenção intencional do projeto, não uma duplicação acidental.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Auditoria de Produto] — Avaliação de prontidão para Alpha privado
+
+Análise estratégica (Product Manager/Software Architect) do estado atual da Atlas, sem nenhuma alteração de código, entregue como relatório de chat. Identificou os itens que se tornaram o escopo obrigatório da Sprint 6 (Alpha Readiness): ausência de recuperação de senha, fluxo de confirmação de e-mail sem feedback, responsividade incompleta (`.login-card` com largura fixa quebrando em mobile), ausência de onboarding guiado, e falta de preparação/checklist de deploy. Também mapeou itens não bloqueantes (paginação, monitoramento de erros, testes automatizados) que permanecem no backlog.
+
+---
+
+## [Sprint 4] — Dashboard Inteligente
+
+Sprint reagendada: o conteúdo original planejado para "Sprint 4" (testes automatizados e CI) foi movido para o backlog; este número de sprint passou a cobrir a transformação do Dashboard em uma central de inteligência financeira.
+
+### Adicionado
+- Tabelas `bills` (contas a pagar/receber) e `goals` (metas financeiras) no Supabase, com Row Level Security por usuário (`supabase/migrations/20260712220000_create_bills_table.sql`, `20260712220100_create_goals_table.sql`).
+- `src/services/billsService.ts` e `src/services/goalsService.ts` — camadas de acesso a dados para os novos domínios, seguindo o padrão de `transactionsService.ts`.
+- `src/hooks/useBills.ts` e `src/hooks/useGoals.ts` — estado, ações (criar, marcar como paga/registrar aporte, remover) e listas derivadas (contas vencidas/vencendo em breve).
+- `src/hooks/useFinancialSummary.ts` — deriva "quanto posso gastar" (saldo menos contas a pagar pendentes) a partir de `useTransactions` + `useBills`.
+- `src/hooks/useRecommendations.ts` e `src/lib/recommendationEngine.ts` — motor de recomendações baseado em regras (saldo negativo, contas vencidas/próximas, gastos do mês acima da renda, metas quase concluídas), com o contrato `RecommendationProvider` já preparado para uma futura substituição por IA real.
+- `src/lib/dateUtils.ts` — utilitários mínimos de data (sem dependência externa) para cálculo de vencimentos.
+- Novos componentes: `RecommendationsPanel`, `FinancialSummaryCards`, `UpcomingBillsPanel`, `BillsList`, `BillModal`, `GoalsPanel`, `GoalsList`, `GoalModal`.
+- Componentes reutilizáveis: `AsyncStateView` (padrão carregando/erro/vazio), `ProgressBar` (acessível, `role="progressbar"`) e `SeverityBadge` (severidade sempre com ícone + texto, nunca só cor).
+- `src/types/bill.ts`, `src/types/goal.ts`, `src/types/recommendation.ts` e `src/validations/billSchema.ts`, `src/validations/goalSchema.ts`.
+
+### Alterado
+- `Dashboard.tsx`: deixou de ter qualquer lógica de negócio própria; agora só orquestra os widgets (`useTransactions`, `useBills` e `useGoals` são chamados uma única vez aqui e repassados como props, evitando requisições duplicadas dos mesmos dados).
+- `TransactionsList.tsx`: refatorado para reutilizar `AsyncStateView`, eliminando a duplicação que surgiria ao criar `BillsList`/`GoalsList` com o mesmo padrão de carregando/erro/vazio.
+- `useTransactions.ts`: adicionados `receitasDoMes`/`despesasDoMes` (derivados, sem novo estado), usados pela recomendação de gastos do mês acima da renda.
+- `Dashboard.css`: novos estilos para os painéis (`Contas a vencer`, `Metas`, `Recomendações`), badges de severidade e barra de progresso.
+
+### Decisões de arquitetura
+- Cada widget (`RecommendationsPanel`, `FinancialSummaryCards`, `UpcomingBillsPanel`, `GoalsPanel`, `TransactionsList`) renderiza seu próprio estado de carregamento/erro/vazio de forma independente — a falha ou lentidão de uma fonte de dados não esconde nem trava as demais seções.
+- `useTransactions`, `useBills` e `useGoals` são chamados uma única vez em `Dashboard.tsx`; os hooks agregadores (`useFinancialSummary`, `useRecommendations`) recebem os retornos já obtidos como parâmetros em vez de rechamar os hooks de domínio, evitando buscas duplicadas do mesmo dado.
+- Registro de aporte em metas implementado como formulário inline (um único campo) em `GoalsList`, em vez de um modal dedicado — simplificação consciente para uma ação de um único campo.
+
+### Documentação
+- `roadmap/sprint-04.md` reescrito para refletir o "Dashboard Inteligente" (o escopo original de testes/CI foi movido para o backlog).
+- `roadmap/backlog.md` e `roadmap/arquitetura.md` atualizados com os novos domínios, componentes e dívidas técnicas identificadas.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Sprint 5] — Planejamento Financeiro Inteligente
+
+Sprint reagendada: o conteúdo original planejado para "Sprint 5" (experiência do usuário, responsividade e deploy) foi movido para o backlog; este número de sprint passou a cobrir o planejamento financeiro inteligente (renda, despesas fixas, reserva mínima e cálculos automáticos), mesmo precedente da Sprint 4.
+
+### Adicionado
+- Tabelas `financial_profiles` (renda mensal + reserva mínima, uma linha por usuário) e `fixed_expenses` (despesas fixas recorrentes) no Supabase, com Row Level Security por usuário (`supabase/migrations/20260714000000_create_financial_profiles_table.sql`, `20260714000100_create_fixed_expenses_table.sql`).
+- `src/services/financialProfileService.ts` (`getProfile`/`upsertProfile`) e `src/services/fixedExpensesService.ts` — camadas de acesso a dados para os novos domínios, seguindo o padrão de `billsService.ts`/`goalsService.ts` (filtro explícito por `user_id` em update/delete).
+- `src/hooks/useFinancialProfile.ts` e `src/hooks/useFixedExpenses.ts` — estado, ações (salvar perfil; criar/remover despesa fixa) e `totalDespesasFixas` derivado.
+- `src/hooks/usePlanning.ts` — compõe perfil + despesas fixas + `useFinancialSummary`/`useBills`/`useGoals` num `PlanningSnapshot`, mantendo "hoje" atualizado a cada 5 minutos (`setInterval`) para o cálculo de dias restantes no mês não ficar parado.
+- `src/lib/planningEngine.ts` (`calcularPlanejamento` + `ruleBasedPlanningProvider`) — motor de regras síncrono e sem I/O que calcula quanto pode gastar hoje, quanto precisa guardar este mês, saldo previsto até o fim do mês e risco financeiro (baixo/médio/alto), com o contrato `PlanningProvider` já preparado para uma futura substituição por IA real.
+- `getDiasRestantesNoMes` e `getMesesRestantes` em `src/lib/dateUtils.ts`.
+- Novos componentes: `PlanningPanel` (+ `FinancialProfileModal`), `FixedExpensesPanel` (+ `FixedExpensesList`, `FixedExpenseModal`).
+- `src/types/financialProfile.ts`, `src/types/fixedExpense.ts`, `src/types/planning.ts` e `src/validations/financialProfileSchema.ts`, `src/validations/fixedExpenseSchema.ts`.
+
+### Alterado
+- `Dashboard.tsx`: passou a buscar também `useFinancialProfile`/`useFixedExpenses` (uma única vez, como os demais domínios) e a renderizar `PlanningPanel` (logo após "Situação financeira hoje") e `FixedExpensesPanel` (na grade de painéis, agora com 3 colunas em telas largas).
+- `lib/recommendationEngine.ts`/`DashboardSnapshot`: novo campo opcional `risco`; quando o planejamento calcula risco financeiro "alto", uma recomendação crítica adicional é gerada. `useRecommendations` passou a receber também o resultado de `usePlanning` — sem bloquear a geração das demais recomendações enquanto o planejamento ainda carrega.
+- `Dashboard.css`: `paineis-grid` passou a acomodar 3 colunas (2 e depois 1 em telas menores); novos estilos para `PlanningPanel` e itens de despesa fixa.
+
+### Decisões de arquitetura
+- Perfil financeiro (`financial_profiles`) usa `user_id` como chave primária (relação 1:1), permitindo salvar sempre via `upsert` sem distinguir criação de atualização no service/hook.
+- Despesas fixas não têm "dia de vencimento": são recorrentes mensais por definição, e o valor total é sempre considerado "a ocorrer" no cálculo do mês — vencimento pontual com status pago/pendente já existe no domínio `bills`.
+- Metas sem `targetDate` ficam fora do cálculo de "quanto precisa guardar" (não há ritmo mensal calculável sem prazo).
+- `usePlanning` não bloqueia `useRecommendations`: a integração entre os dois módulos é por composição de dados (campo opcional `risco`), não por dependência rígida de carregamento.
+
+### Documentação
+- `roadmap/sprint-05.md` reescrito para o "Planejamento Financeiro Inteligente" (o escopo original de UX/responsividade/deploy foi movido para o backlog).
+- `roadmap/backlog.md` e `roadmap/arquitetura.md` atualizados com os novos domínios, componentes, fórmulas do motor de planejamento e dívidas técnicas identificadas.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Sprint 4 — Auto Code Review] — Ajustes técnicos pós-implementação
+
+Revisão técnica completa do código da Sprint 4 (bugs, duplicação, arquitetura, RLS, segredos, acessibilidade, performance, tipagem e aderência ao padrão das sprints anteriores). Melhorias identificadas foram corrigidas sem alterar o escopo funcional da sprint.
+
+### Corrigido
+- `services/billsService.ts`, `services/goalsService.ts`, `services/transactionsService.ts`: `markBillAsPaid`, `deleteBill`, `updateGoalProgress`, `deleteGoal` e `deleteTransaction` passaram a filtrar também por `user_id` (além do `id`), em defesa de profundidade — o RLS já impedia qualquer leitura/escrita cruzada entre usuários, mas a query explícita evita depender de uma única camada de segurança e deixa a intenção clara no código. `useBills`, `useGoals` e `useTransactions` foram ajustados para passar o `userId` autenticado nessas chamadas.
+- `components/GoalsList.tsx`: o aporte inline não tinha nenhum indicador de carregamento nem validação visível — um valor inválido (vazio, zero ou não numérico) falhava silenciosamente, e cliques repetidos antes da resposta do servidor podiam gerar uma corrida (o segundo aporte calculado a partir de um `currentAmount` ainda não atualizado). Corrigido com um estado de "salvando" por meta (desabilita input/botão durante a requisição, eliminando a corrida) e validação usando o schema `goalContributionSchema` (que já existia em `validations/goalSchema.ts`, mas nunca era usado — a lista usava uma checagem manual `!valor || valor <= 0`), exibindo a mesma mensagem de erro padrão usada nos demais formulários.
+
+### Refatorado
+- `lib/supabase.ts`: extraída a função `getSupabaseClient()` (antes replicada de forma idêntica em `billsService.ts`, `goalsService.ts` e `transactionsService.ts`), eliminando a triplicação da checagem "Supabase configurado?" introduzida por esta sprint.
+
+### Verificado (sem alterações necessárias)
+- Todas as consultas de leitura (`listBills`, `listGoals`, `listTransactions`) já filtravam por `user_id` e todas as tabelas (`bills`, `goals`, `transactions`) têm Row Level Security habilitado com políticas de `select`/`insert`/`update`/`delete` restritas a `auth.uid() = user_id`.
+- Nenhuma credencial, chave ou segredo exposto no código-fonte novo; `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` seguem vindo exclusivamente de variáveis de ambiente não versionadas.
+- Hooks de domínio (`useBills`, `useGoals`, `useFinancialSummary`, `useRecommendations`) seguem o padrão de `error`/`actionError` e memoização já estabelecido, sem loops de efeito nem requisições duplicadas.
+- Acessibilidade dos novos componentes (`role="dialog"`/`aria-modal` nos modais, `role="progressbar"` com `aria-value*` na barra de progresso, severidade sempre com ícone + texto) já atendia ao padrão da Sprint 3.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Sprint 3] — Persistência Real de Movimentações Financeiras
+
+### Adicionado
+- Tabela `transactions` no Supabase (`supabase/migrations/20260712210000_create_transactions_table.sql`), com Row Level Security garantindo isolamento por usuário.
+- Camada de serviços `src/services/transactionsService.ts` (`listTransactions`, `createTransaction`, `deleteTransaction`).
+- Hook `src/hooks/useTransactions.ts`: centraliza busca, criação, remoção e cálculo derivado de receitas/despesas/saldo.
+- Componente `src/components/TransactionModal.tsx`: modal único e reutilizável para registrar receita ou despesa, validado com `react-hook-form` + `zod`.
+- `src/validations/transactionSchema.ts` e `src/types/transaction.ts`: schema e tipos das movimentações.
+- `src/lib/errorMessages.ts`: utilitário genérico para mensagens de erro amigáveis (não expõe erros técnicos de banco/rede ao usuário).
+- Estados de carregamento, erro (com nova tentativa) e lista vazia na listagem de movimentações do `Dashboard.tsx`.
+- Botão de exclusão de movimentações.
+
+### Alterado
+- `Dashboard.tsx`: removido totalmente o estado financeiro local (`useState` de receitas/despesas/movimentações); agora consome dados reais via `useTransactions`. O botão "Nova Despesa" deixou de usar `alert()` e passou a abrir o mesmo modal usado para receitas.
+- `Dashboard.css`: novos estilos para modal, lista de movimentações e estados de carregamento/erro/vazio (antes inexistentes/sem estilo).
+
+### Corrigido
+- Erro de lint `react-hooks/set-state-in-effect` durante o desenvolvimento do `useTransactions`, resolvido movendo as atualizações de estado para dentro de callbacks assíncronos (`.then()`), em vez de chamadas diretas no corpo do efeito.
+
+### Documentação
+- `roadmap/sprint-03.md` atualizado com status, escopo real implementado e itens adiados.
+- `roadmap/backlog.md` atualizado, removendo itens concluídos e mantendo edição/categorização como pendências futuras.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Sprint 3 — Auto Code Review] — Ajustes técnicos pós-implementação
+
+Revisão técnica completa do código da Sprint 3 (duplicação, arquitetura, responsabilidades, tamanho de componentes, performance, segurança, acessibilidade, tipagem, tratamento de erros, nomenclatura e aderência ao `CLAUDE.md`). Melhorias identificadas foram corrigidas sem alterar o escopo funcional da sprint.
+
+### Corrigido
+- `validations/transactionSchema.ts`: adicionado `.trim()` na validação de `description`, eliminando uma inconsistência em que uma descrição composta majoritariamente por espaços passava a validação do formulário mas era rejeitada pela constraint do banco (`char_length(trim(description)) >= 3`), gerando um erro genérico confuso para o usuário.
+- `hooks/useTransactions.ts`: erro de exclusão (`remover`) deixou de sobrescrever o estado `error` (usado para falha de carregamento da lista). Antes, uma falha ao remover uma movimentação escondia a lista inteira por trás da tela de erro/"Tentar novamente"; agora usa um estado dedicado `actionError`, exibido sem ocultar os dados já carregados.
+- `components/Dashboard.tsx`: `handleLogout` agora usa `try/finally`, garantindo o redirecionamento para `/login` mesmo se `signOut()` falhar (ex: erro de rede).
+
+### Refatorado
+- `hooks/useTransactions.ts`: eliminada duplicação entre o carregamento inicial (`useEffect`) e `recarregar`, extraindo a lógica comum para `buscarTransacoes` (via `useCallback`), mantendo a conformidade com `react-hooks/set-state-in-effect`.
+- `components/Dashboard.tsx`: extraída a renderização da lista de movimentações (estados de carregando/erro/vazio/itens) para um novo componente `components/TransactionsList.tsx`, reduzindo o tamanho e as responsabilidades misturadas do `Dashboard`.
+- `lib/authErrors.ts` / `lib/errorMessages.ts`: removida duplicação da constante de mensagem padrão de erro; `authErrors.ts` agora reutiliza `MENSAGEM_PADRAO` exportada por `errorMessages.ts`.
+- `services/transactionsService.ts`: adicionado comentário explicando os casts manuais para `TransactionRow` (ausência de tipos gerados do schema do Supabase); item registrado no backlog.
+
+### Acessibilidade
+- `components/TransactionModal.tsx`: adicionados `role="dialog"`, `aria-modal="true"` e `aria-labelledby` no contêiner do modal; fechamento via tecla `Esc`; foco automático no primeiro campo; `aria-label` nos inputs (além do `placeholder`); emojis decorativos na lista de movimentações marcados com `aria-hidden="true"`.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Sprint 1] — Roteamento e Navegação
+
+### Adicionado
+- Dependência `react-router-dom` (^7.18.1).
+- `ProtectedRoute.tsx`: componente de guarda de rota, redireciona usuários não autenticados para `/login`.
+- `BrowserRouter` configurado em `main.tsx`, envolvendo `<App />`.
+- Rotas declarativas em `App.tsx`: `/`, `/login`, `/cadastro`, `/dashboard`.
+- Mecanismo simples de autenticação via `localStorage` (chave `atlas_auth`), usado por `Login.tsx` e `ProtectedRoute.tsx`.
+
+### Alterado
+- `App.tsx`: removida totalmente a navegação baseada em `useState` (variável `tela` / `setTela`); substituída por `<Routes>`/`<Route>`.
+- `Login.tsx`: removidas as props `irParaCadastro` e `entrar`; navegação agora feita via `useNavigate()` e `<Link to="/cadastro">`.
+- `Register.tsx`: removida a prop `voltarLogin`; navegação agora feita via `<Link to="/login">`.
+- `Dashboard.tsx`: correção de lint (`setDespesas` não utilizado removido do destructuring do `useState`), sem alteração de comportamento funcional.
+
+### Corrigido
+- Erro de lint `@typescript-eslint/no-unused-vars` em `Dashboard.tsx`.
+
+### Documentação
+- Criada a pasta `/roadmap` na raiz do projeto, com os arquivos `arquitetura.md`, `backlog.md`, `changelog.md` e `sprint-01.md` a `sprint-05.md`.
+
+### Validado
+- `npm run lint` — sem erros.
+- `npm run build` — build de produção concluído com sucesso.
+
+---
+
+## [Inicial] — Primeiro commit do Atlas
+
+### Adicionado
+- Estrutura inicial do projeto (Vite + React + TypeScript) em `apps/web`.
+- Componentes iniciais: `Login`, `Register`, `Dashboard`.
+- Navegação inicial entre telas via `useState` em `App.tsx` (posteriormente substituída na Sprint 1).
+- Estilos base (`App.css`, `index.css`, `Dashboard.css`).
