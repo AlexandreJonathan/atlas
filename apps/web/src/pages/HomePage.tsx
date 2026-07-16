@@ -1,5 +1,6 @@
 import { useState } from "react";
-import AtlasIntelligencePanel from "../components/AtlasIntelligencePanel";
+import { BrainCircuit, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import BillModal from "../components/BillModal";
 import AtlasPulse from "../components/home/AtlasPulse";
 import BillsTimeline from "../components/home/BillsTimeline";
@@ -21,14 +22,9 @@ import { useFinancialSummary } from "../hooks/useFinancialSummary";
 import { useFixedExpenses } from "../hooks/useFixedExpenses";
 import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
-import { useRecommendations } from "../hooks/useRecommendations";
 import { useTransactions } from "../hooks/useTransactions";
 import { triggerMicrointeraction } from "../lib/microinteractions";
-import {
-  AtlasInsights,
-  IntelligenceFeed,
-  useAtlasIntelligence,
-} from "../modules/atlas-intelligence";
+import { AtlasInsights, useAtlasIntelligence } from "../modules/atlas-intelligence";
 import type { TransactionType } from "../types/transaction";
 import "./HomePage.css";
 
@@ -49,7 +45,6 @@ function HomePage() {
 
   const resumo = useFinancialSummary(transacoes, contas);
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
-  const recomendacoes = useRecommendations(resumo, contas, metas, planejamento);
   const intelligence = useAtlasIntelligence(
     resumo,
     contas,
@@ -75,6 +70,7 @@ function HomePage() {
       <HomeHeader nome={nome} email={user?.email} />
 
       <main className="atlas-home-main">
+        {/* Quanto tenho */}
         <WealthHero
           patrimonioTotal={patrimonioTotal}
           saldoDisponivel={resumo.saldo}
@@ -89,19 +85,18 @@ function HomePage() {
           saldo={resumo.saldo}
         />
 
-        <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
-
         <QuickActions onAction={handleQuickAction} />
 
-        <AtlasIntelligencePanel estado={recomendacoes} />
-
-        <IntelligenceFeed items={intelligence.feed} limit={5} compact />
-
+        {/* O que preciso fazer hoje */}
         <BillsTimeline contas={contas} />
 
-        <GoalsFocus metas={metas} />
+        {/* O que aconteceu */}
+        <TransactionsPreview transacoes={transacoes} />
 
-        <InvestmentsTeaser />
+        {/* Um único bloco de insights (sem Panel/Feed) */}
+        <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
+
+        <GoalsFocus metas={metas} />
 
         <PlanningSnapshot
           perfil={perfil}
@@ -109,7 +104,18 @@ function HomePage() {
           despesasFixas={despesasFixas}
         />
 
-        <TransactionsPreview transacoes={transacoes} />
+        <InvestmentsTeaser />
+
+        <Link to="/atlas-ia" className="atlas-home-ia-cta">
+          <span className="atlas-home-ia-cta-icon" aria-hidden="true">
+            <BrainCircuit size={20} />
+          </span>
+          <span className="atlas-home-ia-cta-copy">
+            <strong>Continuar com a Atlas IA</strong>
+            <small>Conversa e feed de atividade</small>
+          </span>
+          <ChevronRight size={18} aria-hidden="true" />
+        </Link>
       </main>
 
       {modalAberto?.kind === "transaction" && (

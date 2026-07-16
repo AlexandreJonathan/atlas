@@ -26,7 +26,7 @@ function AtlasInsights({ insights, loading }: AtlasInsightsProps) {
         </span>
         <div>
           <h2 id="atlas-insights-titulo">Atlas Insights</h2>
-          <p>Os 3 sinais mais importantes agora</p>
+          <p>O que mais importa agora</p>
         </div>
       </div>
 
