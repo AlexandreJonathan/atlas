@@ -1,4 +1,4 @@
-import { BrainCircuit, Send } from "lucide-react";
+import { Activity, BrainCircuit, Send } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import {
@@ -6,6 +6,7 @@ import {
   type AtlasAiMessage,
 } from "../data/mockAtlasAiChat";
 import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 import { useBills } from "../hooks/useBills";
 import { useFinancialProfile } from "../hooks/useFinancialProfile";
 import { useFinancialSummary } from "../hooks/useFinancialSummary";
@@ -39,6 +40,7 @@ function AtlasAIPage() {
   const [mensagens, setMensagens] = useState<AtlasAiMessage[]>(MOCK_ATLAS_AI_MESSAGES);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [mostrarAtividade, setMostrarAtividade] = useState(false);
 
   async function handleSubmit(evento: FormEvent) {
     evento.preventDefault();
@@ -88,13 +90,28 @@ function AtlasAIPage() {
             <BrainCircuit size={24} />
           </span>
           <div>
+            <p className="atlas-ai-eyebrow">Conversa</p>
             <h1>Atlas Intelligence</h1>
-            <p>Seu centro de conversa financeira</p>
+            <p>Pergunte sobre saldo, metas e contas</p>
           </div>
         </div>
+        <Button
+          type="button"
+          size="sm"
+          variant={mostrarAtividade ? "secondary" : "ghost"}
+          onClick={() => setMostrarAtividade((v) => !v)}
+          aria-expanded={mostrarAtividade}
+        >
+          <Activity size={16} aria-hidden="true" />
+          Atividade
+        </Button>
       </header>
 
-      <IntelligenceFeed items={intelligence.feed} limit={8} />
+      {mostrarAtividade && (
+        <div className="atlas-ai-activity">
+          <IntelligenceFeed items={intelligence.feed} limit={8} compact />
+        </div>
+      )}
 
       <div className="atlas-ai-thread" role="log" aria-live="polite" aria-relevant="additions">
         {mensagens.map((mensagem) => (
@@ -108,10 +125,7 @@ function AtlasAIPage() {
       </div>
 
       <form className="atlas-ai-composer" onSubmit={(e) => void handleSubmit(e)}>
-        <label className="atlas-sr-only" htmlFor="atlas-ai-input">
-          Mensagem para a Atlas IA
-        </label>
-        <input
+        <Input
           id="atlas-ai-input"
           type="text"
           value={texto}
@@ -119,6 +133,8 @@ function AtlasAIPage() {
           placeholder="Pergunte algo..."
           autoComplete="off"
           disabled={enviando}
+          className="atlas-ai-composer-input"
+          aria-label="Mensagem para a Atlas IA"
         />
         <Button type="submit" size="sm" aria-label="Enviar mensagem" loading={enviando}>
           <Send size={16} aria-hidden="true" />
