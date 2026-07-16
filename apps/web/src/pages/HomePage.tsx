@@ -24,6 +24,11 @@ import { usePlanning } from "../hooks/usePlanning";
 import { useRecommendations } from "../hooks/useRecommendations";
 import { useTransactions } from "../hooks/useTransactions";
 import { triggerMicrointeraction } from "../lib/microinteractions";
+import {
+  AtlasInsights,
+  IntelligenceFeed,
+  useAtlasIntelligence,
+} from "../modules/atlas-intelligence";
 import type { TransactionType } from "../types/transaction";
 import "./HomePage.css";
 
@@ -45,6 +50,13 @@ function HomePage() {
   const resumo = useFinancialSummary(transacoes, contas);
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
   const recomendacoes = useRecommendations(resumo, contas, metas, planejamento);
+  const intelligence = useAtlasIntelligence(
+    resumo,
+    contas,
+    metas,
+    transacoes,
+    planejamento,
+  );
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -77,9 +89,13 @@ function HomePage() {
           saldo={resumo.saldo}
         />
 
+        <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
+
         <QuickActions onAction={handleQuickAction} />
 
         <AtlasIntelligencePanel estado={recomendacoes} />
+
+        <IntelligenceFeed items={intelligence.feed} limit={5} compact />
 
         <BillsTimeline contas={contas} />
 
@@ -108,9 +124,19 @@ function HomePage() {
                 amount: dados.amount,
                 target: ".atlas-wealth-hero",
               });
+              void intelligence.publishEvent({
+                kind: "income_added",
+                amount: dados.amount,
+                title: dados.description,
+              });
             } else {
               triggerMicrointeraction("success", {
                 message: "Despesa registrada",
+              });
+              void intelligence.publishEvent({
+                kind: "expense_added",
+                amount: dados.amount,
+                title: dados.description,
               });
             }
           }}
@@ -124,6 +150,11 @@ function HomePage() {
           onSalvar={async (dados) => {
             await contas.criar({ type: "a_pagar", ...dados });
             triggerMicrointeraction("success", { message: "Conta adicionada" });
+            void intelligence.publishEvent({
+              kind: "bill_due_soon",
+              title: dados.description,
+              amount: dados.amount,
+            });
           }}
         />
       )}
@@ -137,6 +168,10 @@ function HomePage() {
               message: "Meta criada",
               moneyRain: false,
               target: ".atlas-wealth-hero",
+            });
+            void intelligence.publishEvent({
+              kind: "goal_progress",
+              title: dados.title,
             });
           }}
         />
