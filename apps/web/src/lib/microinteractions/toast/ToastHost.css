@@ -1,0 +1,128 @@
+.atlas-mi-toasts {
+  position: fixed;
+  top: max(var(--space-4), env(safe-area-inset-top));
+  right: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+  max-width: 380px;
+  margin-left: auto;
+}
+
+@media (min-width: 640px) {
+  .atlas-mi-toasts {
+    left: auto;
+  }
+}
+
+.atlas-mi-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+  animation: atlas-mi-toast-in var(--duration-base) var(--ease-standard);
+}
+
+.atlas-mi-toast-success {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.atlas-mi-toast-error {
+  border-color: rgba(255, 92, 114, 0.4);
+}
+
+.atlas-mi-toast-warning {
+  border-color: rgba(245, 165, 36, 0.4);
+}
+
+.atlas-mi-toast-info {
+  border-color: rgba(77, 163, 255, 0.4);
+}
+
+.atlas-mi-toast-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.atlas-mi-toast-success .atlas-mi-toast-icon {
+  color: var(--color-success);
+}
+
+.atlas-mi-toast-error .atlas-mi-toast-icon {
+  color: var(--color-danger);
+}
+
+.atlas-mi-toast-warning .atlas-mi-toast-icon {
+  color: var(--color-warning);
+}
+
+.atlas-mi-toast-info .atlas-mi-toast-icon {
+  color: var(--color-info);
+}
+
+.atlas-mi-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-mi-toast-body strong {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.atlas-mi-toast-body p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+.atlas-mi-toast-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px -4px 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+}
+
+.atlas-mi-toast-close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-neutral-soft);
+}
+
+@keyframes atlas-mi-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-mi-toast {
+    animation: none;
+  }
+}

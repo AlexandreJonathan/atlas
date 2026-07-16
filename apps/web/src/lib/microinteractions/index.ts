@@ -1,21 +1,12 @@
-import type { MicrointeractionEvent, MicrointeractionOptions } from "./types";
+import "./effects.css";
 
-export type { MicrointeractionEvent, MicrointeractionOptions } from "./types";
+import AnimatedNumber from "./AnimatedNumber";
+import { triggerMicrointeraction } from "./dispatch";
+import { pulseGlow, setSyncing } from "./glow";
+import ToastHost from "./toast/ToastHost";
+import { showToast } from "./toast/toastStore";
 
-/**
- * Dispara uma microinteração (animação, som ou vibração).
- * Implementação atual: no-op — arquitetura preparada para sprints futuras.
- *
- * Futuro esperado:
- * - celebration → confetti / animação de conquista
- * - success / error → feedback sonoro opcional
- * - tap → haptic via navigator.vibrate (quando disponível)
- */
-export function triggerMicrointeraction(
-  event: MicrointeractionEvent,
-  options?: MicrointeractionOptions,
-): void {
-  void event;
-  void options;
-  // No-op intencional — ver roadmap/sprint-08.md
-}
+export type { MicrointeractionEvent, MicrointeractionOptions, ToastTone } from "./types";
+export { AnimatedNumber, ToastHost, showToast, pulseGlow, setSyncing, triggerMicrointeraction };
+export { prefersReducedMotion, isSoundEnabled, setSoundEnabled } from "./preferences";
+export { startOpenFinanceMicrointeractionBridge } from "./openFinanceBridge";
