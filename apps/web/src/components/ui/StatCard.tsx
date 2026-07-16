@@ -9,13 +9,14 @@ type StatCardProps = {
   value: string;
   tone?: StatCardTone;
   hint?: string;
+  className?: string;
 };
 
 // Card de métrica premium do Dashboard 2.0 — substitui os 4 cards simples
 // (título + valor) usados antes desta missão. Ver roadmap/design-system.md.
-function StatCard({ icon, label, value, tone = "brand", hint }: StatCardProps) {
+function StatCard({ icon, label, value, tone = "brand", hint, className }: StatCardProps) {
   return (
-    <div className="atlas-stat-card">
+    <div className={`atlas-stat-card${className ? ` ${className}` : ""}`}>
       <span className={`atlas-stat-card-icon atlas-stat-card-icon-${tone}`} aria-hidden="true">
         {icon}
       </span>

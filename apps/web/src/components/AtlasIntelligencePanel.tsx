@@ -16,7 +16,10 @@ function AtlasIntelligencePanel({ estado }: AtlasIntelligencePanelProps) {
   const insights = estado.recomendacoes.slice(0, 2);
 
   return (
-    <section className="atlas-intelligence" aria-labelledby="atlas-intelligence-titulo">
+    <section
+      className="atlas-intelligence atlas-mi-intel-enter"
+      aria-labelledby="atlas-intelligence-titulo"
+    >
       <div className="atlas-intelligence-top">
         <span className="atlas-intelligence-icon" aria-hidden="true">
           <BrainCircuit size={22} />

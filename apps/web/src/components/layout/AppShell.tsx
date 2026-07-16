@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useFinancialProfile } from "../../hooks/useFinancialProfile";
 import { useFixedExpenses } from "../../hooks/useFixedExpenses";
 import { useGoals } from "../../hooks/useGoals";
 import { useOnboarding } from "../../hooks/useOnboarding";
+import {
+  startOpenFinanceMicrointeractionBridge,
+  ToastHost,
+} from "../../lib/microinteractions";
 import OnboardingWizard from "../onboarding/OnboardingWizard";
 import "./AppShell.css";
 import BottomNavigation from "./BottomNavigation";
@@ -22,24 +26,30 @@ function AppShell() {
   });
   const [onboardingOcultoNestaSessao, setOnboardingOcultoNestaSessao] = useState(false);
 
+  useEffect(() => startOpenFinanceMicrointeractionBridge(), []);
+
   if (onboarding.loading) {
     return <div className="atlas-page-loader">Carregando...</div>;
   }
 
   if (!onboarding.completo && !onboardingOcultoNestaSessao) {
     return (
-      <OnboardingWizard
-        onboarding={onboarding}
-        perfil={perfil}
-        despesasFixas={despesasFixas}
-        metas={metas}
-        onPularPorAgora={() => setOnboardingOcultoNestaSessao(true)}
-      />
+      <>
+        <ToastHost />
+        <OnboardingWizard
+          onboarding={onboarding}
+          perfil={perfil}
+          despesasFixas={despesasFixas}
+          metas={metas}
+          onPularPorAgora={() => setOnboardingOcultoNestaSessao(true)}
+        />
+      </>
     );
   }
 
   return (
     <div className="atlas-app-shell">
+      <ToastHost />
       <div className="atlas-app-shell-content">
         <Outlet />
       </div>

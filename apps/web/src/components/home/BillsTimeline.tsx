@@ -39,7 +39,7 @@ function BillsTimeline({ contas }: BillsTimelineProps) {
       ) : itens.length === 0 ? (
         <p className="atlas-home-block-muted">Nenhuma conta urgente nos próximos dias.</p>
       ) : (
-        <ul className="atlas-bills-timeline-list">
+        <ul className="atlas-bills-timeline-list atlas-mi-timeline-enter">
           {itens.map((bill) => (
             <li key={bill.id} className="atlas-bills-timeline-item">
               <div className="atlas-bills-timeline-info">

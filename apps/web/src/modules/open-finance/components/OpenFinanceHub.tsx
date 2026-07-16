@@ -1,10 +1,18 @@
 import { CreditCard, Landmark, Link2, PiggyBank, RefreshCw, Wallet } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Badge from "../../../components/ui/Badge";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import StatCard from "../../../components/ui/StatCard";
+import {
+  AnimatedNumber,
+  pulseGlow,
+  setSyncing,
+  triggerMicrointeraction,
+} from "../../../lib/microinteractions";
 import { useOpenFinance } from "../hooks/useOpenFinance";
+import type { BankId } from "../types";
 import { formatLastSynced, formatOpenFinanceMoney } from "../utils/aggregate";
 import BankLogo from "./BankLogo";
 import "./OpenFinanceHub.css";
@@ -13,6 +21,40 @@ function OpenFinanceHub() {
   const navigate = useNavigate();
   const { snapshot, totals, connectedBanks, loading, error, refresh, syncBank, actionLoading } =
     useOpenFinance();
+  const [syncingId, setSyncingId] = useState<BankId | null>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const prevSaldoRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const saldo = totals?.saldo ?? null;
+    if (saldo == null) return;
+    const prev = prevSaldoRef.current;
+    if (prev != null && saldo > prev && statsRef.current) {
+      pulseGlow(statsRef.current.querySelector(".atlas-stat-card"));
+    }
+    prevSaldoRef.current = saldo;
+  }, [totals?.saldo]);
+
+  async function handleSync(bankId: BankId) {
+    setSyncingId(bankId);
+    triggerMicrointeraction("bank_sync", {
+      toast: false,
+      target: `[data-bank-row="${bankId}"]`,
+    });
+    try {
+      await syncBank(bankId);
+      triggerMicrointeraction("success", {
+        message: "Sincronização concluída",
+        title: "Open Finance",
+      });
+      if (statsRef.current) pulseGlow(statsRef.current.querySelector(".atlas-stat-card"));
+    } catch {
+      triggerMicrointeraction("error", { message: "Não foi possível sincronizar" });
+    } finally {
+      setSyncing(`[data-bank-row="${bankId}"]`, false);
+      setSyncingId(null);
+    }
+  }
 
   if (loading && !snapshot) {
     return <div className="atlas-of-state">Carregando hub financeiro...</div>;
@@ -43,19 +85,29 @@ function OpenFinanceHub() {
         </Button>
       </header>
 
-      <div className="atlas-of-hub-stats">
-        <StatCard
-          icon={<Wallet size={20} />}
-          label="Patrimônio"
-          value={formatOpenFinanceMoney(totals?.patrimonio ?? 0)}
-          tone="brand"
-        />
-        <StatCard
-          icon={<Landmark size={20} />}
-          label="Saldo em contas"
-          value={formatOpenFinanceMoney(totals?.saldo ?? 0)}
-          tone="success"
-        />
+      <div className="atlas-of-hub-stats" ref={statsRef}>
+        <div className="atlas-stat-card">
+          <span className="atlas-stat-card-icon atlas-stat-card-icon-brand" aria-hidden="true">
+            <Wallet size={20} />
+          </span>
+          <div className="atlas-stat-card-body">
+            <span className="atlas-stat-card-label">Patrimônio</span>
+            <span className="atlas-stat-card-value tabular-nums atlas-stat-card-value-brand">
+              <AnimatedNumber value={totals?.patrimonio ?? 0} format={formatOpenFinanceMoney} />
+            </span>
+          </div>
+        </div>
+        <div className="atlas-stat-card">
+          <span className="atlas-stat-card-icon atlas-stat-card-icon-success" aria-hidden="true">
+            <Landmark size={20} />
+          </span>
+          <div className="atlas-stat-card-body">
+            <span className="atlas-stat-card-label">Saldo em contas</span>
+            <span className="atlas-stat-card-value tabular-nums atlas-stat-card-value-success">
+              <AnimatedNumber value={totals?.saldo ?? 0} format={formatOpenFinanceMoney} />
+            </span>
+          </div>
+        </div>
         <StatCard
           icon={<CreditCard size={20} />}
           label="Cartões (usado)"
@@ -84,7 +136,7 @@ function OpenFinanceHub() {
         ) : (
           <ul className="atlas-of-bank-list">
             {connectedBanks.map((bank) => (
-              <li key={bank.id} className="atlas-of-bank-row">
+              <li key={bank.id} className="atlas-of-bank-row" data-bank-row={bank.id}>
                 <BankLogo bankId={bank.id} name={bank.name} />
                 <div className="atlas-of-bank-info">
                   <strong>{bank.name}</strong>
@@ -95,10 +147,14 @@ function OpenFinanceHub() {
                   size="sm"
                   variant="ghost"
                   disabled={actionLoading}
-                  onClick={() => void syncBank(bank.id)}
+                  onClick={() => void handleSync(bank.id)}
                   aria-label={`Sincronizar ${bank.name}`}
                 >
-                  <RefreshCw size={16} aria-hidden="true" />
+                  <RefreshCw
+                    size={16}
+                    aria-hidden="true"
+                    className={`atlas-mi-sync-icon${syncingId === bank.id ? " atlas-mi-syncing" : ""}`}
+                  />
                 </Button>
               </li>
             ))}

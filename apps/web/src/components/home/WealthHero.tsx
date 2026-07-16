@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import MiniBarChart from "../ui/MiniBarChart";
+import { AnimatedNumber, pulseGlow } from "../../lib/microinteractions";
 import "./WealthHero.css";
 
 type WealthHeroProps = {
@@ -14,13 +16,25 @@ function formatarMoeda(valor: number): string {
 
 function WealthHero({ patrimonioTotal, saldoDisponivel, receitasDoMes, despesasDoMes }: WealthHeroProps) {
   const saldoNegativo = saldoDisponivel < 0;
+  const sectionRef = useRef<HTMLElement>(null);
+  const prevSaldoRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const prev = prevSaldoRef.current;
+    if (prev != null && saldoDisponivel > prev && sectionRef.current) {
+      pulseGlow(sectionRef.current);
+    }
+    prevSaldoRef.current = saldoDisponivel;
+  }, [saldoDisponivel]);
 
   return (
-    <section className="atlas-wealth-hero" aria-label="Patrimônio e saldo">
+    <section ref={sectionRef} className="atlas-wealth-hero" aria-label="Patrimônio e saldo">
       <div className="atlas-wealth-hero-glow" aria-hidden="true" />
 
       <p className="atlas-wealth-hero-label">Patrimônio total</p>
-      <p className="atlas-wealth-hero-patrimonio tabular-nums">{formatarMoeda(patrimonioTotal)}</p>
+      <p className="atlas-wealth-hero-patrimonio tabular-nums">
+        <AnimatedNumber value={patrimonioTotal} format={formatarMoeda} />
+      </p>
 
       <div className="atlas-wealth-hero-saldo">
         <span className="atlas-wealth-hero-saldo-label">Saldo disponível</span>
@@ -29,7 +43,7 @@ function WealthHero({ patrimonioTotal, saldoDisponivel, receitasDoMes, despesasD
             saldoNegativo ? " atlas-wealth-hero-saldo-valor-negativo" : ""
           }`}
         >
-          {formatarMoeda(saldoDisponivel)}
+          <AnimatedNumber value={saldoDisponivel} format={formatarMoeda} />
         </span>
       </div>
 

@@ -102,7 +102,17 @@ function HomePage() {
           onFechar={() => setModalAberto(null)}
           onSalvar={async (dados) => {
             await transacoes.adicionar({ type: modalAberto.tipo, ...dados });
-            triggerMicrointeraction("success");
+            if (modalAberto.tipo === "receita") {
+              triggerMicrointeraction("money_in", {
+                message: "Receita registrada",
+                amount: dados.amount,
+                target: ".atlas-wealth-hero",
+              });
+            } else {
+              triggerMicrointeraction("success", {
+                message: "Despesa registrada",
+              });
+            }
           }}
         />
       )}
@@ -113,7 +123,7 @@ function HomePage() {
           onFechar={() => setModalAberto(null)}
           onSalvar={async (dados) => {
             await contas.criar({ type: "a_pagar", ...dados });
-            triggerMicrointeraction("success");
+            triggerMicrointeraction("success", { message: "Conta adicionada" });
           }}
         />
       )}
@@ -123,7 +133,11 @@ function HomePage() {
           onFechar={() => setModalAberto(null)}
           onSalvar={async (dados) => {
             await metas.criar(dados);
-            triggerMicrointeraction("success");
+            triggerMicrointeraction("celebration", {
+              message: "Meta criada",
+              moneyRain: false,
+              target: ".atlas-wealth-hero",
+            });
           }}
         />
       )}

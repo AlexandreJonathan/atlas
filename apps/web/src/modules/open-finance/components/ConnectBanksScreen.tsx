@@ -17,9 +17,15 @@ function ConnectBanksScreen() {
     setConnectingId(bankId);
     try {
       await connectBank(bankId);
-      triggerMicrointeraction("success");
+      triggerMicrointeraction("bank_connected", {
+        message: "Instituição conectada",
+        title: "Open Finance",
+        target: `[data-connect-bank="${bankId}"]`,
+      });
     } catch {
-      // erro já no hook
+      triggerMicrointeraction("error", {
+        message: "Não foi possível conectar o banco",
+      });
     } finally {
       setConnectingId(null);
     }
@@ -45,7 +51,11 @@ function ConnectBanksScreen() {
           {catalog.map((bank) => {
             const connected = bank.status === "connected";
             return (
-              <li key={bank.id} className="atlas-of-connect-card">
+              <li
+                key={bank.id}
+                className="atlas-of-connect-card"
+                data-connect-bank={bank.id}
+              >
                 <BankLogo bankId={bank.id} name={bank.name} size={48} />
                 <div className="atlas-of-connect-info">
                   <strong>{bank.name}</strong>
