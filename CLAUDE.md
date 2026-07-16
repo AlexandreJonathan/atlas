@@ -24,6 +24,7 @@ O projeto é desenvolvido de forma incremental, em sprints, com cada etapa docum
 - **Cliente de API**: `src/lib/supabase.ts` (client único, via env Vite).
 - **Estado**: local por componente/hooks; dados financeiros no Supabase; Open Finance via módulo `src/modules/open-finance/` (mock em memória, Sprint 10).
 - **Open Finance**: UI → `OpenFinanceService` → `OpenFinanceProvider` (`MockOpenFinanceProvider` ativo; stub `PluggyOpenFinanceProvider`). Provedor-alvo do MVP: Pluggy — sem integração HTTP nesta fase.
+- **Microinterações**: `src/lib/microinteractions` — `triggerMicrointeraction` (som, money rain, glow, toasts, sync); `ToastHost` no `AppShell`.
 - **Estilo**: Design System (`src/styles/tokens.css` + `src/components/ui/`), CSS por componente.
 
 A descrição completa e atualizada da arquitetura vive em [`roadmap/arquitetura.md`](./roadmap/arquitetura.md) — este documento deve ser a fonte detalhada; este `CLAUDE.md` mantém apenas um resumo de alto nível.

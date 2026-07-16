@@ -4,6 +4,26 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 11] — Microinterações Premium (Missão 12)
+
+Camada de feedback visual/sonoro desacoplada em `src/lib/microinteractions`. Sem alteração de regras de negócio, Supabase, Pluggy ou rotas.
+
+### Adicionado
+- Implementação real de `triggerMicrointeraction` (som Web Audio, money rain, glow, sync, haptic).
+- Toasts modernos (`ToastHost` no `AppShell`) — success / error / warning / info.
+- `AnimatedNumber` (contador 60fps sem re-render por frame).
+- Bridge Open Finance → Pix recebido dispara `money_in`.
+- `roadmap/sprint-11.md`.
+
+### Alterado
+- Home, WealthHero, Hub Contas, Conectar bancos, Atlas Intelligence, Bills Timeline passam a usar a camada.
+- Backlog: item de microinterações no-op marcado como concluído.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 10] — Open Finance Foundation (Missão 11)
 
 Fundação de Open Finance com Adapter/Provider. Provedor-alvo do MVP: **Pluggy**. Sem integração HTTP/SDK nesta sprint — apenas mock + stub.

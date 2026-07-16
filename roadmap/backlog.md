@@ -74,7 +74,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - 🟡 Permitir revisitar/editar manualmente os dados coletados no onboarding (hoje só é possível pelos painéis normais da Home após concluído — funcional, mas sem um link direto de volta ao wizard)
 - ✅ ~~Navegação por abas (Bottom Navigation) e arquitetura multi-página~~ — concluído na Sprint 8 (`AppShell` + 5 abas: Início, Contas, Investimentos, Atlas IA, Perfil)
 - ✅ ~~Home Premium (Hero, Pulse, Intelligence conversacional, mobile-first)~~ — concluído na Sprint 9
-- 🟡 Implementar `triggerMicrointeraction` (animação/som/haptic) — arquitetura no-op criada na Sprint 8; Home já dispara `success` nos saves
+- ✅ ~~Implementar `triggerMicrointeraction` (animação/som/haptic)~~ — concluído na Sprint 11 (`src/lib/microinteractions`)
 - 🟢 Code-splitting das páginas das abas e dos 5 modais/`OnboardingWizard` via `React.lazy` — para mitigar o aviso de bundle >500 kB
 - 🔴 Open Finance real (Pluggy) — fundação Adapter/Provider + mock + stub concluídos na Sprint 10 (`src/modules/open-finance/`); falta Connect Widget, API e persistência
 - 🔴 IA real (LLM) na aba Atlas IA / Atlas Pulse — heurísticas locais na Sprint 9; chat e Pulse prontos para provider futuro
