@@ -4,6 +4,28 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 13] — Atlas Polish + UX Review 1.0
+
+Polish de UX/UI baseado em `roadmap/ux-review-1.0.md`. Sem novas funcionalidades de negócio.
+
+### Adicionado
+- Relatório `roadmap/ux-review-1.0.md` (Missão 14).
+- CTA compacto Home → Atlas IA; token `--atlas-bottom-nav-height`.
+
+### Alterado
+- Home: ordem “quanto tenho / o que fazer / o que aconteceu”; removidos Panel e Feed da Home.
+- Investimentos e Perfil: mesma coluna visual da Home/Contas; eyebrows; disclaimer mais suave.
+- Atlas IA: chat-first; feed em “Atividade”; composer com `Input` do DS.
+- Bottom nav: labels curtas (Investir / IA); Auth links em brand.
+
+### Removido
+- Toggles “Em breve” no Perfil (notificações/configurações placeholder).
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 12] — Atlas Intelligence 1.0 (Missão 13)
 
 Arquitetura do cérebro da Atlas: insights automáticos, feed inteligente e contrato Adapter/Provider para IA futura. **Sem OpenAI/LLM** nesta sprint.
