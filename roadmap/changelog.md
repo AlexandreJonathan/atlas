@@ -4,6 +4,29 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 14] — Atlas v0.8 Release Candidate (Missão 15)
+
+Primeira Release Candidate apresentável. Somente qualidade (visual, consistência DS, UX, performance leve). Sem novas funcionalidades, sem mudanças de negócio/DB/auth.
+
+### Adicionado
+- `roadmap/release-v0.8.md` — inventário da versão e critérios da RC.
+- `roadmap/sprint-14.md`.
+- Utilitários globais `.atlas-surface` e `.atlas-link`.
+- Tokens `--atlas-focus-ring`, `--atlas-icon-md` / `--atlas-icon-lg` (além do já existente `--atlas-bottom-nav-height`).
+- Code-split das abas autenticadas via `React.lazy` + `Suspense` em `App.tsx`.
+
+### Alterado
+- Versão do app: `0.8.0`.
+- Home / Insights / Feed / Auth / shell: radius, shadows, tipografia e links alinhados ao Design System.
+- Inputs (focus/disabled), StatCard e Bottom Nav; overflow horizontal do `body` contido.
+- Hub Open Finance: loading curto; botão de sync desabilitado durante sync em andamento.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+- Deploy Vercel a partir de `main`.
+
+---
+
 ## [Sprint 13] — Atlas Polish + UX Review 1.0
 
 Polish de UX/UI baseado em `roadmap/ux-review-1.0.md`. Sem novas funcionalidades de negócio.

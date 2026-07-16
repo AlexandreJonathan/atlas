@@ -42,7 +42,13 @@
 .atlas-input:focus {
   outline: none;
   border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px var(--color-brand-soft);
+  box-shadow: var(--atlas-focus-ring);
+}
+
+.atlas-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  color: var(--color-text-secondary);
 }
 
 .atlas-input-wrapper-error .atlas-input {

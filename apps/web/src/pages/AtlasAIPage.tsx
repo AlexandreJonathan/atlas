@@ -133,7 +133,6 @@ function AtlasAIPage() {
           placeholder="Pergunte algo..."
           autoComplete="off"
           disabled={enviando}
-          className="atlas-ai-composer-input"
           aria-label="Mensagem para a Atlas IA"
         />
         <Button type="submit" size="sm" aria-label="Enviar mensagem" loading={enviando}>

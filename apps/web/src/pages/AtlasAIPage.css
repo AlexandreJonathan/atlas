@@ -45,8 +45,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--atlas-icon-lg);
+  height: var(--atlas-icon-lg);
   border-radius: var(--radius-md);
   background: var(--color-brand-soft);
   color: var(--color-brand);
@@ -65,7 +65,7 @@
 
 .atlas-ai-header h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
 }
@@ -131,10 +131,6 @@
   margin: 0;
 }
 
-.atlas-ai-composer .atlas-input-wrapper {
-  border-radius: var(--radius-full);
-}
-
-.atlas-ai-composer-input {
+.atlas-ai-composer .atlas-input {
   border-radius: var(--radius-full);
 }

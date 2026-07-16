@@ -45,7 +45,7 @@ function PlanningSnapshot({ perfil, planejamento, despesasFixas }: PlanningSnaps
   const resultado = planejamento.resultado;
 
   return (
-    <section className="atlas-planning-snapshot" aria-labelledby="planning-snapshot-titulo">
+    <section className="atlas-surface atlas-planning-snapshot" aria-labelledby="planning-snapshot-titulo">
       <div className="atlas-home-block-header">
         <h2 id="planning-snapshot-titulo">
           <BarChart3 size={18} aria-hidden="true" /> Planejamento

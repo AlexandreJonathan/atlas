@@ -50,14 +50,7 @@
 }
 
 .atlas-auth-footer a {
-  color: var(--color-brand);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
   margin-left: var(--space-1);
-}
-
-.atlas-auth-footer a:hover {
-  text-decoration: underline;
 }
 
 .atlas-auth-form {
@@ -73,14 +66,6 @@
   margin-top: calc(var(--space-2) * -1);
 }
 
-.atlas-auth-links a {
-  color: var(--color-brand);
-  text-decoration: none;
-}
-
-.atlas-auth-links a:hover {
-  text-decoration: underline;
-}
 
 .atlas-mensagem-sucesso {
   color: var(--color-success);
@@ -97,12 +82,11 @@
 .atlas-link-botao {
   background: none;
   border: none;
-  color: var(--color-brand);
-  text-decoration: underline;
   cursor: pointer;
   font-size: var(--font-size-xs);
   padding: 0;
   font-family: inherit;
+  text-decoration: underline;
 }
 
 .atlas-link-botao:disabled {

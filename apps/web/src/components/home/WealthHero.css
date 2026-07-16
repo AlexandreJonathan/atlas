@@ -38,7 +38,7 @@
 .atlas-wealth-hero-patrimonio {
   position: relative;
   margin: 0;
-  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-size: clamp(var(--font-size-3xl), 8vw, var(--font-size-4xl));
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
   color: var(--color-text-primary);

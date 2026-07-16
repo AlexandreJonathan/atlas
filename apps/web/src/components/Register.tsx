@@ -97,7 +97,9 @@ function Register() {
         footer={
           <span>
             Já confirmou?
-            <Link to="/login">Entrar</Link>
+            <Link to="/login" className="atlas-link">
+              Entrar
+            </Link>
           </span>
         }
       >
@@ -125,7 +127,9 @@ function Register() {
       footer={
         <span>
           Já possui conta?
-          <Link to="/login">Entrar</Link>
+          <Link to="/login" className="atlas-link">
+            Entrar
+          </Link>
         </span>
       }
     >

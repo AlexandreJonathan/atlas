@@ -94,6 +94,9 @@
 
   /* ---------- Shell ---------- */
   --atlas-bottom-nav-height: 72px;
+  --atlas-focus-ring: 0 0 0 3px var(--color-brand-soft);
+  --atlas-icon-md: 36px;
+  --atlas-icon-lg: 44px;
 }
 
 @media (prefers-reduced-motion: reduce) {

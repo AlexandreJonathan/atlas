@@ -14,7 +14,7 @@ function TransactionsPreview({ transacoes }: TransactionsPreviewProps) {
   const recentes = transacoes.transactions.slice(0, 5);
 
   return (
-    <section className="atlas-tx-preview" aria-labelledby="tx-preview-titulo">
+    <section className="atlas-surface atlas-tx-preview" aria-labelledby="tx-preview-titulo">
       <div className="atlas-home-block-header">
         <h2 id="tx-preview-titulo">Recentes</h2>
       </div>

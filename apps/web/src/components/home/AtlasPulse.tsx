@@ -39,7 +39,7 @@ function AtlasPulse({ contas, transacoes, planejamento, saldo }: AtlasPulseProps
   );
 
   return (
-    <aside className="atlas-pulse" aria-live="polite">
+    <aside className="atlas-surface atlas-pulse" aria-live="polite">
       <span className={`atlas-pulse-dot ${DOT[mensagem.tone]}`} aria-hidden="true" />
       <p className="atlas-pulse-text">{mensagem.text}</p>
     </aside>

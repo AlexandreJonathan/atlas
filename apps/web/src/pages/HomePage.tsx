@@ -106,7 +106,7 @@ function HomePage() {
 
         <InvestmentsTeaser />
 
-        <Link to="/atlas-ia" className="atlas-home-ia-cta">
+        <Link to="/atlas-ia" className="atlas-surface atlas-home-ia-cta">
           <span className="atlas-home-ia-cta-icon" aria-hidden="true">
             <BrainCircuit size={20} />
           </span>

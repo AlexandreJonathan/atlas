@@ -19,7 +19,7 @@ function GoalsFocus({ metas }: GoalsFocusProps) {
   const destaque = metas.goals.slice(0, 2);
 
   return (
-    <section className="atlas-goals-focus" aria-labelledby="metas-focus-titulo">
+    <section className="atlas-surface atlas-goals-focus" aria-labelledby="metas-focus-titulo">
       <div className="atlas-home-block-header">
         <h2 id="metas-focus-titulo">
           <Target size={18} aria-hidden="true" /> Metas

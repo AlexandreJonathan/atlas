@@ -11,7 +11,7 @@ function InvestmentsTeaser() {
   const { patrimonioInvestido, rendimentoMensalPercentual } = MOCK_INVESTMENTS;
 
   return (
-    <section className="atlas-invest-teaser" aria-labelledby="invest-teaser-titulo">
+    <section className="atlas-surface atlas-invest-teaser" aria-labelledby="invest-teaser-titulo">
       <div className="atlas-home-block-header">
         <h2 id="invest-teaser-titulo">
           <TrendingUp size={18} aria-hidden="true" /> Investimentos

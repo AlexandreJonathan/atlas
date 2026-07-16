@@ -79,7 +79,9 @@ function Login() {
       footer={
         <span>
           Ainda não possui conta?
-          <Link to="/cadastro">Criar conta</Link>
+          <Link to="/cadastro" className="atlas-link">
+            Criar conta
+          </Link>
         </span>
       }
     >
@@ -103,7 +105,9 @@ function Login() {
         />
 
         <div className="atlas-auth-links">
-          <Link to="/esqueci-senha">Esqueceu sua senha?</Link>
+          <Link to="/esqueci-senha" className="atlas-link">
+            Esqueceu sua senha?
+          </Link>
         </div>
 
         {erroGeral && (
@@ -114,7 +118,7 @@ function Login() {
                 {" "}
                 <button
                   type="button"
-                  className="atlas-link-botao"
+                  className="atlas-link atlas-link-botao"
                   onClick={handleReenviarConfirmacao}
                   disabled={reenviando}
                 >

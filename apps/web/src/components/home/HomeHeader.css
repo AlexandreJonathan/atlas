@@ -17,8 +17,8 @@
 
 .atlas-home-header-text h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   line-height: var(--line-height-tight);
 }
@@ -41,10 +41,4 @@
 
 .atlas-home-header-avatar:active {
   transform: scale(0.96);
-}
-
-@media (min-width: 768px) {
-  .atlas-home-header-text h1 {
-    font-size: var(--font-size-2xl);
-  }
 }

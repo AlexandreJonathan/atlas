@@ -19,8 +19,7 @@ import "./OpenFinanceHub.css";
 
 function OpenFinanceHub() {
   const navigate = useNavigate();
-  const { snapshot, totals, connectedBanks, loading, error, refresh, syncBank, actionLoading } =
-    useOpenFinance();
+  const { snapshot, totals, connectedBanks, loading, error, refresh, syncBank } = useOpenFinance();
   const [syncingId, setSyncingId] = useState<BankId | null>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const prevSaldoRef = useRef<number | null>(null);
@@ -57,7 +56,7 @@ function OpenFinanceHub() {
   }
 
   if (loading && !snapshot) {
-    return <div className="atlas-of-state">Carregando hub financeiro...</div>;
+    return <div className="atlas-of-state">Carregando...</div>;
   }
 
   if (error && !snapshot) {
@@ -146,7 +145,7 @@ function OpenFinanceHub() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  disabled={actionLoading}
+                  disabled={syncingId !== null}
                   onClick={() => void handleSync(bank.id)}
                   aria-label={`Sincronizar ${bank.name}`}
                 >

@@ -22,7 +22,7 @@ function BillsTimeline({ contas }: BillsTimelineProps) {
     .slice(0, 3);
 
   return (
-    <section className="atlas-bills-timeline" aria-labelledby="timeline-titulo">
+    <section className="atlas-surface atlas-bills-timeline" aria-labelledby="timeline-titulo">
       <div className="atlas-home-block-header">
         <h2 id="timeline-titulo">Hoje e próximos</h2>
       </div>

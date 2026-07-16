@@ -97,7 +97,9 @@ function ResetPassword() {
         subtitle="Este link de redefinição de senha não é mais válido. Solicite um novo."
         footer={
           <span>
-            <Link to="/esqueci-senha">Esqueci minha senha</Link>
+            <Link to="/esqueci-senha" className="atlas-link">
+              Esqueci minha senha
+            </Link>
           </span>
         }
       />

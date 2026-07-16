@@ -56,7 +56,9 @@ function ForgotPassword() {
         subtitle="Se este e-mail estiver cadastrado, você receberá em poucos minutos um link para redefinir sua senha."
         footer={
           <span>
-            <Link to="/login">Voltar para o login</Link>
+            <Link to="/login" className="atlas-link">
+              Voltar para o login
+            </Link>
           </span>
         }
       />
@@ -70,7 +72,9 @@ function ForgotPassword() {
       footer={
         <span>
           Lembrou a senha?
-          <Link to="/login">Entrar</Link>
+          <Link to="/login" className="atlas-link">
+            Entrar
+          </Link>
         </span>
       }
     >
