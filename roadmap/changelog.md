@@ -4,6 +4,23 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 12] — Atlas Intelligence 1.0 (Missão 13)
+
+Arquitetura do cérebro da Atlas: insights automáticos, feed inteligente e contrato Adapter/Provider para IA futura. **Sem OpenAI/LLM** nesta sprint.
+
+### Adicionado
+- Módulo `src/modules/atlas-intelligence/` (engine, providers Mock + stub OpenAI, service, hooks, prompts, AtlasInsights, IntelligenceFeed).
+- `roadmap/atlas-intelligence.md` e `roadmap/sprint-12.md`.
+
+### Alterado
+- Home: bloco Atlas Insights (top 3) + Feed inteligente; eventos de receita/despesa/conta/meta narrados no feed.
+- Atlas IA: respostas via `MockAtlasAIProvider` com contexto financeiro.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 11] — Microinterações Premium (Missão 12)
 
 Camada de feedback visual/sonoro desacoplada em `src/lib/microinteractions`. Sem alteração de regras de negócio, Supabase, Pluggy ou rotas.

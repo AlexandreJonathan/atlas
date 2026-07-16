@@ -4,7 +4,7 @@
 
 O Atlas é uma aplicação web de organização financeira pessoal, composta por um front-end SPA (Single Page Application) construído com React, TypeScript e Vite, e por um backend gerenciado via Supabase (autenticação e banco de dados Postgres). O projeto está estruturado como um monorepo, com o front-end residindo em `apps/web`.
 
-Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`). Na Sprint 10 ("Open Finance Foundation" / Missão 11), a Atlas ganhou o módulo `src/modules/open-finance/` com padrão Adapter/Provider (`OpenFinanceService` → `OpenFinanceProvider`), mock ativo, stub Pluggy (provedor-alvo do MVP, sem HTTP), hub financeiro e telas de conectar/contas conectadas. Na Sprint 11 ("Microinterações Premium" / Missão 12), a API no-op de `src/lib/microinteractions` passou a ter implementação real (som, money rain, toasts, contador animado, glow, sync) sem alterar regras de negócio.
+Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`). Na Sprint 10 ("Open Finance Foundation" / Missão 11), a Atlas ganhou o módulo `src/modules/open-finance/` com padrão Adapter/Provider (`OpenFinanceService` → `OpenFinanceProvider`), mock ativo, stub Pluggy (provedor-alvo do MVP, sem HTTP), hub financeiro e telas de conectar/contas conectadas. Na Sprint 11 ("Microinterações Premium" / Missão 12), a API no-op de `src/lib/microinteractions` passou a ter implementação real (som, money rain, toasts, contador animado, glow, sync) sem alterar regras de negócio. Na Sprint 12 ("Atlas Intelligence 1.0" / Missão 13), nasceu o módulo `src/modules/atlas-intelligence/` com Insight Engine, feed inteligente e `AtlasAIProvider` (Mock ativo, OpenAI stub) — sem LLM real.
 
 ## 2. Stack Tecnológica
 
@@ -103,14 +103,24 @@ atlas/
 │       │   │   ├── AtlasAIPage.tsx / .css
 │       │   │   └── ProfilePage.tsx / .css
 │       │   ├── modules/
-│       │   │   └── open-finance/
+│       │   │   ├── open-finance/
+│       │   │   │       ├── types/
+│       │   │   │       ├── providers/   # interface + Mock + stub Pluggy
+│       │   │   │       ├── services/    # OpenFinanceService
+│       │   │   │       ├── mocks/
+│       │   │   │       ├── utils/
+│       │   │   │       ├── hooks/
+│       │   │   │       ├── components/
+│       │   │   │       └── index.ts
+│       │   │   └── atlas-intelligence/
 │       │   │       ├── types/
-│       │   │       ├── providers/   # interface + Mock + stub Pluggy
-│       │   │       ├── services/    # OpenFinanceService
-│       │   │       ├── mocks/
-│       │   │       ├── utils/
+│       │   │       ├── engine/         # Insight Engine
+│       │   │       ├── providers/      # AtlasAIProvider + Mock + stub OpenAI
+│       │   │       ├── services/
 │       │   │       ├── hooks/
-│       │   │       ├── components/
+│       │   │       ├── prompts/
+│       │   │       ├── components/     # AtlasInsights, IntelligenceFeed
+│       │   │       ├── utils/
 │       │   │       └── index.ts
 │       │   ├── data/
 │       │   │   ├── mockInvestments.ts

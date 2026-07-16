@@ -49,7 +49,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 
 ## 4. Inteligência e Recomendações (Sprint 4/5)
 
-- 🔴 Implementar `aiRecommendationProvider` real (Supabase Edge Function + LLM), substituindo/complementando o motor de regras `recommendationEngine.ts` por trás do mesmo contrato `RecommendationProvider`
+- 🔴 Implementar `aiRecommendationProvider` real (Supabase Edge Function + LLM), substituindo/complementando o motor de regras `recommendationEngine.ts` por trás do mesmo contrato `RecommendationProvider` — fundação Atlas Intelligence (Mock + stub OpenAI) concluída na Sprint 12 (`src/modules/atlas-intelligence/`)
 - 🟡 Ajustar/expandir as regras heurísticas atuais conforme feedback de uso real (hoje: saldo negativo, contas vencidas/próximas, gastos do mês acima da renda, metas quase concluídas, risco financeiro alto)
 - 🔴 Implementar `aiPlanningProvider` real (Supabase Edge Function), substituindo/complementando o motor `planningEngine.ts` por trás do mesmo contrato `PlanningProvider` — usar o histórico real de transações para prever gastos variáveis (hoje o cálculo assume apenas despesas fixas/contas pendentes, sem prever gastos variáveis futuros)
 - 🟡 Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" (`usePlanning`/`planningEngine.ts`) — avaliar uma forma de estimar ritmo mensal mesmo sem prazo definido
@@ -77,7 +77,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Implementar `triggerMicrointeraction` (animação/som/haptic)~~ — concluído na Sprint 11 (`src/lib/microinteractions`)
 - 🟢 Code-splitting das páginas das abas e dos 5 modais/`OnboardingWizard` via `React.lazy` — para mitigar o aviso de bundle >500 kB
 - 🔴 Open Finance real (Pluggy) — fundação Adapter/Provider + mock + stub concluídos na Sprint 10 (`src/modules/open-finance/`); falta Connect Widget, API e persistência
-- 🔴 IA real (LLM) na aba Atlas IA / Atlas Pulse — heurísticas locais na Sprint 9; chat e Pulse prontos para provider futuro
+- 🔴 IA real (LLM) na aba Atlas IA / Atlas Pulse — Sprint 12 entregou MockAtlasAIProvider + stub OpenAI + insights/feed; falta conectar LLM
 - 🟡 Investimentos reais (somente leitura/estudo primeiro; a Atlas não vende investimentos) — estrutura na Sprint 8
 
 ## 7. Infraestrutura e DevOps
