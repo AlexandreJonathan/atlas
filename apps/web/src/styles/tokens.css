@@ -91,6 +91,9 @@
   /* ---------- Z-index ---------- */
   --z-modal: 50;
   --z-toast: 60;
+
+  /* ---------- Shell ---------- */
+  --atlas-bottom-nav-height: 72px;
 }
 
 @media (prefers-reduced-motion: reduce) {

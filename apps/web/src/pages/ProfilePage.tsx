@@ -1,12 +1,4 @@
-import {
-  Bell,
-  ChevronRight,
-  Landmark,
-  LogOut,
-  Settings,
-  Shield,
-} from "lucide-react";
-import { useState } from "react";
+import { ChevronRight, Landmark, LogOut, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Badge from "../components/ui/Badge";
@@ -29,7 +21,6 @@ function iniciais(nome: string | undefined, email: string | undefined): string {
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const [notificacoesAtivas, setNotificacoesAtivas] = useState(false);
 
   const nome = (user?.user_metadata?.nome as string | undefined) ?? "Usuário Atlas";
   const email = user?.email ?? "";
@@ -46,8 +37,9 @@ function ProfilePage() {
     <div className="atlas-page">
       <header className="atlas-page-header">
         <div>
+          <p className="atlas-page-eyebrow">Conta</p>
           <h1>Perfil</h1>
-          <p>Conta, segurança e preferências</p>
+          <p>Identidade, segurança e Open Finance</p>
         </div>
       </header>
 
@@ -73,34 +65,6 @@ function ProfilePage() {
                 </span>
                 <ChevronRight size={18} aria-hidden="true" />
               </Link>
-            </li>
-            <li>
-              <div className="atlas-profile-menu-item">
-                <span className="atlas-profile-menu-label">
-                  <Bell size={18} aria-hidden="true" />
-                  Notificações
-                </span>
-                <label className="atlas-profile-toggle">
-                  <span className="atlas-sr-only">Ativar notificações (em breve)</span>
-                  <input
-                    type="checkbox"
-                    checked={notificacoesAtivas}
-                    onChange={(evento) => setNotificacoesAtivas(evento.target.checked)}
-                    disabled
-                    title="Em breve"
-                  />
-                  <Badge tone="neutra">Em breve</Badge>
-                </label>
-              </div>
-            </li>
-            <li>
-              <div className="atlas-profile-menu-item atlas-profile-menu-item-static">
-                <span className="atlas-profile-menu-label">
-                  <Settings size={18} aria-hidden="true" />
-                  Configurações
-                </span>
-                <Badge tone="neutra">Em breve</Badge>
-              </div>
             </li>
             <li>
               <Link to="/contas" className="atlas-profile-menu-item">

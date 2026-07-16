@@ -1,14 +1,21 @@
+/* Shell de página compartilhado — mesma coluna mobile da Home / Contas */
+
 .atlas-page {
-  padding: var(--space-6) var(--space-7);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-6);
 }
 
 .atlas-page-of {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-4) var(--space-6);
 }
 
 @media (min-width: 640px) {
+  .atlas-page,
   .atlas-page-of {
     max-width: 560px;
     padding: var(--space-6) var(--space-5);
@@ -16,19 +23,29 @@
 }
 
 @media (min-width: 900px) {
+  .atlas-page,
   .atlas-page-of {
     max-width: 720px;
+    padding: var(--space-7) var(--space-6);
   }
 }
 
 .atlas-page-header {
-  max-width: 1100px;
-  margin: 0 auto var(--space-6);
+  margin: 0 0 var(--space-6);
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
+}
+
+.atlas-page-eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand);
 }
 
 .atlas-page-header h1 {
@@ -45,8 +62,6 @@
 }
 
 .atlas-page-main {
-  max-width: 1100px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
@@ -110,18 +125,26 @@
   font-size: var(--font-size-xs);
 }
 
+.atlas-page-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-canvas-alt);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+/* legado: disclaimer antigo — redireciona visualmente para note */
 .atlas-page-disclaimer {
   margin: 0;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--color-warning-soft);
-  color: var(--color-warning);
+  background: var(--color-bg-canvas-alt);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-}
-
-@media (max-width: 640px) {
-  .atlas-page {
-    padding: var(--space-5) var(--space-4);
-  }
+  line-height: var(--line-height-base);
 }

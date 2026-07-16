@@ -18,14 +18,15 @@ function InvestmentsPage() {
     <div className="atlas-page">
       <header className="atlas-page-header">
         <div>
+          <p className="atlas-page-eyebrow">Estudo</p>
           <h1>Investimentos</h1>
           <p>Acompanhe e estude — sem pressão para comprar</p>
         </div>
       </header>
 
       <main className="atlas-page-main">
-        <p className="atlas-page-disclaimer" role="note">
-          A Atlas não vende investimentos.
+        <p className="atlas-page-note" role="note">
+          A Atlas não vende investimentos. Aqui você só acompanha e estuda.
         </p>
 
         <div className="atlas-invest-stats">

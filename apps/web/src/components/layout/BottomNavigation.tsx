@@ -5,8 +5,8 @@ import "./BottomNavigation.css";
 const ABAS = [
   { to: "/inicio", label: "Início", icon: Home },
   { to: "/contas", label: "Contas", icon: CreditCard },
-  { to: "/investimentos", label: "Investimentos", icon: TrendingUp },
-  { to: "/atlas-ia", label: "Atlas IA", icon: Bot },
+  { to: "/investimentos", label: "Investir", icon: TrendingUp },
+  { to: "/atlas-ia", label: "IA", icon: Bot },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 

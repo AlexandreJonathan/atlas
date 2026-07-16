@@ -74,7 +74,7 @@
 }
 
 .atlas-auth-links a {
-  color: var(--color-info);
+  color: var(--color-brand);
   text-decoration: none;
 }
 
@@ -97,7 +97,7 @@
 .atlas-link-botao {
   background: none;
   border: none;
-  color: var(--color-info);
+  color: var(--color-brand);
   text-decoration: underline;
   cursor: pointer;
   font-size: var(--font-size-xs);

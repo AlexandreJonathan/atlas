@@ -1,11 +1,12 @@
 .atlas-invest-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
 }
 
-@media (max-width: 640px) {
+@media (min-width: 480px) {
   .atlas-invest-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
   }
 }
