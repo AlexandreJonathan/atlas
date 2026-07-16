@@ -4,7 +4,7 @@
 
 O Atlas é uma aplicação web de organização financeira pessoal, composta por um front-end SPA (Single Page Application) construído com React, TypeScript e Vite, e por um backend gerenciado via Supabase (autenticação e banco de dados Postgres). O projeto está estruturado como um monorepo, com o front-end residindo em `apps/web`.
 
-Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`).
+Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`). Na Sprint 10 ("Open Finance Foundation" / Missão 11), a Atlas ganhou o módulo `src/modules/open-finance/` com padrão Adapter/Provider (`OpenFinanceService` → `OpenFinanceProvider`), mock ativo, stub Pluggy (provedor-alvo do MVP, sem HTTP), hub financeiro e telas de conectar/contas conectadas.
 
 ## 2. Stack Tecnológica
 
@@ -97,11 +97,22 @@ atlas/
 │       │   ├── pages/
 │       │   │   ├── HomePage.tsx / .css
 │       │   │   ├── AccountsPage.tsx / .css
+│       │   │   ├── ConnectBanksPage.tsx
+│       │   │   ├── ConnectedAccountsPage.tsx
 │       │   │   ├── InvestmentsPage.tsx / .css
 │       │   │   ├── AtlasAIPage.tsx / .css
 │       │   │   └── ProfilePage.tsx / .css
+│       │   ├── modules/
+│       │   │   └── open-finance/
+│       │   │       ├── types/
+│       │   │       ├── providers/   # interface + Mock + stub Pluggy
+│       │   │       ├── services/    # OpenFinanceService
+│       │   │       ├── mocks/
+│       │   │       ├── utils/
+│       │   │       ├── hooks/
+│       │   │       ├── components/
+│       │   │       └── index.ts
 │       │   ├── data/
-│       │   │   ├── mockOpenFinance.ts
 │       │   │   ├── mockInvestments.ts
 │       │   │   └── mockAtlasAiChat.ts
 │       │   ├── contexts/
@@ -200,12 +211,23 @@ O roteamento é gerenciado pelo `react-router-dom` v7, utilizando `BrowserRouter
 
 | Rota               | Componente        | Acesso     |
 |--------------------|--------------------|------------|
-| `/`                | Redirect → `/dashboard` | Público |
+| `/`                | Redirect → `/inicio` | Público |
 | `/login`           | `Login`            | Público    |
 | `/cadastro`        | `Register`         | Público    |
-| `/esqueci-senha`   | `ForgotPassword`   | Público (Sprint 6) |
-| `/redefinir-senha` | `ResetPassword`    | Público, mas exige uma sessão de recuperação válida (link do Supabase Auth) — ver seção 5 (Sprint 6) |
-| `/dashboard`       | `Dashboard`         | Protegido (`ProtectedRoute`); exibe o onboarding guiado em vez do conteúdo normal enquanto não for concluído (Sprint 6) |
+| `/esqueci-senha`   | `ForgotPassword`   | Público |
+| `/redefinir-senha` | `ResetPassword`    | Público (sessão de recuperação) |
+| `/inicio`          | `HomePage`         | Protegido (`AppShell`) |
+| `/contas`          | Hub Open Finance   | Protegido |
+| `/contas/conectar` | Conectar bancos    | Protegido (Sprint 10) |
+| `/contas/conectadas` | Contas conectadas | Protegido (Sprint 10) |
+| `/investimentos`   | `InvestmentsPage`  | Protegido |
+| `/atlas-ia`        | `AtlasAIPage`      | Protegido |
+| `/perfil`          | `ProfilePage`      | Protegido |
+| `/dashboard`       | Redirect → `/inicio` | Compatibilidade |
+
+### Open Finance (Sprint 10)
+
+Fluxo obrigatório: **UI → `OpenFinanceService` → `OpenFinanceProvider`**. Implementações: `MockOpenFinanceProvider` (ativo) e `PluggyOpenFinanceProvider` (stub). Nenhuma tela chama Pluggy diretamente.
 
 ## 5. Autenticação
 

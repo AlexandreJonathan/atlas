@@ -22,7 +22,8 @@ O projeto é desenvolvido de forma incremental, em sprints, com cada etapa docum
 - **Autenticação**: Supabase Auth (`@supabase/supabase-js`), com sessão via `AuthContext`/`useAuth` e rotas protegidas por `ProtectedRoute.tsx`.
 - **Formulários**: `react-hook-form` + `zod` (`src/validations`), tipos em `src/types`.
 - **Cliente de API**: `src/lib/supabase.ts` (client único, via env Vite).
-- **Estado**: local por componente/hooks; mocks tipados em `src/data/` para Contas/Investimentos/Atlas IA (Sprint 8).
+- **Estado**: local por componente/hooks; dados financeiros no Supabase; Open Finance via módulo `src/modules/open-finance/` (mock em memória, Sprint 10).
+- **Open Finance**: UI → `OpenFinanceService` → `OpenFinanceProvider` (`MockOpenFinanceProvider` ativo; stub `PluggyOpenFinanceProvider`). Provedor-alvo do MVP: Pluggy — sem integração HTTP nesta fase.
 - **Estilo**: Design System (`src/styles/tokens.css` + `src/components/ui/`), CSS por componente.
 
 A descrição completa e atualizada da arquitetura vive em [`roadmap/arquitetura.md`](./roadmap/arquitetura.md) — este documento deve ser a fonte detalhada; este `CLAUDE.md` mantém apenas um resumo de alto nível.

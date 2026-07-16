@@ -4,6 +4,28 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 10] — Open Finance Foundation (Missão 11)
+
+Fundação de Open Finance com Adapter/Provider. Provedor-alvo do MVP: **Pluggy**. Sem integração HTTP/SDK nesta sprint — apenas mock + stub.
+
+### Adicionado
+- Módulo `src/modules/open-finance/`: types, `OpenFinanceProvider`, `MockOpenFinanceProvider`, stub `PluggyOpenFinanceProvider`, `OpenFinanceService`, catálogo, snapshot mock, aggregator, event bus, `useOpenFinance`.
+- Telas: Hub financeiro (`/contas`), Conectar bancos (`/contas/conectar`), Contas conectadas (`/contas/conectadas`).
+- `roadmap/sprint-10.md`.
+
+### Alterado
+- Aba Contas passa a renderizar o hub Open Finance (em vez do mock estático antigo).
+- Perfil → Open Finance navega para `/contas`.
+- Bottom Nav mantém Contas ativa em rotas aninhadas `/contas/*`.
+
+### Removido
+- `src/data/mockOpenFinance.ts` (substituído pelo módulo).
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 9] — Atlas Premium Home (UX First)
 
 Redesenho completo da Home mobile-first: Hero premium, Atlas Pulse, Intelligence conversacional, seções de síntese. Sem alteração de banco/auth/engines. UX aprovada em `roadmap/ux-home-premium.md`.
