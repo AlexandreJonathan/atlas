@@ -17,10 +17,10 @@ function BottomNavigation() {
         <NavLink
           key={to}
           to={to}
+          end={to !== "/contas"}
           className={({ isActive }) =>
             `atlas-bottom-nav-item${isActive ? " atlas-bottom-nav-item-active" : ""}`
           }
-          end
         >
           <Icon size={22} aria-hidden="true" />
           <span>{label}</span>

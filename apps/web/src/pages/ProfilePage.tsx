@@ -103,13 +103,13 @@ function ProfilePage() {
               </div>
             </li>
             <li>
-              <div className="atlas-profile-menu-item atlas-profile-menu-item-static">
+              <Link to="/contas" className="atlas-profile-menu-item">
                 <span className="atlas-profile-menu-label">
                   <Landmark size={18} aria-hidden="true" />
                   Open Finance
                 </span>
-                <Badge tone="informativa">Em breve</Badge>
-              </div>
+                <ChevronRight size={18} aria-hidden="true" />
+              </Link>
             </li>
           </ul>
         </Card>
