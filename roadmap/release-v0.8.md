@@ -1,9 +1,9 @@
 # Atlas v0.8 — Release Candidate
 
 **Status:** Release Candidate (primeira versão apresentável)  
-**Versão do app:** `0.8.0` (`apps/web/package.json`)  
-**Data de corte:** 2026-07-16  
-**Missão:** 15  
+**Versão do app:** `0.8.1` (patch Perfection sobre RC `0.8.0`)  
+**Data de corte:** 2026-07-16 (RC); polish 2026-07-16 (Sprint 15)  
+**Missão:** 15 (RC) + Sprint 15 Perfection  
 
 ## 1. O que é esta RC
 
@@ -25,6 +25,7 @@ A Atlas v0.8 é o consolidado de produto **antes** de OpenAI real e Open Finance
 | UX Review | Missão 14 | `roadmap/ux-review-1.0.md` |
 | Atlas Polish | Sprint 13 | Home simplificada, shell unificado, Atlas IA chat-first |
 | Release Candidate | Sprint 14 / M15 | Consistência DS, lazy routes, polish final, este documento |
+| Atlas Perfection | Sprint 15 | UI/UX 10.0 — shell, focus, motion, skeletons, a11y (sem features) |
 
 ## 3. Escopo da Missão 15 (somente qualidade)
 

@@ -43,7 +43,15 @@ Cada cor semântica tem uma variante `-soft` (ex: `--color-danger-soft`) para fu
 - Espaçamento: escala de 4px, `--space-1` (4px) a `--space-12` (96px).
 - Radius: `--radius-sm` (8px) a `--radius-xl` (28px), `--radius-full` para pills/badges.
 - Sombra: `--shadow-sm/md/lg` (glow suave, não preto puro — pensado para fundo escuro) e `--shadow-glow-brand` (uso pontual, ex: seção Atlas Intelligence).
-- Movimento: `--duration-fast/base/slow` + `--ease-standard`; respeita `prefers-reduced-motion`.
+- Movimento: `--duration-fast/base/slow` + `--ease-standard`; keyframe compartilhado `atlas-rise` em `index.css`; respeita `prefers-reduced-motion`.
+
+### Shell e utilitários (Sprint 14/15)
+
+- `.atlas-page-shell` — coluna responsiva (`--atlas-page-max-sm/md/lg`: 480 → 560 → 720).
+- `.atlas-page-eyebrow` — label uppercase brand.
+- `.atlas-surface` / `.atlas-surface-pad` — painel tipo Card + padding `md`.
+- `.atlas-link` — link textual brand com hover/focus.
+- Focus: `--atlas-focus-ring`; alvos tocáveis `--atlas-touch-min` (44px).
 
 ## 3. Componentes (`src/components/ui/`)
 

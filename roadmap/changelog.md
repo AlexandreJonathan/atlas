@@ -4,6 +4,27 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 15] — Atlas Perfection (UI/UX 10.0)
+
+Refinamento premium exclusivo de UI/UX sobre a RC v0.8. Sem novas funcionalidades nem mudanças de negócio/DB/auth/arquitetura.
+
+### Adicionado
+- Shell `.atlas-page-shell`, eyebrow `.atlas-page-eyebrow`, padding `.atlas-surface-pad`
+- Tokens de layout (`--atlas-page-max-*`, `--atlas-icon-xl`, `--atlas-touch-min`, `--z-nav`)
+- `@keyframes atlas-rise` compartilhado
+- `roadmap/sprint-15.md`
+
+### Alterado
+- Versão `0.8.1`
+- Focus/a11y em nav, links, quick actions, perfil, toasts; contraste tertiary
+- Auth feedback (erro/sucesso), Home skeletons, empty states, toasts semânticos
+- Cards/surfaces/hover e motion unificados nas abas
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 14] — Atlas v0.8 Release Candidate (Missão 15)
 
 Primeira Release Candidate apresentável. Somente qualidade (visual, consistência DS, UX, performance leve). Sem novas funcionalidades, sem mudanças de negócio/DB/auth.
