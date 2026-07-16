@@ -1,0 +1,57 @@
+.atlas-bank-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-on-brand);
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.atlas-bank-logo-nubank {
+  background: linear-gradient(135deg, #820ad1, #5b5fef);
+}
+
+.atlas-bank-logo-inter {
+  background: linear-gradient(135deg, #ff7a00, #f5a524);
+}
+
+.atlas-bank-logo-c6 {
+  background: linear-gradient(135deg, #1a1a1a, #3d3d3d);
+  border: 1px solid var(--color-border-strong);
+}
+
+.atlas-bank-logo-itau {
+  background: linear-gradient(135deg, #ec7000, #ff9f1a);
+}
+
+.atlas-bank-logo-santander {
+  background: linear-gradient(135deg, #ec0000, #ff5c72);
+}
+
+.atlas-bank-logo-bradesco {
+  background: linear-gradient(135deg, #cc092f, #ff5c72);
+}
+
+.atlas-bank-logo-banco_do_brasil {
+  background: linear-gradient(135deg, #ffcc29, #f5a524);
+  color: #1a1a1a;
+}
+
+.atlas-bank-logo-caixa {
+  background: linear-gradient(135deg, #0070af, #4da3ff);
+}
+
+.atlas-bank-logo-pagbank {
+  background: linear-gradient(135deg, #00a868, #2dd4bf);
+}
+
+.atlas-bank-logo-mercado_pago {
+  background: linear-gradient(135deg, #009ee3, #4da3ff);
+}
+
+.atlas-bank-logo-wise {
+  background: linear-gradient(135deg, #9fe870, #2dd4bf);
+  color: #0a0e1a;
+}

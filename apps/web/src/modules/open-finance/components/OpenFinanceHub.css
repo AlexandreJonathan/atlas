@@ -1,0 +1,133 @@
+.atlas-of-hub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.atlas-of-hub-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.atlas-of-eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+}
+
+.atlas-of-hub-header h1 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.atlas-of-hub-header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.atlas-of-hub-cta {
+  text-decoration: none;
+}
+
+.atlas-of-hub-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+.atlas-of-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.atlas-of-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.atlas-of-section-header h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.atlas-of-link {
+  color: var(--color-brand);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.atlas-of-muted {
+  margin: 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+.atlas-of-bank-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.atlas-of-bank-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-canvas-alt);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.atlas-of-bank-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.atlas-of-bank-info strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.atlas-of-bank-info small {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.atlas-of-state {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.atlas-of-state-erro {
+  color: var(--color-danger);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .atlas-of-hub-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

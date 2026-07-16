@@ -1,0 +1,79 @@
+.atlas-of-connect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.atlas-of-connect-header h1 {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.atlas-of-connect-header p:last-child {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.atlas-of-back {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+  color: var(--color-brand);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.atlas-of-connect-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.atlas-of-connect-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.atlas-of-connect-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.atlas-of-connect-info strong {
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.atlas-of-connect-info small {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.atlas-of-connect-done {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.atlas-of-inline-erro {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
