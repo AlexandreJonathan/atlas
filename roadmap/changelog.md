@@ -4,6 +4,26 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 16] — Observability & Quality Foundation (Missão 16)
+
+Infraestrutura de qualidade para crescer com segurança. Sem novas funcionalidades de produto, sem OpenAI/Pluggy, sem mudanças de UX/negócio/DB/auth.
+
+### Adicionado
+- `ErrorBoundary` global com fallback elegante e retorno à Home.
+- `src/lib/logging` — logger com níveis debug/info/warning/error e sink preparado para Sentry.
+- `src/config` — `AppConfig`, `FeatureFlagService` (openai, openFinance, investments, notifications).
+- `src/lib/analytics` — `AnalyticsService` com eventos tipados (sem envio externo).
+- `roadmap/sprint-16.md` e seção 11.1 em `arquitetura.md`.
+
+### Alterado
+- Wiring mínimo de `analytics.track` em login, cadastro, onboarding, Home, Conectar banco e Atlas IA.
+- Services Open Finance / Intelligence leem `AppConfig` para provider pretendido (runtime permanece mock).
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 15] — Atlas Perfection (UI/UX 10.0)
 
 Refinamento premium exclusivo de UI/UX sobre a RC v0.8. Sem novas funcionalidades nem mudanças de negócio/DB/auth/arquitetura.

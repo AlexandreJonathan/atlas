@@ -85,7 +85,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Documentar variáveis de ambiente e checklist de deploy~~ — concluído na Sprint 6 (`docs/deploy.md`: migrações, configuração de Auth no Supabase, variáveis de ambiente, build, hospedagem)
 - ✅ ~~Preparar configuração explícita de deploy para Vercel (SPA fallback, cache)~~ — concluído na Missão Primeiro Deploy Oficial (`apps/web/vercel.json`); guia não-técnico passo a passo criado em `docs/guia-deploy-fundador.md`
 - 🟡 Configurar deploy automatizado (CI/CD publicando em Vercel/Netlify a cada merge) — hoje o deploy é manual, seguindo o checklist de `docs/deploy.md`/`docs/guia-deploy-fundador.md`
-- 🔴 Monitoramento de erros em produção (Sentry ou similar) — recomendado como próximo passo antes de convidar os primeiros usuários reais (elevado de 🟢 para 🔴 após a Auditoria de Produto: sem isso, falhas em uso diário não geram nenhum alerta)
+- 🟡 Ligar Sentry (ou similar) ao `FutureErrorReporterSink` / Error Boundary — fundação pronta na Sprint 16; falta apenas o SDK e DSN de produção
 - 🟢 Observabilidade e métricas de uso
 
 ## 8.1 Limpeza de Código Morto (identificado na FAT)

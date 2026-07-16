@@ -4,7 +4,7 @@
 
 O Atlas é uma aplicação web de organização financeira pessoal, composta por um front-end SPA (Single Page Application) construído com React, TypeScript e Vite, e por um backend gerenciado via Supabase (autenticação e banco de dados Postgres). O projeto está estruturado como um monorepo, com o front-end residindo em `apps/web`.
 
-Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`). Na Sprint 10 ("Open Finance Foundation" / Missão 11), a Atlas ganhou o módulo `src/modules/open-finance/` com padrão Adapter/Provider (`OpenFinanceService` → `OpenFinanceProvider`), mock ativo, stub Pluggy (provedor-alvo do MVP, sem HTTP), hub financeiro e telas de conectar/contas conectadas. Na Sprint 11 ("Microinterações Premium" / Missão 12), a API no-op de `src/lib/microinteractions` passou a ter implementação real (som, money rain, toasts, contador animado, glow, sync) sem alterar regras de negócio. Na Sprint 12 ("Atlas Intelligence 1.0" / Missão 13), nasceu o módulo `src/modules/atlas-intelligence/` com Insight Engine, feed inteligente e `AtlasAIProvider` (Mock ativo, OpenAI stub) — sem LLM real. Na Sprint 13 ("Atlas Polish"), a Home e o shell foram simplificados (chat-first em Atlas IA; feed sob demanda). Na Sprint 14 ("v0.8 Release Candidate" / Missão 15), a Atlas consolidou consistência do Design System, lazy-loading das abas autenticadas e documentação de release (`roadmap/release-v0.8.md`) — sem novas funcionalidades nem integrações reais de OpenAI/Pluggy. Na Sprint 15 ("Atlas Perfection"), o shell de página, focus rings, motion compartilhado e estados async/empty foram refinados para demo premium (`0.8.1`), ainda sem alterar regras de negócio ou arquitetura de módulos.
+Desde a Sprint 4, o Dashboard funciona como uma central de inteligência financeira: além de registrar receitas/despesas, o sistema acompanha contas a pagar/receber, metas financeiras e gera recomendações automáticas a partir de regras sobre os dados do próprio usuário. Na Sprint 5, o Dashboard ganhou um módulo de planejamento financeiro: a partir de renda mensal, despesas fixas recorrentes e reserva mínima configuradas pelo usuário, o sistema calcula automaticamente quanto pode gastar hoje, quanto precisa guardar, o saldo previsto até o fim do mês e o risco financeiro (baixo/médio/alto). Na Sprint 6 ("Alpha Readiness"), o produto ganhou os últimos itens bloqueantes para um primeiro Alpha privado: recuperação de senha, fluxo de confirmação de e-mail tratado em todos os estados, responsividade completa (320px–1920px), um onboarding guiado no primeiro acesso e um checklist de deploy documentado (`docs/deploy.md`). Na Sprint 7 ("Atlas Premium Experience"), a aplicação recebeu um Design System oficial (`roadmap/design-system.md`) e um redesenho visual completo (Auth, Onboarding, Dashboard e a nova identidade "Atlas Intelligence") — puramente de UX/UI, sem alterar nenhuma regra de negócio ou dado. Na Sprint 8 ("Atlas Experience 2.0"), a Atlas deixou de ser uma página única: passou a um `AppShell` com Bottom Navigation e cinco abas (Início, Contas, Investimentos, Atlas IA, Perfil), com dados de preparação para Open Finance, investimentos e chat de IA — sem integrações reais ainda. Na Sprint 9 ("Atlas Premium Home"), a Home foi redesenhada mobile-first com WealthHero, Atlas Pulse, Intelligence conversacional e seções de síntese (`src/components/home/`). Na Sprint 10 ("Open Finance Foundation" / Missão 11), a Atlas ganhou o módulo `src/modules/open-finance/` com padrão Adapter/Provider (`OpenFinanceService` → `OpenFinanceProvider`), mock ativo, stub Pluggy (provedor-alvo do MVP, sem HTTP), hub financeiro e telas de conectar/contas conectadas. Na Sprint 11 ("Microinterações Premium" / Missão 12), a API no-op de `src/lib/microinteractions` passou a ter implementação real (som, money rain, toasts, contador animado, glow, sync) sem alterar regras de negócio. Na Sprint 12 ("Atlas Intelligence 1.0" / Missão 13), nasceu o módulo `src/modules/atlas-intelligence/` com Insight Engine, feed inteligente e `AtlasAIProvider` (Mock ativo, OpenAI stub) — sem LLM real. Na Sprint 13 ("Atlas Polish"), a Home e o shell foram simplificados (chat-first em Atlas IA; feed sob demanda). Na Sprint 14 ("v0.8 Release Candidate" / Missão 15), a Atlas consolidou consistência do Design System, lazy-loading das abas autenticadas e documentação de release (`roadmap/release-v0.8.md`) — sem novas funcionalidades nem integrações reais de OpenAI/Pluggy. Na Sprint 15 ("Atlas Perfection"), o shell de página, focus rings, motion compartilhado e estados async/empty foram refinados para demo premium (`0.8.1`), ainda sem alterar regras de negócio ou arquitetura de módulos. Na Sprint 16 ("Observability & Quality Foundation"), a Atlas ganhou Error Boundary global, logging centralizado, Feature Flags, Analytics desacoplado e `AppConfig` — infraestrutura de qualidade sem novas funcionalidades de produto nem integrações OpenAI/Pluggy.
 
 ## 2. Stack Tecnológica
 
@@ -35,7 +35,13 @@ atlas/
 │       ├── src/
 │       │   ├── styles/
 │       │   │   └── tokens.css
+│       │   ├── config/
+│       │   │   ├── AppConfig.ts          # env, versão, flags, providers
+│       │   │   ├── FeatureFlagService.ts
+│       │   │   ├── types.ts
+│       │   │   └── index.ts
 │       │   ├── components/
+│       │   │   ├── ErrorBoundary.tsx / .css
 │       │   │   ├── ui/
 │       │   │   │   ├── Button.tsx / .css
 │       │   │   │   ├── Card.tsx / .css
@@ -147,6 +153,8 @@ atlas/
 │       │   │   ├── planningEngine.ts
 │       │   │   ├── atlasIntelligenceCopy.ts
 │       │   │   ├── atlasPulse.ts
+│       │   │   ├── logging/             # logger + sinks (Sentry futuro)
+│       │   │   ├── analytics/           # AnalyticsService (sem envio externo)
 │       │   │   └── microinteractions/
 │       │   │       ├── index.ts          # API pública
 │       │   │       ├── dispatch.ts       # triggerMicrointeraction
@@ -354,6 +362,36 @@ Não há, ainda, um gerenciador de estado global genérico (Redux, Zustand) — 
 - **Lint**: ESLint com regras recomendadas de TypeScript, React Hooks (incluindo `set-state-in-effect`) e React Refresh (`eslint.config.js`).
 - **Dev server**: `vite` com HMR (Hot Module Replacement).
 
+## 11.1 Observability & Quality Foundation (Sprint 16)
+
+Camada transversal — **não altera UX, regras de negócio, auth, schema nem adapters reais**.
+
+### Error Boundary
+- `ErrorBoundary` envolve `<App />` em `main.tsx` (dentro de `BrowserRouter`).
+- Exceções de render não tratadas mostram fallback elegante (DS) com “Voltar para a Home” (`/inicio`) e “Tentar novamente”.
+- `componentDidCatch` registra via `logger.error` (preparado para sink Sentry).
+
+### Logging (`src/lib/logging`)
+- API: `logger.debug` / `info` / `warning` / `error`.
+- Development: nível mínimo `debug` (console detalhado).
+- Production: nível mínimo `info` + `FutureErrorReporterSink` no-op (ponto de encaixe para Sentry).
+- O logger nunca propaga falha de sink para a UI.
+
+### Feature Flags (`src/config/FeatureFlagService`)
+- Flags: `openai`, `openFinance`, `investments`, `notifications`.
+- Defaults = comportamento atual da RC; overrides opcionais `VITE_FF_*` (ver `.env.example`).
+- Telas **não** consultam flags diretamente — serviços podem expor `isModuleEnabled()` / `isOpenAiEnabled()`.
+- Desligar uma flag **não** remove UI nesta sprint (evita mudar UX); a API existe para gate futuro seguro.
+
+### Analytics (`src/lib/analytics`)
+- `analytics.track(name, properties?)` com eventos tipados (`login`, `sign_up`, `onboarding_completed`, `home_opened`, `connect_bank_clicked`, `atlas_ai_opened`).
+- Sink padrão no-op (nenhum dado externo); buffer em memória + `logger.debug` em dev.
+- Call sites mínimos nos fluxos existentes — sem mudança visual.
+
+### AppConfig (`src/config/AppConfig.ts`)
+- Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`: mock|pluggy, `atlasAi`: mock|openai).
+- Providers reais ainda não entram em runtime: stubs continuam mock para preservar UX até Missões de integração.
+
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
 - Edição (update) de movimentações financeiras e despesas fixas ainda não implementada na UI.
@@ -364,7 +402,7 @@ Não há, ainda, um gerenciador de estado global genérico (Redux, Zustand) — 
 - Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
 - Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
 - Não há testes automatizados (unitários, integração ou E2E) — o checklist de deploy (`docs/deploy.md`) depende de verificação manual.
-- Não há monitoramento de erros em produção (Sentry ou similar).
+- Monitoramento de erros em produção: fundação pronta (Error Boundary + logger + sink futuro); integração Sentry ainda não ligada.
 - Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.
 - Não há gerenciamento de estado global genérico nem camada de cache/dados (React Query, etc.).
 - Design System (Sprint 7) é 100% tema escuro — não há alternância clara/escura nem auditoria formal de contraste WCAG AA com a nova paleta.
