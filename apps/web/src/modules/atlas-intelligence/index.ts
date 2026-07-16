@@ -1,0 +1,32 @@
+export type {
+  ChatMessage,
+  ChatRole,
+  FeedItem,
+  FeedItemKind,
+  FinancialEvent,
+  FinancialEventKind,
+  Insight,
+  InsightCategory,
+  InsightTone,
+  IntelligenceContext,
+} from "./types";
+
+export type { AtlasAIProvider } from "./providers/AtlasAIProvider";
+export { MockAtlasAIProvider } from "./providers/MockAtlasAIProvider";
+export { OpenAIProvider } from "./providers/OpenAIProvider";
+export {
+  AtlasIntelligenceService,
+  atlasIntelligenceService,
+} from "./services/AtlasIntelligenceService";
+export { gerarInsights } from "./engine/insightEngine";
+export { useAtlasIntelligence } from "./hooks/useAtlasIntelligence";
+export { rankInsights, formatMoneyBRL } from "./utils/format";
+export {
+  ATLAS_SYSTEM_PROMPT,
+  buildChatPrompt,
+  buildEventNarrationPrompt,
+  buildInsightPrompt,
+} from "./prompts/templates";
+
+export { default as AtlasInsights } from "./components/AtlasInsights";
+export { default as IntelligenceFeed } from "./components/IntelligenceFeed";
