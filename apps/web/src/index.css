@@ -33,24 +33,88 @@ input {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------- Motion compartilhado ---------- */
+@keyframes atlas-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atlas-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Shell de página (Home / Contas / Invest / Perfil) ---------- */
+.atlas-page-shell {
+  width: 100%;
+  max-width: var(--atlas-page-max-sm);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .atlas-page-shell {
+    max-width: var(--atlas-page-max-md);
+    padding: var(--space-6) var(--space-5);
+  }
+}
+
+@media (min-width: 900px) {
+  .atlas-page-shell {
+    max-width: var(--atlas-page-max-lg);
+    padding: var(--space-7) var(--space-6);
+  }
+}
+
+/* Eyebrow de página — Auth / Home / Contas / IA */
+.atlas-page-eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+}
+
 /* Superfície padrão do DS — mesma receita do Card (sem elevated/glow).
-   Use em painéis que ainda não montam <Card>. */
+   Use em painéis que ainda não montam <Card>. Padding via utilitário. */
 .atlas-surface {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
 }
 
-/* Link textual padrão (Auth e CTAs textuais). */
+.atlas-surface-pad {
+  padding: var(--space-6);
+}
+
+/* Link textual padrão (Auth, Home, Open Finance, CTAs textuais). */
 .atlas-link {
   color: var(--color-brand);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .atlas-link:hover {
   text-decoration: underline;
+  color: var(--color-brand-strong);
+}
+
+.atlas-link-strong {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
 }
 
 /* Estado de carregamento em tela cheia — usado por ProtectedRoute,
@@ -63,4 +127,25 @@ input {
   color: var(--color-text-secondary);
   font-size: var(--font-size-lg);
   background: var(--color-bg-canvas);
+}
+
+/* ---------- Focus / a11y (controles fora de Button/Input) ---------- */
+.atlas-link:focus-visible,
+.atlas-link-botao:focus-visible,
+.atlas-home-block-link:focus-visible,
+.atlas-of-link:focus-visible,
+.atlas-bottom-nav-item:focus-visible,
+.atlas-quick-action:focus-visible,
+.atlas-profile-menu-item:focus-visible,
+.atlas-home-header-avatar:focus-visible,
+.atlas-home-ia-cta:focus-visible,
+.atlas-mi-toast-close:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-surface {
+    transition: none;
+  }
 }

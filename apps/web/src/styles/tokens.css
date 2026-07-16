@@ -19,7 +19,8 @@
   /* ---------- Cor: texto ---------- */
   --color-text-primary: #f5f7fa;
   --color-text-secondary: #9aa5b8;
-  --color-text-tertiary: #6b7488;
+  /* Tertiary levemente mais claro para contraste em labels xs / placeholders */
+  --color-text-tertiary: #7a8499;
   --color-text-on-brand: #ffffff;
 
   /* ---------- Cor: marca (identidade Atlas) ---------- */
@@ -89,14 +90,20 @@
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ---------- Z-index ---------- */
+  --z-nav: 40;
   --z-modal: 50;
   --z-toast: 60;
 
-  /* ---------- Shell ---------- */
+  /* ---------- Shell / layout ---------- */
   --atlas-bottom-nav-height: 72px;
   --atlas-focus-ring: 0 0 0 3px var(--color-brand-soft);
   --atlas-icon-md: 36px;
   --atlas-icon-lg: 44px;
+  --atlas-icon-xl: 56px;
+  --atlas-page-max-sm: 480px;
+  --atlas-page-max-md: 560px;
+  --atlas-page-max-lg: 720px;
+  --atlas-touch-min: 44px;
 }
 
 @media (prefers-reduced-motion: reduce) {
