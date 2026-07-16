@@ -74,7 +74,7 @@ function OpenFinanceHub() {
     <div className="atlas-of-hub">
       <header className="atlas-of-hub-header">
         <div>
-          <p className="atlas-of-eyebrow">Open Finance</p>
+          <p className="atlas-page-eyebrow">Open Finance</p>
           <h1>Hub financeiro</h1>
           <p>Patrimônio, saldos e conexões em um só lugar</p>
         </div>

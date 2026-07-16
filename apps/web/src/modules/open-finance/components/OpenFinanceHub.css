@@ -12,15 +12,6 @@
   gap: var(--space-4);
 }
 
-.atlas-of-eyebrow {
-  margin: 0 0 var(--space-1);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-brand);
-}
-
 .atlas-of-hub-header h1 {
   margin: 0 0 var(--space-1);
   font-size: var(--font-size-2xl);
@@ -63,10 +54,17 @@
 }
 
 .atlas-of-link {
+  /* Alias visual de .atlas-link + .atlas-link-strong */
   color: var(--color-brand);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.atlas-of-link:hover {
+  color: var(--color-brand-strong);
+  text-decoration: underline;
 }
 
 .atlas-of-muted {

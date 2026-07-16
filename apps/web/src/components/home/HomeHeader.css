@@ -6,15 +6,6 @@
   margin-bottom: var(--space-6);
 }
 
-.atlas-home-header-eyebrow {
-  margin: 0 0 var(--space-1);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-brand);
-}
-
 .atlas-home-header-text h1 {
   margin: 0;
   font-size: var(--font-size-2xl);
@@ -25,8 +16,8 @@
 
 .atlas-home-header-avatar {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: var(--atlas-icon-lg);
+  height: var(--atlas-icon-lg);
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;

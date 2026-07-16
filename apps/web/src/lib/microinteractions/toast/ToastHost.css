@@ -33,19 +33,23 @@
 }
 
 .atlas-mi-toast-success {
-  border-color: rgba(45, 212, 191, 0.35);
+  border-color: var(--color-success-soft);
+  background: linear-gradient(180deg, var(--color-success-soft), var(--color-bg-elevated) 48%);
 }
 
 .atlas-mi-toast-error {
-  border-color: rgba(255, 92, 114, 0.4);
+  border-color: var(--color-danger-soft);
+  background: linear-gradient(180deg, var(--color-danger-soft), var(--color-bg-elevated) 48%);
 }
 
 .atlas-mi-toast-warning {
-  border-color: rgba(245, 165, 36, 0.4);
+  border-color: var(--color-warning-soft);
+  background: linear-gradient(180deg, var(--color-warning-soft), var(--color-bg-elevated) 48%);
 }
 
 .atlas-mi-toast-info {
-  border-color: rgba(77, 163, 255, 0.4);
+  border-color: var(--color-info-soft);
+  background: linear-gradient(180deg, var(--color-info-soft), var(--color-bg-elevated) 48%);
 }
 
 .atlas-mi-toast-icon {
@@ -80,7 +84,7 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-1);
 }
 
 .atlas-mi-toast-body p {
@@ -95,14 +99,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin: -4px -6px -4px 0;
+  width: var(--atlas-touch-min);
+  height: var(--atlas-touch-min);
+  margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-tertiary);
   cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background var(--duration-fast) var(--ease-standard);
 }
 
 .atlas-mi-toast-close:hover {

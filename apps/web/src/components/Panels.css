@@ -96,7 +96,7 @@
   transition:
     border-color var(--duration-base) var(--ease-standard),
     transform var(--duration-fast) var(--ease-standard);
-  animation: atlas-list-row-in var(--duration-slow) var(--ease-standard) backwards;
+  animation: atlas-rise var(--duration-slow) var(--ease-standard) backwards;
 }
 
 .atlas-list-row:hover {
@@ -108,8 +108,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--atlas-icon-md);
+  height: var(--atlas-icon-md);
   border-radius: var(--radius-md);
   flex-shrink: 0;
 }
@@ -177,6 +177,7 @@
 .atlas-list-row-actions input:focus {
   outline: none;
   border-color: var(--color-brand);
+  box-shadow: var(--atlas-focus-ring);
 }
 
 .atlas-list-row-fill {
@@ -185,17 +186,6 @@
   gap: var(--space-2);
   align-items: flex-start;
   width: 100%;
-}
-
-@keyframes atlas-list-row-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -34,7 +34,7 @@ function ProfilePage() {
   }
 
   return (
-    <div className="atlas-page">
+    <div className="atlas-page-shell atlas-page">
       <header className="atlas-page-header">
         <div>
           <p className="atlas-page-eyebrow">Conta</p>

@@ -3,7 +3,7 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
-  animation: atlas-home-rise var(--duration-slow) var(--ease-standard) 60ms backwards;
+  animation: atlas-rise var(--duration-slow) var(--ease-standard) 60ms backwards;
 }
 
 .atlas-pulse-dot {

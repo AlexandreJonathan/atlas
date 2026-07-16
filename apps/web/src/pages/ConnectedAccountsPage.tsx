@@ -3,7 +3,7 @@ import "./AccountsPage.css";
 
 function ConnectedAccountsPage() {
   return (
-    <div className="atlas-page atlas-page-of">
+    <div className="atlas-page-shell atlas-page">
       <ConnectedAccountsScreen />
     </div>
   );

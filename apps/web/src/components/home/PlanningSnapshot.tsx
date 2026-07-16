@@ -4,6 +4,7 @@ import type { useFinancialProfile } from "../../hooks/useFinancialProfile";
 import type { useFixedExpenses } from "../../hooks/useFixedExpenses";
 import type { usePlanning } from "../../hooks/usePlanning";
 import type { RiscoFinanceiro } from "../../types/planning";
+import "../AsyncStateView.css";
 import FinancialProfileModal from "../FinancialProfileModal";
 import FixedExpensesPanel from "../FixedExpensesPanel";
 import SeverityBadge, { type SeverityTone } from "../SeverityBadge";
@@ -45,7 +46,7 @@ function PlanningSnapshot({ perfil, planejamento, despesasFixas }: PlanningSnaps
   const resultado = planejamento.resultado;
 
   return (
-    <section className="atlas-surface atlas-planning-snapshot" aria-labelledby="planning-snapshot-titulo">
+    <section className="atlas-surface atlas-surface-pad atlas-planning-snapshot" aria-labelledby="planning-snapshot-titulo">
       <div className="atlas-home-block-header">
         <h2 id="planning-snapshot-titulo">
           <BarChart3 size={18} aria-hidden="true" /> Planejamento
@@ -56,7 +57,11 @@ function PlanningSnapshot({ perfil, planejamento, despesasFixas }: PlanningSnaps
       </div>
 
       {planejamento.loading || perfil.loading ? (
-        <p className="atlas-home-block-muted">Calculando seu planejamento...</p>
+        <div className="atlas-async-loading" role="status" aria-live="polite">
+          <span className="atlas-skeleton-row" />
+          <span className="atlas-skeleton-row atlas-skeleton-row-short" />
+          <span className="atlas-async-loading-texto">Calculando seu planejamento...</span>
+        </div>
       ) : perfil.error ? (
         <div className="atlas-home-block-erro">
           <p>{perfil.error}</p>

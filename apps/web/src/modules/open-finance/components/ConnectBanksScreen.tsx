@@ -37,7 +37,7 @@ function ConnectBanksScreen() {
         <Link to="/contas" className="atlas-of-back">
           ← Hub
         </Link>
-        <p className="atlas-of-eyebrow">Open Finance</p>
+        <p className="atlas-page-eyebrow">Open Finance</p>
         <h1>Conectar bancos</h1>
         <p>Escolha uma instituição para trazer saldos e cartões para a Atlas</p>
       </header>

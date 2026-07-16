@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 40;
+  z-index: var(--z-nav);
   display: flex;
   justify-content: space-around;
   align-items: stretch;
@@ -24,6 +24,7 @@
   justify-content: center;
   gap: var(--space-1);
   min-width: 0;
+  min-height: var(--atlas-touch-min);
   padding: var(--space-2) var(--space-1);
   border-radius: var(--radius-md);
   color: var(--color-text-tertiary);

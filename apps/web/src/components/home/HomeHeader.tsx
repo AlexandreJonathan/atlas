@@ -25,7 +25,7 @@ function HomeHeader({ nome, email }: HomeHeaderProps) {
   return (
     <header className="atlas-home-header">
       <div className="atlas-home-header-text">
-        <p className="atlas-home-header-eyebrow">Atlas</p>
+        <p className="atlas-page-eyebrow">Atlas</p>
         <h1>
           {saudacao}
           {primeiroNome ? `, ${primeiroNome}` : ""}.

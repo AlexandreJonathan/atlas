@@ -90,7 +90,7 @@ function AtlasAIPage() {
             <BrainCircuit size={24} />
           </span>
           <div>
-            <p className="atlas-ai-eyebrow">Conversa</p>
+            <p className="atlas-page-eyebrow">Conversa</p>
             <h1>Atlas Intelligence</h1>
             <p>Pergunte sobre saldo, metas e contas</p>
           </div>

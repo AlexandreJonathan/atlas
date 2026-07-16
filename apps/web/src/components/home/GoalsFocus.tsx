@@ -1,6 +1,7 @@
 import { Target } from "lucide-react";
 import { useState } from "react";
 import type { useGoals } from "../../hooks/useGoals";
+import AsyncStateView from "../AsyncStateView";
 import GoalModal from "../GoalModal";
 import Button from "../ui/Button";
 import ProgressRing from "../ui/ProgressRing";
@@ -19,7 +20,7 @@ function GoalsFocus({ metas }: GoalsFocusProps) {
   const destaque = metas.goals.slice(0, 2);
 
   return (
-    <section className="atlas-surface atlas-goals-focus" aria-labelledby="metas-focus-titulo">
+    <section className="atlas-surface atlas-surface-pad atlas-goals-focus" aria-labelledby="metas-focus-titulo">
       <div className="atlas-home-block-header">
         <h2 id="metas-focus-titulo">
           <Target size={18} aria-hidden="true" /> Metas
@@ -29,18 +30,14 @@ function GoalsFocus({ metas }: GoalsFocusProps) {
         </Button>
       </div>
 
-      {metas.loading ? (
-        <p className="atlas-home-block-muted">Carregando metas...</p>
-      ) : metas.error ? (
-        <div className="atlas-home-block-erro">
-          <p>{metas.error}</p>
-          <Button variant="secondary" size="sm" onClick={metas.recarregar}>
-            Tentar novamente
-          </Button>
-        </div>
-      ) : destaque.length === 0 ? (
-        <p className="atlas-home-block-muted">Ainda sem metas. Crie a primeira e acompanhe o progresso aqui.</p>
-      ) : (
+      <AsyncStateView
+        loading={metas.loading}
+        error={metas.error}
+        isEmpty={destaque.length === 0}
+        emptyMessage="Ainda sem metas. Crie a primeira e acompanhe o progresso aqui."
+        onRetry={metas.recarregar}
+        loadingMessage="Carregando metas..."
+      >
         <div className="atlas-goals-focus-grid">
           {destaque.map((goal) => {
             const progresso = goal.targetAmount > 0 ? goal.currentAmount / goal.targetAmount : 0;
@@ -63,7 +60,7 @@ function GoalsFocus({ metas }: GoalsFocusProps) {
             );
           })}
         </div>
-      )}
+      </AsyncStateView>
 
       {metas.actionError && <p className="atlas-panel-erro-acao">{metas.actionError}</p>}
 

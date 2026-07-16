@@ -1,34 +1,5 @@
-/* Shell de página compartilhado — mesma coluna mobile da Home / Contas */
-
-.atlas-page {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: var(--space-5) var(--space-4) var(--space-6);
-}
-
-.atlas-page-of {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: var(--space-5) var(--space-4) var(--space-6);
-}
-
-@media (min-width: 640px) {
-  .atlas-page,
-  .atlas-page-of {
-    max-width: 560px;
-    padding: var(--space-6) var(--space-5);
-  }
-}
-
-@media (min-width: 900px) {
-  .atlas-page,
-  .atlas-page-of {
-    max-width: 720px;
-    padding: var(--space-7) var(--space-6);
-  }
-}
+/* Shell de página — layout compartilhado via .atlas-page-shell (index.css).
+   Mantém utilitários de lista/seção usados por Contas, Investimentos e Perfil. */
 
 .atlas-page-header {
   margin: 0 0 var(--space-6);
@@ -37,15 +8,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-}
-
-.atlas-page-eyebrow {
-  margin: 0 0 var(--space-1);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-brand);
 }
 
 .atlas-page-header h1 {
@@ -107,6 +69,11 @@
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
+  transition: border-color var(--duration-base) var(--ease-standard);
+}
+
+.atlas-page-list-item:hover {
+  border-color: var(--color-border-strong);
 }
 
 .atlas-page-list-item-stack {

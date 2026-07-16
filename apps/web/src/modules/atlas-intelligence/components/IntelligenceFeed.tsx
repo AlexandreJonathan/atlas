@@ -28,7 +28,7 @@ function IntelligenceFeed({ items, limit = 6, compact = false }: IntelligenceFee
 
   return (
     <section
-      className={`atlas-surface atlas-intel-feed${compact ? " atlas-intel-feed-compact" : ""}`}
+      className={`atlas-surface atlas-intel-feed${compact ? " atlas-intel-feed-compact" : " atlas-surface-pad"}`}
       aria-labelledby="atlas-intel-feed-titulo"
     >
       <div className="atlas-intel-feed-header">

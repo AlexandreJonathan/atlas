@@ -8,6 +8,10 @@
     box-shadow var(--duration-base) var(--ease-standard);
 }
 
+.atlas-card:hover {
+  border-color: var(--color-border-strong);
+}
+
 .atlas-card-padding-sm {
   padding: var(--space-4);
 }

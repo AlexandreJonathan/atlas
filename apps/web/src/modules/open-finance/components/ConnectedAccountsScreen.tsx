@@ -36,7 +36,7 @@ function ConnectedAccountsScreen() {
         <Link to="/contas" className="atlas-of-back">
           ← Hub
         </Link>
-        <p className="atlas-of-eyebrow">Open Finance</p>
+        <p className="atlas-page-eyebrow">Open Finance</p>
         <h1>Contas conectadas</h1>
         <p>Bancos, saldos, cartões e última atualização</p>
       </header>

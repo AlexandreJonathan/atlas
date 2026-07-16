@@ -4,7 +4,7 @@ import "./AccountsPage.css";
 /** Hub financeiro — aba Contas (Open Finance Foundation). */
 function AccountsPage() {
   return (
-    <div className="atlas-page atlas-page-of">
+    <div className="atlas-page-shell atlas-page">
       <OpenFinanceHub />
     </div>
   );

@@ -52,24 +52,37 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4) 0;
+  min-height: var(--atlas-touch-min);
+  padding: var(--space-4) var(--space-2);
+  margin: 0 calc(-1 * var(--space-2));
+  border-radius: var(--radius-md);
   border-bottom: 1px solid var(--color-border-subtle);
   color: var(--color-text-primary);
   text-decoration: none;
   font-size: var(--font-size-md);
+  transition:
+    background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.atlas-profile-menu-item:hover {
+  background: var(--color-bg-surface-hover);
+}
+
+.atlas-profile-menu-item:active {
+  background: var(--color-neutral-soft);
 }
 
 .atlas-profile-menu li:last-child .atlas-profile-menu-item {
   border-bottom: none;
-  padding-bottom: 0;
-}
-
-.atlas-profile-menu li:first-child .atlas-profile-menu-item {
-  padding-top: 0;
 }
 
 .atlas-profile-menu-item-static {
   cursor: default;
+}
+
+.atlas-profile-menu-item-static:hover {
+  background: transparent;
 }
 
 .atlas-profile-menu-label {

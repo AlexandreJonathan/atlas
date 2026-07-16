@@ -27,8 +27,12 @@
 }
 
 .atlas-btn:focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--atlas-focus-ring);
+}
+
+.atlas-btn-primary:focus-visible {
+  box-shadow: var(--shadow-glow-brand), var(--atlas-focus-ring);
 }
 
 /* Tamanhos */
@@ -101,14 +105,8 @@
 .atlas-btn-spinner {
   width: 1em;
   height: 1em;
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  border: 2px solid var(--color-border-strong);
   border-top-color: currentColor;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: atlas-spin var(--duration-slow) linear infinite;
-}
-
-@keyframes atlas-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

@@ -1,4 +1,5 @@
 import { Lightbulb } from "lucide-react";
+import "../../../components/AsyncStateView.css";
 import type { Insight } from "../types";
 import "./AtlasInsights.css";
 
@@ -19,7 +20,7 @@ const TONE_CLASS: Record<Insight["tone"], string> = {
  */
 function AtlasInsights({ insights, loading }: AtlasInsightsProps) {
   return (
-    <section className="atlas-surface atlas-insights" aria-labelledby="atlas-insights-titulo">
+    <section className="atlas-surface atlas-surface-pad atlas-insights" aria-labelledby="atlas-insights-titulo">
       <div className="atlas-insights-header">
         <span className="atlas-insights-icon" aria-hidden="true">
           <Lightbulb size={18} />
@@ -31,7 +32,12 @@ function AtlasInsights({ insights, loading }: AtlasInsightsProps) {
       </div>
 
       {loading && insights.length === 0 ? (
-        <p className="atlas-insights-muted">Carregando...</p>
+        <div className="atlas-async-loading" role="status" aria-live="polite">
+          <span className="atlas-skeleton-row" />
+          <span className="atlas-skeleton-row" />
+          <span className="atlas-skeleton-row atlas-skeleton-row-short" />
+          <span className="atlas-async-loading-texto">Carregando...</span>
+        </div>
       ) : insights.length === 0 ? (
         <p className="atlas-insights-muted">Nenhum insight no momento.</p>
       ) : (

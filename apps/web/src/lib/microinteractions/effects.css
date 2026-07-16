@@ -92,7 +92,7 @@
 
 /* Atlas Intelligence — entrada em stagger */
 .atlas-mi-intel-enter .atlas-intelligence-bubble {
-  animation: atlas-mi-rise var(--duration-slow) var(--ease-standard) both;
+  animation: atlas-rise var(--duration-slow) var(--ease-standard) both;
 }
 
 .atlas-mi-intel-enter .atlas-intelligence-bubble:nth-child(1) {
@@ -109,7 +109,7 @@
 
 /* Timeline — stagger */
 .atlas-mi-timeline-enter .atlas-bills-timeline-item {
-  animation: atlas-mi-rise var(--duration-slow) var(--ease-standard) both;
+  animation: atlas-rise var(--duration-slow) var(--ease-standard) both;
 }
 
 .atlas-mi-timeline-enter .atlas-bills-timeline-item:nth-child(1) {
@@ -122,17 +122,6 @@
 
 .atlas-mi-timeline-enter .atlas-bills-timeline-item:nth-child(3) {
   animation-delay: 160ms;
-}
-
-@keyframes atlas-mi-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 480px;
+  max-width: var(--atlas-page-max-sm);
   margin: 0 auto;
   /* Compensa o padding-bottom do AppShell para colar o composer na nav */
   margin-bottom: calc(-1 * (var(--atlas-bottom-nav-height) + env(safe-area-inset-bottom, 0px)));
@@ -13,14 +13,14 @@
 
 @media (min-width: 640px) {
   .atlas-ai-page {
-    max-width: 560px;
+    max-width: var(--atlas-page-max-md);
     padding: var(--space-6) var(--space-5) 0;
   }
 }
 
 @media (min-width: 900px) {
   .atlas-ai-page {
-    max-width: 720px;
+    max-width: var(--atlas-page-max-lg);
   }
 }
 
@@ -54,20 +54,12 @@
   flex-shrink: 0;
 }
 
-.atlas-ai-eyebrow {
-  margin: 0 0 2px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-brand);
-}
-
 .atlas-ai-header h1 {
   margin: 0;
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
 }
 
 .atlas-ai-header p {
@@ -81,6 +73,7 @@
   max-height: 40%;
   overflow-y: auto;
   margin-bottom: var(--space-3);
+  animation: atlas-rise var(--duration-base) var(--ease-standard);
 }
 
 .atlas-ai-thread {
@@ -99,6 +92,7 @@
   border-radius: var(--radius-lg);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-base);
+  animation: atlas-rise var(--duration-base) var(--ease-standard);
 }
 
 .atlas-ai-bubble-assistant {
@@ -133,4 +127,17 @@
 
 .atlas-ai-composer .atlas-input {
   border-radius: var(--radius-full);
+}
+
+.atlas-ai-composer .atlas-btn {
+  min-width: var(--atlas-touch-min);
+  min-height: var(--atlas-touch-min);
+  border-radius: var(--radius-full);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-ai-activity,
+  .atlas-ai-bubble {
+    animation: none;
+  }
 }

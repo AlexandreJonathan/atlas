@@ -23,8 +23,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--atlas-icon-lg);
+  height: var(--atlas-icon-lg);
   border-radius: var(--radius-md);
   flex-shrink: 0;
 }

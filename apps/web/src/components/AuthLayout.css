@@ -13,7 +13,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  animation: atlas-auth-card-in var(--duration-slow) var(--ease-standard);
+  animation: atlas-rise var(--duration-slow) var(--ease-standard);
 }
 
 .atlas-auth-brand {
@@ -29,12 +29,15 @@
 }
 
 .atlas-auth-heading h1 {
+  margin: 0;
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
 }
 
 .atlas-auth-heading p {
+  margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-base);
@@ -66,27 +69,46 @@
   margin-top: calc(var(--space-2) * -1);
 }
 
-
 .atlas-mensagem-sucesso {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+  border: 1px solid rgba(45, 212, 191, 0.28);
   color: var(--color-success);
   font-size: var(--font-size-sm);
   text-align: center;
+  line-height: var(--line-height-base);
 }
 
 .atlas-erro-geral {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  border: 1px solid rgba(255, 92, 114, 0.28);
   color: var(--color-danger);
   font-size: var(--font-size-sm);
   text-align: center;
+  line-height: var(--line-height-base);
 }
 
 .atlas-link-botao {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: var(--font-size-xs);
-  padding: 0;
+  font-size: var(--font-size-sm);
+  padding: var(--space-1);
+  min-height: var(--atlas-touch-min);
   font-family: inherit;
+  color: var(--color-brand);
+  font-weight: var(--font-weight-medium);
   text-decoration: underline;
+  border-radius: var(--radius-sm);
+}
+
+.atlas-link-botao:hover:not(:disabled) {
+  color: var(--color-brand-strong);
 }
 
 .atlas-link-botao:disabled {
@@ -94,14 +116,9 @@
   cursor: not-allowed;
 }
 
-@keyframes atlas-auth-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+  .atlas-auth-card {
+    animation: none;
   }
 }
 

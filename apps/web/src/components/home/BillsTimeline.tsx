@@ -1,4 +1,5 @@
 import type { useBills } from "../../hooks/useBills";
+import AsyncStateView from "../AsyncStateView";
 import Button from "../ui/Button";
 import "./BillsTimeline.css";
 
@@ -22,23 +23,19 @@ function BillsTimeline({ contas }: BillsTimelineProps) {
     .slice(0, 3);
 
   return (
-    <section className="atlas-surface atlas-bills-timeline" aria-labelledby="timeline-titulo">
+    <section className="atlas-surface atlas-surface-pad atlas-bills-timeline" aria-labelledby="timeline-titulo">
       <div className="atlas-home-block-header">
         <h2 id="timeline-titulo">Hoje e próximos</h2>
       </div>
 
-      {contas.loading ? (
-        <p className="atlas-home-block-muted">Carregando contas...</p>
-      ) : contas.error ? (
-        <div className="atlas-home-block-erro">
-          <p>{contas.error}</p>
-          <Button variant="secondary" size="sm" onClick={contas.recarregar}>
-            Tentar novamente
-          </Button>
-        </div>
-      ) : itens.length === 0 ? (
-        <p className="atlas-home-block-muted">Nenhuma conta urgente nos próximos dias.</p>
-      ) : (
+      <AsyncStateView
+        loading={contas.loading}
+        error={contas.error}
+        isEmpty={itens.length === 0}
+        emptyMessage="Nenhuma conta urgente nos próximos dias."
+        onRetry={contas.recarregar}
+        loadingMessage="Carregando contas..."
+      >
         <ul className="atlas-bills-timeline-list atlas-mi-timeline-enter">
           {itens.map((bill) => (
             <li key={bill.id} className="atlas-bills-timeline-item">
@@ -55,7 +52,7 @@ function BillsTimeline({ contas }: BillsTimelineProps) {
             </li>
           ))}
         </ul>
-      )}
+      </AsyncStateView>
 
       {contas.actionError && <p className="atlas-panel-erro-acao">{contas.actionError}</p>}
     </section>

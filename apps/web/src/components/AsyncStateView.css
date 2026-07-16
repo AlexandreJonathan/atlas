@@ -50,7 +50,12 @@
 .atlas-async-vazio {
   text-align: center;
   color: var(--color-text-secondary);
-  padding: var(--space-6) 0;
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-canvas-alt);
+  border: 1px dashed var(--color-border-subtle);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -66,7 +66,7 @@ function HomePage() {
   }
 
   return (
-    <div className="atlas-home">
+    <div className="atlas-page-shell atlas-home">
       <HomeHeader nome={nome} email={user?.email} />
 
       <main className="atlas-home-main">

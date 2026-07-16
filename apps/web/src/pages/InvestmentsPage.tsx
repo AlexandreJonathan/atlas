@@ -15,7 +15,7 @@ function InvestmentsPage() {
     MOCK_INVESTMENTS;
 
   return (
-    <div className="atlas-page">
+    <div className="atlas-page-shell atlas-page">
       <header className="atlas-page-header">
         <div>
           <p className="atlas-page-eyebrow">Estudo</p>
