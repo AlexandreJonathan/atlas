@@ -3,6 +3,7 @@ import { Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { analytics } from "../lib/analytics";
 import { getAuthErrorMessage, MENSAGEM_EMAIL_NAO_CONFIRMADO } from "../lib/authErrors";
 import { supabase } from "../lib/supabase";
 import type { LoginFormData } from "../types/auth";
@@ -48,6 +49,7 @@ function Login() {
       return;
     }
 
+    analytics.track("login");
     navigate("/inicio");
   }
 

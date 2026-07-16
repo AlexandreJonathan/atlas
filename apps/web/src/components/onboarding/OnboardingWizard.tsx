@@ -3,6 +3,7 @@ import type { useFinancialProfile } from "../../hooks/useFinancialProfile";
 import type { useFixedExpenses } from "../../hooks/useFixedExpenses";
 import type { useGoals } from "../../hooks/useGoals";
 import type { useOnboarding } from "../../hooks/useOnboarding";
+import { analytics } from "../../lib/analytics";
 import { getFriendlyErrorMessage } from "../../lib/errorMessages";
 import AtlasLogo from "../ui/AtlasLogo";
 import Card from "../ui/Card";
@@ -87,6 +88,7 @@ function OnboardingWizard({ onboarding, perfil, despesasFixas, metas, onPularPor
 
     try {
       await onboarding.concluir();
+      analytics.track("onboarding_completed");
     } catch (erroCapturado) {
       setErro(getFriendlyErrorMessage(erroCapturado, "Não foi possível concluir a configuração."));
     } finally {

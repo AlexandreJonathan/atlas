@@ -1,3 +1,5 @@
+import { appConfig, featureFlagService } from "../../../config";
+import { logger } from "../../../lib/logging";
 import type { AtlasAIProvider } from "../providers/AtlasAIProvider";
 import { MockAtlasAIProvider } from "../providers/MockAtlasAIProvider";
 import type {
@@ -9,6 +11,14 @@ import type {
 } from "../types";
 import { prependFeedItems } from "../utils/feedStore";
 import { rankInsights } from "../utils/format";
+
+function createAtlasAiProvider(): AtlasAIProvider {
+  if (appConfig.providers.atlasAi === "openai") {
+    // Stub ainda não implementado — manter mock para não alterar UX.
+    logger.warning("Atlas AI: provider openai solicitado; usando mock até a integração real");
+  }
+  return new MockAtlasAIProvider();
+}
 
 /**
  * Única porta de entrada do app para Atlas Intelligence.
@@ -23,6 +33,11 @@ export class AtlasIntelligenceService {
 
   getProviderName(): string {
     return this.provider.name;
+  }
+
+  /** Flag OpenAI (módulo de IA externa) — telas não precisam consultar diretamente. */
+  isOpenAiEnabled(): boolean {
+    return featureFlagService.isEnabled("openai");
   }
 
   generateInsights(context: IntelligenceContext): Promise<Insight[]> {
@@ -52,6 +67,4 @@ export class AtlasIntelligenceService {
 }
 
 /** Instância padrão (mock até integração OpenAI). */
-export const atlasIntelligenceService = new AtlasIntelligenceService(
-  new MockAtlasAIProvider(),
-);
+export const atlasIntelligenceService = new AtlasIntelligenceService(createAtlasAiProvider());

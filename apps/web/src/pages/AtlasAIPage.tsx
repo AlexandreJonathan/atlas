@@ -1,6 +1,7 @@
 import { Activity, BrainCircuit, Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { analytics } from "../lib/analytics";
 import {
   MOCK_ATLAS_AI_MESSAGES,
   type AtlasAiMessage,
@@ -41,6 +42,10 @@ function AtlasAIPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [mostrarAtividade, setMostrarAtividade] = useState(false);
+
+  useEffect(() => {
+    analytics.track("atlas_ai_opened");
+  }, []);
 
   async function handleSubmit(evento: FormEvent) {
     evento.preventDefault();

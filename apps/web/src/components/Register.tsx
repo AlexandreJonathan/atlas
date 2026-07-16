@@ -3,6 +3,7 @@ import { Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { analytics } from "../lib/analytics";
 import { getAuthErrorMessage } from "../lib/authErrors";
 import { supabase } from "../lib/supabase";
 import type { RegisterFormData } from "../types/auth";
@@ -50,6 +51,8 @@ function Register() {
       setErroGeral(getAuthErrorMessage(error.message));
       return;
     }
+
+    analytics.track("sign_up");
 
     // Se o projeto Supabase exigir confirmação de e-mail, `signUp` não
     // retorna uma sessão — nesse caso, em vez de mandar o usuário para

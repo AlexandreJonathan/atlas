@@ -1,3 +1,5 @@
+import { appConfig, featureFlagService } from "../../../config";
+import { logger } from "../../../lib/logging";
 import type { OpenFinanceProvider } from "../providers/OpenFinanceProvider";
 import { MockOpenFinanceProvider } from "../providers/MockOpenFinanceProvider";
 import type { Bank, BankId, FinancialHubTotals, OpenFinanceSnapshot } from "../types";
@@ -7,6 +9,15 @@ import {
   onBankConnected,
   openFinanceEvents,
 } from "../utils/events";
+
+function createOpenFinanceProvider(): OpenFinanceProvider {
+  const configured = appConfig.providers.openFinance;
+  if (configured === "pluggy") {
+    // Stub ainda não implementado — manter mock para não alterar UX.
+    logger.warning("Open Finance: provider pluggy solicitado; usando mock até a integração real");
+  }
+  return new MockOpenFinanceProvider();
+}
 
 /**
  * Única porta de entrada do app para Open Finance.
@@ -21,6 +32,11 @@ export class OpenFinanceService {
 
   getProviderName(): string {
     return this.provider.name;
+  }
+
+  /** Flag de módulo (AppConfig) — telas não precisam consultar diretamente. */
+  isModuleEnabled(): boolean {
+    return featureFlagService.isEnabled("openFinance");
   }
 
   listCatalog(): Promise<Bank[]> {
@@ -64,4 +80,4 @@ export class OpenFinanceService {
 }
 
 /** Instância padrão da aplicação (mock até a integração Pluggy). */
-export const openFinanceService = new OpenFinanceService(new MockOpenFinanceProvider());
+export const openFinanceService = new OpenFinanceService(createOpenFinanceProvider());

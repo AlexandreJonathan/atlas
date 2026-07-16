@@ -5,6 +5,7 @@ import Badge from "../../../components/ui/Badge";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import StatCard from "../../../components/ui/StatCard";
+import { analytics } from "../../../lib/analytics";
 import {
   AnimatedNumber,
   pulseGlow,
@@ -78,7 +79,13 @@ function OpenFinanceHub() {
           <h1>Hub financeiro</h1>
           <p>Patrimônio, saldos e conexões em um só lugar</p>
         </div>
-        <Button size="sm" onClick={() => navigate("/contas/conectar")}>
+        <Button
+          size="sm"
+          onClick={() => {
+            analytics.track("connect_bank_clicked");
+            navigate("/contas/conectar");
+          }}
+        >
           <Link2 size={16} aria-hidden="true" />
           Conectar bancos
         </Button>

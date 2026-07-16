@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrainCircuit, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { analytics } from "../lib/analytics";
 import BillModal from "../components/BillModal";
 import AtlasPulse from "../components/home/AtlasPulse";
 import BillsTimeline from "../components/home/BillsTimeline";
@@ -54,6 +55,10 @@ function HomePage() {
   );
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
+
+  useEffect(() => {
+    analytics.track("home_opened");
+  }, []);
 
   const nome = user?.user_metadata?.nome as string | undefined;
   const patrimonioTotal = resumo.saldo + MOCK_INVESTMENTS.patrimonioInvestido;
