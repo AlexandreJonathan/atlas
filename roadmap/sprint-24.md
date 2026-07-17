@@ -47,4 +47,6 @@ O cliente envia **apenas** `{ mode: "agent", messages: user|assistant }`.
 - [x] lint / build / test
 - [x] documentação
 - [x] commits + push
-- [ ] deploy Edge `atlas-ai-chat` (requer secrets/link do projeto)
+- [ ] deploy Edge `atlas-ai-chat` — código no `main`; executar localmente:
+  `npx supabase login` → `npx supabase functions deploy atlas-ai-chat`
+  (CLI sem `SUPABASE_ACCESS_TOKEN` nesta sessão)
