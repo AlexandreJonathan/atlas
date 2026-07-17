@@ -1,38 +1,27 @@
 /**
- * Atlas AI Chat — proxy OpenAI (Missões 19 + 22).
+ * Atlas AI Chat — proxy OpenAI (Missões 19 + 22 + 24).
  *
- * - JWT + auth.getUser()
- * - Rate limit user/IP
- * - mode=legacy: contexto financeiro RLS no system prompt
- * - mode=agent: tool calling (tools executadas no front via FinancialDataService)
+ * Trust boundary (Missão 24):
+ * - mode=agent: loop + tools + resultados 100% no servidor (RLS)
+ * - Cliente envia apenas mensagens user/assistant
+ * - Rejeita tools, toolChoice, context, role=tool, system e tool_calls do cliente
+ * - Rate limit fail-closed; CORS sem wildcard
  *
  * Secrets: OPENAI_API_KEY, opcional OPENAI_MODEL, ALLOWED_ORIGINS, AI_RATE_*
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.49.1";
+import { runServerAgentLoop } from "./agentLoop.ts";
+import {
+  resolveCorsOrigin,
+  validateAgentClientPayload,
+  type AgentRequestPayload,
+} from "./agentTrust.ts";
 
 type IncomingMessage = {
   role: string;
   content?: string | null;
-  tool_calls?: unknown;
-  tool_call_id?: string;
-};
-
-type AgentToolDef = {
-  type: "function";
-  function: {
-    name: string;
-    description?: string;
-    parameters?: Record<string, unknown>;
-  };
-};
-
-type RequestPayload = {
-  mode?: "agent" | "legacy";
-  messages?: IncomingMessage[];
-  tools?: AgentToolDef[];
-  toolChoice?: "auto" | "required" | "none";
 };
 
 type FinancialContext = {
@@ -52,28 +41,12 @@ const USER_LIMIT = Number(Deno.env.get("AI_RATE_LIMIT_USER") ?? "20");
 const IP_LIMIT = Number(Deno.env.get("AI_RATE_LIMIT_IP") ?? "40");
 const WINDOW_MS = Number(Deno.env.get("AI_RATE_WINDOW_MS") ?? String(60 * 60 * 1000));
 
-const AGENT_SYSTEM_FALLBACK = [
-  "Você é a Atlas Intelligence, assistente financeira do app Atlas.",
-  "Fale em português do Brasil, tom claro e objetivo (2–4 frases).",
-  "Use as tools para obter dados financeiros antes de responder números.",
-  "Nunca invente saldos, contas, metas ou investimentos.",
-  "A Atlas não vende investimentos.",
-].join("\n");
-
-function resolveCorsOrigin(req: Request): string {
-  const allowed = (Deno.env.get("ALLOWED_ORIGINS") ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const origin = req.headers.get("Origin") ?? "";
-  if (allowed.length === 0) return "*";
-  if (origin && allowed.includes(origin)) return origin;
-  return allowed[0] ?? "*";
-}
-
 function corsHeaders(req: Request): Record<string, string> {
   return {
-    "Access-Control-Allow-Origin": resolveCorsOrigin(req),
+    "Access-Control-Allow-Origin": resolveCorsOrigin(
+      req,
+      Deno.env.get("ALLOWED_ORIGINS") ?? "",
+    ),
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     Vary: "Origin",
@@ -110,6 +83,7 @@ async function hashIp(ip: string): Promise<string> {
     .slice(0, 32);
 }
 
+/** Fail-closed: erro de leitura/escrita do bucket → nega a requisição. */
 async function enforceRateLimit(
   admin: SupabaseClient,
   bucketKey: string,
@@ -123,8 +97,8 @@ async function enforceRateLimit(
     .maybeSingle();
 
   if (error) {
-    console.error("[atlas-ai-chat] rate limit read error", error.message);
-    return { ok: true };
+    console.error("[atlas-ai-chat] rate limit read error (fail-closed)", error.message);
+    return { ok: false, retryAfterSec: 60 };
   }
 
   let windowStart = row?.window_started_at ? new Date(row.window_started_at).getTime() : now;
@@ -149,7 +123,8 @@ async function enforceRateLimit(
   });
 
   if (upsertError) {
-    console.error("[atlas-ai-chat] rate limit upsert error", upsertError.message);
+    console.error("[atlas-ai-chat] rate limit upsert error (fail-closed)", upsertError.message);
+    return { ok: false, retryAfterSec: 60 };
   }
 
   return { ok: true };
@@ -319,37 +294,6 @@ function buildSystemPrompt(context: FinancialContext): string {
   ].join("\n");
 }
 
-function normalizeAgentMessages(messages: IncomingMessage[]): Record<string, unknown>[] {
-  const out: Record<string, unknown>[] = [];
-  for (const m of messages.slice(-24)) {
-    if (!m || typeof m.role !== "string") continue;
-    if (m.role === "tool") {
-      if (typeof m.tool_call_id !== "string" || typeof m.content !== "string") continue;
-      out.push({
-        role: "tool",
-        tool_call_id: m.tool_call_id,
-        content: m.content.slice(0, 12_000),
-      });
-      continue;
-    }
-    if (m.role === "assistant" && Array.isArray(m.tool_calls) && m.tool_calls.length > 0) {
-      out.push({
-        role: "assistant",
-        content: typeof m.content === "string" ? m.content.slice(0, 4000) : null,
-        tool_calls: m.tool_calls,
-      });
-      continue;
-    }
-    if (
-      (m.role === "system" || m.role === "user" || m.role === "assistant") &&
-      typeof m.content === "string"
-    ) {
-      out.push({ role: m.role, content: m.content.slice(0, 4000) });
-    }
-  }
-  return out;
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders(req) });
@@ -412,7 +356,7 @@ Deno.serve(async (req) => {
     );
   }
 
-  let payload: RequestPayload;
+  let payload: AgentRequestPayload;
   try {
     payload = await req.json();
   } catch {
@@ -423,90 +367,64 @@ Deno.serve(async (req) => {
   const model = Deno.env.get("OPENAI_MODEL") ?? "gpt-4.1-mini";
 
   if (mode === "agent") {
-    const openaiMessages = normalizeAgentMessages(
-      Array.isArray(payload.messages) ? payload.messages : [],
-    );
-    if (openaiMessages.length === 0) {
-      return jsonResponse(req, { error: "messages required" }, 400);
+    const validated = validateAgentClientPayload(payload);
+    if (!validated.ok) {
+      console.warn("[atlas-ai-chat] trust violation", { userId, code: validated.code });
+      return jsonResponse(
+        req,
+        { error: "trust_violation", code: validated.code },
+        400,
+      );
     }
-    const hasSystem = openaiMessages.some((m) => m.role === "system");
-    if (!hasSystem) {
-      openaiMessages.unshift({ role: "system", content: AGENT_SYSTEM_FALLBACK });
-    }
-
-    const tools = Array.isArray(payload.tools) ? payload.tools.slice(0, 12) : [];
-    if (tools.length === 0) {
-      return jsonResponse(req, { error: "tools required in agent mode" }, 400);
-    }
-
-    const toolChoice =
-      payload.toolChoice === "none" || payload.toolChoice === "auto"
-        ? payload.toolChoice
-        : "required";
-
-    console.info("[atlas-ai-chat] agent turn", {
-      userId,
-      messageCount: openaiMessages.length,
-      toolChoice,
-      tools: tools.map((t) => t.function?.name),
-    });
 
     try {
-      const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          temperature: 0.3,
-          max_tokens: 600,
-          messages: openaiMessages,
-          tools,
-          tool_choice: toolChoice,
-        }),
+      const result = await runServerAgentLoop({
+        apiKey,
+        model,
+        conversation: validated.messages,
+        userClient,
+        admin,
+        userId,
       });
-
-      const openaiJson = await openaiRes.json();
-      if (!openaiRes.ok) {
-        console.error("[atlas-ai-chat] OpenAI agent error", openaiRes.status);
-        return jsonResponse(req, { error: "OpenAI request failed" }, 502);
-      }
-
-      const message = openaiJson?.choices?.[0]?.message;
-      const toolCalls = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
-      if (toolCalls.length > 0) {
-        return jsonResponse(req, {
-          mode: "agent",
-          toolCalls,
-          content: typeof message?.content === "string" ? message.content : null,
-          model,
-          contextSource: "tools",
-          usage: openaiJson?.usage ?? null,
-        });
-      }
-
-      const reply = typeof message?.content === "string" ? message.content.trim() : "";
-      if (!reply) {
-        return jsonResponse(req, { error: "Empty model reply" }, 502);
-      }
 
       return jsonResponse(req, {
         mode: "agent",
-        reply,
-        content: reply,
+        reply: result.reply,
+        content: result.reply,
         model,
-        contextSource: "tools",
-        usage: openaiJson?.usage ?? null,
+        toolsUsed: result.toolsUsed,
+        contextSource: "server_tools",
+        usage: result.usage,
       });
     } catch (error) {
-      console.error("[atlas-ai-chat] agent unexpected", error);
+      const message = error instanceof Error ? error.message : "unexpected";
+      console.error("[atlas-ai-chat] agent failed", message);
+      if (message === "OPENAI_REQUEST_FAILED") {
+        return jsonResponse(req, { error: "OpenAI request failed" }, 502);
+      }
+      if (message === "UNKNOWN_TOOLS_ONLY") {
+        return jsonResponse(req, { error: "unknown_tools_rejected" }, 502);
+      }
+      if (message === "EMPTY_MODEL_REPLY") {
+        return jsonResponse(req, { error: "Empty model reply" }, 502);
+      }
+      if (message === "AGENT_ROUND_LIMIT") {
+        return jsonResponse(req, { error: "agent_round_limit" }, 502);
+      }
       return jsonResponse(req, { error: "Unexpected proxy error" }, 500);
     }
   }
 
-  const messages = Array.isArray(payload.messages) ? payload.messages : [];
+  // Legacy: também rejeita context/tools do cliente (ignora silenciosamente tools; bloqueia context).
+  if (Object.prototype.hasOwnProperty.call(payload, "context") && payload.context != null) {
+    return jsonResponse(
+      req,
+      { error: "trust_violation", code: "client_context_forbidden" },
+      400,
+    );
+  }
+
+  const messages = Array.isArray(payload.messages) ? (payload.messages as IncomingMessage[]) : [];
   const history = messages
     .filter(
       (m) =>
