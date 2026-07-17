@@ -11,7 +11,14 @@ export type AnalyticsEventName =
   | "atlas_ai_opened"
   | "atlas_ai_chat_success"
   | "atlas_ai_chat_fallback"
-  | "atlas_ai_rate_limited";
+  | "atlas_ai_rate_limited"
+  | "pluggy_connect_started"
+  | "pluggy_connect_success"
+  | "pluggy_connect_error"
+  | "pluggy_disconnect"
+  | "pluggy_sync_started"
+  | "pluggy_sync_success"
+  | "pluggy_sync_error";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 
