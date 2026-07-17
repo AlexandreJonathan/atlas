@@ -4,6 +4,25 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 22] — Atlas AI Tool Calling (Missão 22)
+
+Agente Atlas IA com tools tipadas sobre `FinancialDataService`. UX e contrato da FDL preservados. Versão `0.9.4`.
+
+### Adicionado
+- `AtlasToolRegistry` + schemas (`getFinancialSnapshot`, `getAccounts`, `getTransactions`, `getInvestments`, `getGoals`).
+- Loop `runAtlasToolAgent` (timeout/retry/logs/analytics).
+- Edge `atlas-ai-chat` modo `agent` (tool calling) + legado.
+- Eventos `atlas_ai_tool_*` / `atlas_ai_agent_*`.
+- `roadmap/sprint-22.md`.
+
+### Alterado
+- `OpenAIProvider` passa a orquestrar o agente antes do fallback legado/mock.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 21] — Pluggy Integration (Missão 21)
 
 Integração real com a Pluggy via Edge Function. Contrato da FDL e UX preservados. Versão `0.9.3`.

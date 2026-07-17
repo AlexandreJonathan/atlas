@@ -89,7 +89,7 @@ supabase functions deploy atlas-ai-chat
 
 Sem a Edge Function / secret, o `OpenAIProvider` faz fallback automático para **modo limitado** (resposta local rotulada — não parece chat online).
 
-A Edge **ignora** qualquer `context` enviado pelo cliente e monta o contexto financeiro via RLS.
+A Edge **ignora** qualquer `context` enviado pelo cliente. Em `mode=agent` (Sprint 22) a OpenAI recebe tools e o front executa via `FinancialDataService`; em `mode=legacy` o contexto ainda é montado via RLS.
 
 ### 3.2 Pluggy (Sprint 21) — segredo só no Supabase
 

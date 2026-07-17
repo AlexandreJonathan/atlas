@@ -425,6 +425,12 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Timeout + retry no client (`pluggyEdgeClient`); logs + analytics (`pluggy_*`).
 - Saldo/receitas/despesas da Home continuam no ledger Atlas (não misturam txs Pluggy no cálculo) — evita mudança de UX; OF Pluggy alimenta contas/cartões/investimentos do snapshot.
 
+### Atlas AI Tool Calling (Sprint 22)
+- `AtlasToolRegistry` em `atlas-intelligence/tools/` — tools tipadas que leem **somente** `FinancialDataService` (nunca Pluggy).
+- Fluxo: `OpenAIProvider` → Edge `mode=agent` (`tool_choice=required` no 1º turno) → execução local das tools → nova chamada Edge → resposta.
+- Edge permanece como proxy OpenAI (JWT, rate limit, sem secret no front); execução de tools é no cliente autenticado.
+- Fallbacks: agente → legado RLS → mock limitado (analytics + logs).
+
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
 - Edição (update) de movimentações financeiras e despesas fixas ainda não implementada na UI.

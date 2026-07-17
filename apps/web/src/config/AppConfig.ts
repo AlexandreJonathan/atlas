@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "0.9.3";
+export const APP_VERSION = "0.9.4";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;

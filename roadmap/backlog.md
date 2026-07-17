@@ -79,7 +79,8 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Open Finance real (Pluggy)~~ — Sprint 21: Edge `pluggy-proxy`, Connect Widget, `pluggy_connections`, providers reais (FDL + OF)
 - 🟡 Webhooks Pluggy (`item/updated`) para sync push em vez de só pull sob demanda
 - 🟡 Merge opcional de transações Pluggy no ledger Atlas (hoje OF não altera saldo da Home)
-- 🔴 IA real (LLM) na aba Atlas IA / Atlas Pulse — Sprint 12 entregou MockAtlasAIProvider + stub OpenAI + insights/feed; falta conectar LLM
+- ✅ ~~IA real (LLM) na aba Atlas IA~~ — Sprint 17 OpenAI + Sprint 22 Tool Calling (`AtlasToolRegistry` → FDS)
+- 🟡 Expandir tools (planejamento, bills mark paid) e webhooks Pluggy → feed IA
 - 🟡 Investimentos reais (somente leitura/estudo primeiro; a Atlas não vende investimentos) — estrutura na Sprint 8
 
 ## 7. Infraestrutura e DevOps
