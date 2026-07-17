@@ -4,6 +4,25 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 17] — Atlas AI Integration (Missão 17)
+
+Primeiro LLM real (OpenAI) no chat da Atlas IA, via Edge Function. Sem chave no front; Insights/Home intactos; fallback mock.
+
+### Adicionado
+- Edge Function `supabase/functions/atlas-ai-chat` (proxy OpenAI, JWT obrigatório).
+- `OpenAIProvider` + `openaiEdgeClient` (timeout, retry, logs, analytics).
+- Eventos `atlas_ai_chat_success` / `atlas_ai_chat_fallback`.
+- `roadmap/sprint-17.md`; versão app `0.9.0`.
+
+### Alterado
+- Factory do `AtlasIntelligenceService` seleciona OpenAI quando `VITE_FF_OPENAI=true`.
+- Docs de deploy / `atlas-intelligence.md` / arquitetura.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 16] — Observability & Quality Foundation (Missão 16)
 
 Infraestrutura de qualidade para crescer com segurança. Sem novas funcionalidades de produto, sem OpenAI/Pluggy, sem mudanças de UX/negócio/DB/auth.

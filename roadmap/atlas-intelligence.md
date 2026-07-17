@@ -1,7 +1,7 @@
 # Atlas Intelligence 1.0 — Arquitetura
 
-**Status:** Implementado (Sprint 12 / Missão 13)  
-**Escopo:** arquitetura do cérebro da Atlas — **sem OpenAI, sem LLM, sem alteração de banco/auth/Open Finance**.
+**Status:** Implementado (Sprint 12) + chat OpenAI (Sprint 17 / Missão 17)  
+**Escopo:** cérebro da Atlas com Adapter/Provider. Chat real via OpenAI (Edge Function); Insights/feed locais. Sem alteração de banco/auth/Open Finance.
 
 ---
 
@@ -23,18 +23,21 @@ O restante do sistema (Home, Contas, engines de planejamento/recomendação Spri
 ```
 UI (Home / Atlas IA)
         ↓
-useAtlasIntelligence
+useAtlasIntelligence / AtlasAIPage
         ↓
 AtlasIntelligenceService
         ↓
 AtlasAIProvider (interface)
- ├── MockAtlasAIProvider   ← ativo
- └── OpenAIProvider        ← stub (sem HTTP)
+ ├── MockAtlasAIProvider     ← flag openai off / fallback
+ └── OpenAIProvider          ← flag openai on
+        │   chat → Edge Function atlas-ai-chat → OpenAI API
+        │   insights / narrate → delega ao mock (Sprint 17)
         ↓
-Insight Engine (regras puras)
+Insight Engine (regras puras) — Home
 ```
 
-Telas **nunca** importam `OpenAIProvider` diretamente.
+Telas **nunca** importam `OpenAIProvider` diretamente.  
+`OPENAI_API_KEY` **nunca** fica no front — só no secret da Edge Function.
 
 ---
 
@@ -90,22 +93,17 @@ Persistência do feed: **sessão (memória)** nesta missão — sem tabela Supab
 
 ---
 
-## 6. Provider OpenAI (futuro)
+## 6. Provider OpenAI (Sprint 17)
 
-Arquivo: `providers/OpenAIProvider.ts` — stub que lança erro explicativo.
+Arquivo: `providers/OpenAIProvider.ts` + `openaiEdgeClient.ts`.
 
-Prompts já preparados em `prompts/templates.ts`:
+- Chat: `supabase.functions.invoke("atlas-ai-chat")` com timeout 20s e até 3 tentativas.
+- Edge Function: `supabase/functions/atlas-ai-chat` (system prompt + contexto financeiro).
+- Fallback: qualquer falha / flag off → `MockAtlasAIProvider.generateChatReply`.
+- Analytics: `atlas_ai_chat_success` / `atlas_ai_chat_fallback`.
+- Ativação: `VITE_FF_OPENAI=true` + secret `OPENAI_API_KEY` no Supabase.
 
-- `ATLAS_SYSTEM_PROMPT`
-- `buildInsightPrompt`
-- `buildChatPrompt`
-- `buildEventNarrationPrompt`
-
-Quando a integração real for feita:
-
-1. Implementar HTTP/Edge Function só em `OpenAIProvider`.
-2. Trocar a instância injetada em `atlasIntelligenceService`.
-3. UI e Service permanecem intactos.
+Prompts / serialização: `prompts/templates.ts` (`serializeContextForChat`, etc.).
 
 ---
 
@@ -123,7 +121,7 @@ Quando a integração real for feita:
 | Superfície | Uso |
 |---|---|
 | Home `/inicio` | `AtlasInsights` (top 3) + `IntelligenceFeed` compacto; eventos em saves |
-| Atlas IA `/atlas-ia` | Chat via `MockAtlasAIProvider` + feed completo |
+| Atlas IA `/atlas-ia` | Chat via `OpenAIProvider` (ou mock) + feed completo |
 
 ---
 

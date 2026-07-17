@@ -58,8 +58,27 @@ Copiar `apps/web/.env.example` para `.env` (local) ou configurar como variáveis
 |---|---|---|
 | `VITE_SUPABASE_URL` | Supabase Dashboard → Settings → API → Project URL | Pública, mas específica do projeto |
 | `VITE_SUPABASE_ANON_KEY` | Supabase Dashboard → Settings → API → anon public | Pública por design (protegida pelo RLS), mas ainda assim deve vir de variável de ambiente, nunca hardcoded |
+| `VITE_FF_OPENAI` | Definir `true` no front (Vite/Vercel) para ativar o chat OpenAI | Opcional; default `false` (mock). **Não** é a chave da OpenAI |
 
-Sem essas duas variáveis configuradas no ambiente de build/produção, o Supabase Client não é instanciado (`lib/supabase.ts`) e a aplicação inteira exibe o aviso "Supabase não está configurado" em qualquer tela que dependa dele.
+### 3.1 OpenAI (Sprint 17) — segredo só no Supabase
+
+A `OPENAI_API_KEY` **nunca** vai no front-end nem nas env vars da Vercel do app Vite.
+
+1. Criar chave em https://platform.openai.com/api-keys  
+2. No projeto Supabase (CLI linkado):
+
+```bash
+supabase secrets set OPENAI_API_KEY=sk-...
+# opcional:
+supabase secrets set OPENAI_MODEL=gpt-4.1-mini
+supabase functions deploy atlas-ai-chat
+```
+
+3. No front (local/Vercel): `VITE_FF_OPENAI=true` além de `VITE_SUPABASE_*`.
+
+Sem a Edge Function / secret, o `OpenAIProvider` faz fallback automático para o mock (chat continua funcionando).
+
+Sem essas duas variáveis `VITE_SUPABASE_*` configuradas no ambiente de build/produção, o Supabase Client não é instanciado (`lib/supabase.ts`) e a aplicação inteira exibe o aviso "Supabase não está configurado" em qualquer tela que dependa dele.
 
 ## 4. Build de Produção
 
