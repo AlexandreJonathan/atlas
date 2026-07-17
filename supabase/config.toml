@@ -1,0 +1,5 @@
+# Configuração mínima do projeto Supabase (CLI).
+# Segredos (OPENAI_API_KEY) nunca entram neste arquivo — use `supabase secrets set`.
+
+[functions.atlas-ai-chat]
+verify_jwt = true
