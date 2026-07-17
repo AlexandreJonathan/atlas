@@ -19,7 +19,7 @@ const LIMITED_PREFIX =
   "Estou em modo limitado no momento (a Atlas IA online está indisponível). Resposta local, com base nos dados já carregados neste aparelho:";
 
 /**
- * Provider OpenAI — agente com Tool Calling (FinancialDataService).
+ * Provider OpenAI — agente com Tool Calling (execução na Edge / RLS).
  * Insights / narração permanecem no mock.
  */
 export class OpenAIProvider implements AtlasAIProvider {
@@ -59,7 +59,7 @@ export class OpenAIProvider implements AtlasAIProvider {
       analytics.track("atlas_ai_chat_success", {
         model: model ?? "unknown",
         replyLength: reply.length,
-        contextSource: "tools",
+        contextSource: "server_tools",
         toolsUsed: toolsUsed.join(","),
       });
       return { content: reply, mode: "openai" };

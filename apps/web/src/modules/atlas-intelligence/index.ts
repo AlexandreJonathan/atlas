@@ -50,3 +50,15 @@ export type {
   OpenAiToolDefinition,
 } from "./tools/schemas";
 export { runAtlasToolAgent } from "./tools/runAtlasToolAgent";
+export {
+  buildSafeAgentPayload,
+  validateAgentClientPayload,
+  isAllowedToolName,
+  assertToolAllowed,
+  ATLAS_TOOL_ALLOWLIST,
+} from "./security/agentTrustBoundary";
+export type {
+  TrustViolation,
+  SafeAgentMessage,
+  AgentClientPayload,
+} from "./security/agentTrustBoundary";

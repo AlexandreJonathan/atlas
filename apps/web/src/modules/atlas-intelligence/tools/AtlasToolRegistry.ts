@@ -35,8 +35,9 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 }
 
 /**
- * Registry de tools do agente Atlas IA.
- * Toda ferramenta consome apenas FinancialDataService — nunca Pluggy.
+ * Registry local (legado / testes / modo limitado offline).
+ * Missão 24: o caminho OpenAI executa tools somente na Edge (allowlist + RLS).
+ * Este registry NÃO deve ser usado para alimentar o LLM em produção.
  */
 export class AtlasToolRegistry {
   private readonly service: FinancialDataService;

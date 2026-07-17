@@ -1,9 +1,9 @@
 import { getSupabaseClient } from "../../../lib/supabase";
+import { buildSafeAgentPayload } from "../security/agentTrustBoundary";
 import type { ChatMessage } from "../types";
-import type { OpenAiToolDefinition } from "../tools/schemas";
 
 export const ATLAS_AI_CHAT_FUNCTION = "atlas-ai-chat";
-export const ATLAS_AI_CHAT_TIMEOUT_MS = 25_000;
+export const ATLAS_AI_CHAT_TIMEOUT_MS = 55_000;
 export const ATLAS_AI_CHAT_MAX_ATTEMPTS = 3;
 
 export class AtlasAiRateLimitError extends Error {
@@ -16,27 +16,18 @@ export class AtlasAiRateLimitError extends Error {
   }
 }
 
-export type AgentToolCallDto = {
-  id: string;
-  type: "function";
-  function: { name: string; arguments: string };
-};
-
-export type AgentChatMessage =
-  | { role: "system" | "user" | "assistant"; content: string | null; tool_calls?: AgentToolCallDto[] }
-  | { role: "tool"; tool_call_id: string; content: string };
-
 type EdgeChatSuccess = {
   reply?: string;
   content?: string | null;
-  toolCalls?: AgentToolCallDto[];
   model?: string;
   contextSource?: string;
   mode?: "agent" | "legacy";
+  toolsUsed?: string[];
 };
 
 type EdgeChatErrorBody = {
   error?: string;
+  code?: string;
   scope?: string;
 };
 
@@ -78,7 +69,7 @@ function isRetryableError(error: unknown): boolean {
   if (error instanceof Error && error.message.startsWith("ATLAS_AI_TIMEOUT")) return true;
   const status = extractStatus(error);
   if (typeof status === "number") {
-    if (status === 429) return false;
+    if (status === 429 || status === 400) return false;
     return status === 408 || status >= 500;
   }
   if (typeof error === "object" && error !== null) {
@@ -117,22 +108,28 @@ async function invokeRaw(payload: Record<string, unknown>): Promise<EdgeChatSucc
         throw new AtlasAiRateLimitError();
       }
 
+      if (data && typeof data === "object" && "error" in data && data.error === "trust_violation") {
+        throw new Error(
+          `ATLAS_TRUST:${typeof data.code === "string" ? data.code : "rejected"}`,
+        );
+      }
+
       if (data && typeof data === "object") {
-        const toolCalls = Array.isArray((data as EdgeChatSuccess).toolCalls)
-          ? (data as EdgeChatSuccess).toolCalls
-          : undefined;
         const reply =
           typeof (data as EdgeChatSuccess).reply === "string"
             ? (data as EdgeChatSuccess).reply
             : undefined;
-        if (toolCalls?.length || typeof reply === "string") {
+        if (typeof reply === "string") {
+          const toolsUsed = Array.isArray((data as EdgeChatSuccess).toolsUsed)
+            ? ((data as EdgeChatSuccess).toolsUsed as string[])
+            : [];
           return {
             reply,
-            content: (data as EdgeChatSuccess).content ?? reply ?? null,
-            toolCalls,
+            content: (data as EdgeChatSuccess).content ?? reply,
             model: (data as EdgeChatSuccess).model,
             contextSource: (data as EdgeChatSuccess).contextSource,
             mode: (data as EdgeChatSuccess).mode,
+            toolsUsed,
           };
         }
       }
@@ -182,16 +179,23 @@ export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<{
   };
 }
 
-/** Um turno do agente (pode devolver tool_calls ou reply final). */
-export async function invokeAtlasAiAgentTurn(input: {
-  messages: AgentChatMessage[];
-  tools: OpenAiToolDefinition[];
-  toolChoice: "auto" | "required" | "none";
-}): Promise<EdgeChatSuccess> {
-  return invokeRaw({
-    mode: "agent",
-    messages: input.messages,
-    tools: input.tools,
-    toolChoice: input.toolChoice,
-  });
+/**
+ * Agente completo na Edge (Missão 24).
+ * Não envia tools, toolChoice, role=tool nem contexto financeiro.
+ */
+export async function invokeAtlasAiAgent(messages: ChatMessage[]): Promise<{
+  reply: string;
+  model?: string;
+  contextSource?: string;
+  toolsUsed: string[];
+}> {
+  const payload = buildSafeAgentPayload(messages);
+  const data = await invokeRaw(payload as unknown as Record<string, unknown>);
+  if (!data.reply) throw new Error("Resposta vazia da Edge Function");
+  return {
+    reply: data.reply,
+    model: data.model,
+    contextSource: data.contextSource,
+    toolsUsed: data.toolsUsed ?? [],
+  };
 }
