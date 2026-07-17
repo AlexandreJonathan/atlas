@@ -1,7 +1,7 @@
 # Atlas Intelligence 1.0 — Arquitetura
 
-**Status:** Implementado (Sprint 12) + chat OpenAI (Sprint 17 / Missão 17)  
-**Escopo:** cérebro da Atlas com Adapter/Provider. Chat real via OpenAI (Edge Function); Insights/feed locais. Sem alteração de banco/auth/Open Finance.
+**Status:** Implementado (Sprint 12) + chat OpenAI (17) + Tool Calling (22) + Trust Boundary (24)  
+**Escopo:** cérebro da Atlas com Adapter/Provider. Chat real via OpenAI (Edge Function, tools no servidor); Insights/feed locais.
 
 ---
 
@@ -30,7 +30,7 @@ AtlasIntelligenceService
 AtlasAIProvider (interface)
  ├── MockAtlasAIProvider     ← flag openai off / fallback
  └── OpenAIProvider          ← flag openai on
-        │   chat → Edge Function atlas-ai-chat → OpenAI API
+        │   chat → Edge atlas-ai-chat (agent loop + tools RLS)
         │   insights / narrate → delega ao mock (Sprint 17)
         ↓
 Insight Engine (regras puras) — Home
@@ -50,11 +50,20 @@ apps/web/src/modules/atlas-intelligence/
 ├── providers/       # AtlasAIProvider, Mock, OpenAI stub
 ├── services/        # AtlasIntelligenceService
 ├── hooks/           # useAtlasIntelligence
-├── prompts/         # templates para futura OpenAI
+├── prompts/         # templates
+├── tools/           # schemas + registry local (legado; LLM usa Edge)
+├── security/        # agentTrustBoundary (payload seguro do cliente)
 ├── components/      # AtlasInsights, IntelligenceFeed
 ├── utils/           # rankInsights, feedStore, format
 └── index.ts
 ```
+
+### Trust boundary (Sprint 24)
+
+- Cliente: só `user`/`assistant` via `buildSafeAgentPayload`.
+- Edge: allowlist, system prompt, `tool_choice`, execução RLS e resultados das tools.
+- Qualquer `tools` / `role=tool` / `context` do cliente → `trust_violation`.
+
 
 ---
 
@@ -93,15 +102,15 @@ Persistência do feed: **sessão (memória)** nesta missão — sem tabela Supab
 
 ---
 
-## 6. Provider OpenAI (Sprint 17)
+## 6. Provider OpenAI (Sprint 17 + 22 + 24)
 
-Arquivo: `providers/OpenAIProvider.ts` + `openaiEdgeClient.ts`.
+Arquivo: `providers/OpenAIProvider.ts` + `openaiEdgeClient.ts` + `security/agentTrustBoundary.ts`.
 
-- Chat: `supabase.functions.invoke("atlas-ai-chat")` com timeout 20s e até 3 tentativas.
-- Edge Function: `supabase/functions/atlas-ai-chat` (system prompt + contexto financeiro).
-- Fallback: qualquer falha / flag off → `MockAtlasAIProvider.generateChatReply`.
-- Analytics: `atlas_ai_chat_success` / `atlas_ai_chat_fallback`.
-- Ativação: `VITE_FF_OPENAI=true` + secret `OPENAI_API_KEY` no Supabase.
+- Chat agente: `invokeAtlasAiAgent` — timeout ~55s, até 3 tentativas; payload só user/assistant.
+- Edge: loop + allowlist + tools via RLS; legado ainda monta contexto no system prompt.
+- Fallback: agente → legado → mock limitado (flag off / rate limit / erro).
+- Analytics: `atlas_ai_chat_success` / `atlas_ai_chat_fallback` / `atlas_ai_agent_*`.
+- Ativação: `VITE_FF_OPENAI=true` + secret `OPENAI_API_KEY` + `ALLOWED_ORIGINS` em produção.
 
 Prompts / serialização: `prompts/templates.ts` (`serializeContextForChat`, etc.).
 

@@ -4,6 +4,26 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 24] — Atlas AI Trust Boundary (Missão 24)
+
+Fecha a trust boundary do agente: tools, schemas e resultados financeiros só no servidor. Versão `0.9.5`.
+
+### Adicionado
+- Edge: allowlist `SERVER_TOOL_DEFINITIONS`, loop do agente e execução RLS (`agentTrust` / `agentTools` / `agentLoop`).
+- Cliente: `agentTrustBoundary` + `buildSafeAgentPayload` (somente user/assistant).
+- Testes Vitest de injection (`npm run test`).
+- `roadmap/sprint-24.md`.
+
+### Alterado
+- `mode=agent` deixa de aceitar `tools`, `toolChoice`, `context`, `role=tool` e `system` do cliente.
+- Rate limit fail-closed; CORS sem `*`.
+- `AtlasToolRegistry` permanece local (legado/testes) — não alimenta o LLM em produção.
+
+### Validado
+- `npm run lint`, `npm run test` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 22] — Atlas AI Tool Calling (Missão 22)
 
 Agente Atlas IA com tools tipadas sobre `FinancialDataService`. UX e contrato da FDL preservados. Versão `0.9.4`.

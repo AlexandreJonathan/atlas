@@ -425,11 +425,14 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Timeout + retry no client (`pluggyEdgeClient`); logs + analytics (`pluggy_*`).
 - Saldo/receitas/despesas da Home continuam no ledger Atlas (não misturam txs Pluggy no cálculo) — evita mudança de UX; OF Pluggy alimenta contas/cartões/investimentos do snapshot.
 
-### Atlas AI Tool Calling (Sprint 22)
-- `AtlasToolRegistry` em `atlas-intelligence/tools/` — tools tipadas que leem **somente** `FinancialDataService` (nunca Pluggy).
-- Fluxo: `OpenAIProvider` → Edge `mode=agent` (`tool_choice=required` no 1º turno) → execução local das tools → nova chamada Edge → resposta.
-- Edge permanece como proxy OpenAI (JWT, rate limit, sem secret no front); execução de tools é no cliente autenticado.
+### Atlas AI Tool Calling (Sprint 22) + Trust Boundary (Sprint 24)
+- Allowlist de tools no **servidor** (`SERVER_TOOL_DEFINITIONS` na Edge). Cliente não envia schemas nem resultados.
+- Fluxo: `OpenAIProvider` → Edge `mode=agent` → loop OpenAI + execução RLS no servidor → `reply` + `toolsUsed` (`contextSource: server_tools`).
+- Payload do cliente: apenas `{ mode: "agent", messages: user|assistant }`. Violações → `trust_violation` 400.
+- Rate limit fail-closed; CORS sem wildcard (exige `ALLOWED_ORIGINS` fora de localhost).
+- `AtlasToolRegistry` no front é legado/testes/offline — **não** alimenta o LLM em produção.
 - Fallbacks: agente → legado RLS → mock limitado (analytics + logs).
+- Testes: `apps/web` Vitest (`agentTrustBoundary.test.ts`).
 
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
@@ -440,7 +443,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" do planejamento financeiro (sem ritmo mensal calculável).
 - Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
 - Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
-- Não há testes automatizados (unitários, integração ou E2E) — o checklist de deploy (`docs/deploy.md`) depende de verificação manual.
+- Cobertura de testes ainda mínima (Vitest cobre trust boundary da IA; sem E2E/CI completo) — o checklist de deploy (`docs/deploy.md`) ainda depende em grande parte de verificação manual.
 - Monitoramento de erros em produção: Sentry opcional via `VITE_SENTRY_DSN` (sem DSN o SDK não carrega).
 - Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.
 - Não há gerenciamento de estado global genérico nem camada de cache/dados (React Query, etc.).
