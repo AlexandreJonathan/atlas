@@ -62,6 +62,7 @@ Copiar `apps/web/.env.example` para `.env` (local) ou configurar como variáveis
 | `VITE_FF_OPENAI` | Definir `true` no front (Vite/Vercel) para ativar o chat OpenAI | Opcional; default `false` (mock). **Não** é a chave da OpenAI |
 | `VITE_SENTRY_DSN` | Projeto Sentry → Client Keys (DSN) | Opcional; sem valor o SDK não carrega |
 | `VITE_OF_PROVIDER` | `mock` (default) ou `pluggy` | `pluggy` ativa o stub drop-in (sem HTTP); use `mock` no Alpha |
+| `VITE_FINANCIAL_DATA_PROVIDER` | `mock` (default) ou `pluggy` | Financial Data Layer; `pluggy` = stub OF via PluggyProvider |
 
 ### 3.1 OpenAI (Sprint 17/19) — segredo só no Supabase
 

@@ -96,7 +96,8 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 ## 8. Estado Global e Arquitetura de Front-end
 
 - 🟡 Avaliar necessidade de gerenciador de estado global (Context API, Zustand ou Redux) à medida que a aplicação cresce
-- 🟢 Introduzir camada de cache de dados (React Query / TanStack Query) — mitigaria buscas duplicadas quando `AppShell` (onboarding) e `HomePage` carregam os mesmos hooks de perfil/metas/despesas fixas
+- ✅ ~~Camada de cache financeiro compartilhada (AppShell + Home)~~ — Sprint 20 (`FinancialDataService` in-memory); React Query continua opcional para paginação/remoto
+- 🟢 Avaliar TanStack Query sobre a FDL se o histórico crescer (paginação / stale-while-revalidate)
 - ✅ ~~Bundle único > 500 kB~~ — mitigado na Sprint 19 (`manualChunks` + lazy auth/páginas); reavaliar chunks residuais após cada release
 
 ---

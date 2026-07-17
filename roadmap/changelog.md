@@ -4,6 +4,25 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 20] — Financial Data Layer (Missão 20)
+
+Camada única de dados financeiros antes da Pluggy real. Sem mudança de UX. Versão `0.9.2`.
+
+### Adicionado
+- Módulo `src/modules/financial-data/` (`FinancialDataService`, `FinancialDataProvider`, Mock + stub Pluggy).
+- Cache em memória, `sync` / `invalidate`, loading/syncing, mutações otimistas e `financialDataEvents`.
+- `useFinancialData` como porta React da Home, Atlas IA, AppShell e Investimentos.
+- `roadmap/sprint-20.md`.
+
+### Alterado
+- `useAtlasIntelligence` passa a receber `FinancialSnapshot` (sem `MOCK_INVESTMENTS` direto).
+- `AppConfig.providers.financialData` (`mock` \| `pluggy` via `VITE_FINANCIAL_DATA_PROVIDER`).
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 19] — Alpha Hardening (Missão 19)
 
 Endurecimento de produção para Alpha privado. Sem Tool Calling, sem Pluggy HTTP, sem novas features de produto. Versão `0.9.1`.

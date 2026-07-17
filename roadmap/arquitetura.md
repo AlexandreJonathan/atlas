@@ -109,6 +109,13 @@ atlas/
 │       │   │   ├── AtlasAIPage.tsx / .css
 │       │   │   └── ProfilePage.tsx / .css
 │       │   ├── modules/
+│       │   │   ├── financial-data/     # Financial Data Layer (Missão 20)
+│       │   │   │       ├── types/
+│       │   │   │       ├── providers/   # Mock + stub Pluggy
+│       │   │   │       ├── services/    # FinancialDataService (cache/sync)
+│       │   │   │       ├── hooks/       # useFinancialData
+│       │   │   │       ├── utils/
+│       │   │   │       └── index.ts
 │       │   │   ├── open-finance/
 │       │   │   │       ├── types/
 │       │   │   │       ├── providers/   # interface + Mock + stub Pluggy
@@ -121,7 +128,7 @@ atlas/
 │       │   │   └── atlas-intelligence/
 │       │   │       ├── types/
 │       │   │       ├── engine/         # Insight Engine
-│       │   │       ├── providers/      # AtlasAIProvider + Mock + stub OpenAI
+│       │   │       ├── providers/      # AtlasAIProvider + Mock + OpenAI
 │       │   │       ├── services/
 │       │   │       ├── hooks/
 │       │   │       ├── prompts/
@@ -392,9 +399,19 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Call sites mínimos nos fluxos existentes — sem mudança visual.
 
 ### AppConfig (`src/config/AppConfig.ts`)
-- Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`: mock|pluggy, `atlasAi`: mock|openai), `observability.sentryDsn`.
+- Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`, `atlasAi`, `financialData`), `observability.sentryDsn`.
 - Open Finance: `VITE_OF_PROVIDER=pluggy` instancia o stub Pluggy de verdade (drop-in; sem HTTP). Default permanece mock.
 - Atlas AI: flag `openai` usa Edge `atlas-ai-chat` com contexto **somente servidor**; fallback explícito em modo limitado.
+- Financial Data: `VITE_FINANCIAL_DATA_PROVIDER=pluggy` seleciona `PluggyFinancialDataProvider` (stub); default `mock`.
+
+### Financial Data Layer (Sprint 20)
+- Módulo `src/modules/financial-data/` — **única fonte de leitura** de saldo, contas (bills), cartões, metas, receitas/despesas e patrimônio para Home / Atlas IA / AppShell / Investimentos.
+- Fluxo: UI → `useFinancialData` / `FinancialDataService` → `FinancialDataProvider` (`Mock` | `Pluggy` stub).
+- `MockFinancialDataProvider`: ledger Supabase + snapshot OF via `openFinanceService` + investimentos de estudo.
+- `PluggyFinancialDataProvider`: ledger Supabase + `PluggyOpenFinanceProvider.getSnapshot()` (vazio até integração HTTP).
+- Cache em memória compartilhado entre montagens; `sync()` / `invalidate(scope)`; estados `loading` / `syncing`; mutações otimistas no ledger.
+- Hub Open Finance (`/contas`) continua em `openFinanceService` para connect/sync de instituições — a FDL só lê o snapshot para consolidar cartões/contas bancárias no modelo unificado.
+- Hooks CRUD legados (`useTransactions`, etc.) permanecem como adapters internos/legado; páginas principais não os chamam mais.
 
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
