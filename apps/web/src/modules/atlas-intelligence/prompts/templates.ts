@@ -52,7 +52,10 @@ export function buildEventNarrationPrompt(eventLabel: string, context: Intellige
   ].join("\n");
 }
 
-/** Payload serializável enviado à Edge Function (somente leitura). */
+/**
+ * Serialização local para prompts/mock.
+ * A Edge `atlas-ai-chat` NÃO aceita contexto do cliente — monta no servidor (RLS).
+ */
 export function serializeContextForChat(context: IntelligenceContext) {
   return {
     saldo: context.saldo,

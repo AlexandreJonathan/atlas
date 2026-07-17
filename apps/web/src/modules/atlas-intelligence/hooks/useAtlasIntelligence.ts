@@ -6,7 +6,14 @@ import type { useGoals } from "../../../hooks/useGoals";
 import type { usePlanning } from "../../../hooks/usePlanning";
 import type { useTransactions } from "../../../hooks/useTransactions";
 import { atlasIntelligenceService } from "../services/AtlasIntelligenceService";
-import type { FeedItem, FinancialEvent, Insight, IntelligenceContext } from "../types";
+import type {
+  ChatMessage,
+  ChatReplyResult,
+  FeedItem,
+  FinancialEvent,
+  Insight,
+  IntelligenceContext,
+} from "../types";
 import { getFeedItems, subscribeFeed } from "../utils/feedStore";
 
 type ResumoSlice = ReturnType<typeof useFinancialSummary>;
@@ -16,45 +23,49 @@ type TransacoesSlice = ReturnType<typeof useTransactions>;
 type PlanejamentoSlice = Pick<ReturnType<typeof usePlanning>, "resultado">;
 
 function buildContext(input: {
-  resumo: ResumoSlice;
-  contas: ContasSlice;
-  metas: MetasSlice;
-  transacoes: TransacoesSlice;
-  planejamento: PlanejamentoSlice;
+  saldo: number;
+  receitasDoMes: number;
+  despesasDoMes: number;
+  contasProximas: ContasSlice["contasVencendoEmBreve"];
+  contasVencidas: ContasSlice["contasVencidas"];
+  metas: MetasSlice["goals"];
+  transactions: TransacoesSlice["transactions"];
+  risco: PlanejamentoSlice["resultado"] extends { risco: infer R } | null | undefined ? R | null : null;
+  contasError: boolean;
+  metasError: boolean;
+  txError: boolean;
 }): IntelligenceContext {
   const investimentos = MOCK_INVESTMENTS.patrimonioInvestido;
   return {
-    saldo: input.resumo.saldo,
-    patrimonio: input.resumo.saldo + investimentos,
-    receitasDoMes: input.resumo.receitasDoMes,
-    despesasDoMes: input.resumo.despesasDoMes,
-    contasProximas: (input.contas.error ? [] : input.contas.contasVencendoEmBreve).map((c) => ({
+    saldo: input.saldo,
+    patrimonio: input.saldo + investimentos,
+    receitasDoMes: input.receitasDoMes,
+    despesasDoMes: input.despesasDoMes,
+    contasProximas: (input.contasError ? [] : input.contasProximas).map((c) => ({
       id: c.id,
       description: c.description,
       dueDate: c.dueDate,
       amount: c.amount,
     })),
-    contasVencidas: (input.contas.error ? [] : input.contas.contasVencidas).map((c) => ({
+    contasVencidas: (input.contasError ? [] : input.contasVencidas).map((c) => ({
       id: c.id,
       description: c.description,
       amount: c.amount,
     })),
-    metas: (input.metas.error ? [] : input.metas.goals).map((g) => ({
+    metas: (input.metasError ? [] : input.metas).map((g) => ({
       id: g.id,
       title: g.title,
       targetAmount: g.targetAmount,
       currentAmount: g.currentAmount,
     })),
     investimentosPatrimonio: investimentos,
-    risco: input.planejamento.resultado?.risco ?? null,
-    transacoesRecentes: (input.transacoes.error ? [] : input.transacoes.transactions)
-      .slice(0, 20)
-      .map((t) => ({
-        id: t.id,
-        type: t.type,
-        description: t.description,
-        amount: t.amount,
-      })),
+    risco: input.risco ?? null,
+    transacoesRecentes: (input.txError ? [] : input.transactions).slice(0, 20).map((t) => ({
+      id: t.id,
+      type: t.type,
+      description: t.description,
+      amount: t.amount,
+    })),
   };
 }
 
@@ -77,9 +88,40 @@ export function useAtlasIntelligence(
   const fontesLoading =
     resumo.loading || contas.loading || metas.loading || transacoes.loading;
 
+  const risco = planejamento.resultado?.risco ?? null;
+  const contasProximas = contas.contasVencendoEmBreve;
+  const contasVencidas = contas.contasVencidas;
+  const goals = metas.goals;
+  const transactions = transacoes.transactions;
+
   const context = useMemo(
-    () => buildContext({ resumo, contas, metas, transacoes, planejamento }),
-    [resumo, contas, metas, transacoes, planejamento],
+    () =>
+      buildContext({
+        saldo: resumo.saldo,
+        receitasDoMes: resumo.receitasDoMes,
+        despesasDoMes: resumo.despesasDoMes,
+        contasProximas,
+        contasVencidas,
+        metas: goals,
+        transactions,
+        risco,
+        contasError: Boolean(contas.error),
+        metasError: Boolean(metas.error),
+        txError: Boolean(transacoes.error),
+      }),
+    [
+      resumo.saldo,
+      resumo.receitasDoMes,
+      resumo.despesasDoMes,
+      contasProximas,
+      contasVencidas,
+      goals,
+      transactions,
+      risco,
+      contas.error,
+      metas.error,
+      transacoes.error,
+    ],
   );
 
   const refresh = useCallback(async () => {
@@ -91,9 +133,7 @@ export function useAtlasIntelligence(
       setInsights(all);
       setTopInsights(top);
     } catch (erro) {
-      setError(
-        erro instanceof Error ? erro.message : "Não foi possível gerar insights.",
-      );
+      setError(erro instanceof Error ? erro.message : "Não foi possível gerar insights.");
     } finally {
       setLoading(false);
     }
@@ -120,7 +160,7 @@ export function useAtlasIntelligence(
   );
 
   const ask = useCallback(
-    async (messages: Parameters<typeof atlasIntelligenceService.generateChatReply>[0]) => {
+    async (messages: ChatMessage[]): Promise<ChatReplyResult> => {
       return atlasIntelligenceService.generateChatReply(messages, context);
     },
     [context],

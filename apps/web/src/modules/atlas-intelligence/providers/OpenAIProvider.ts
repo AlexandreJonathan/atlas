@@ -3,6 +3,7 @@ import { analytics } from "../../../lib/analytics";
 import { logger } from "../../../lib/logging";
 import type {
   ChatMessage,
+  ChatReplyResult,
   FeedItem,
   FinancialEvent,
   Insight,
@@ -10,12 +11,14 @@ import type {
 } from "../types";
 import type { AtlasAIProvider } from "./AtlasAIProvider";
 import { MockAtlasAIProvider } from "./MockAtlasAIProvider";
-import { invokeAtlasAiChat } from "./openaiEdgeClient";
+import { AtlasAiRateLimitError, invokeAtlasAiChat } from "./openaiEdgeClient";
+
+const LIMITED_PREFIX =
+  "Estou em modo limitado no momento (a Atlas IA online está indisponível). Resposta local, com base nos dados já carregados neste aparelho:";
 
 /**
- * Provider OpenAI — chat via Supabase Edge Function (`atlas-ai-chat`).
- * Insights e narração de eventos permanecem no mock (Missão 17 — só chat).
- * A OPENAI_API_KEY nunca passa por este código.
+ * Provider OpenAI — chat via Edge Function (contexto montado no servidor).
+ * Insights / narração permanecem no mock.
  */
 export class OpenAIProvider implements AtlasAIProvider {
   readonly name = "openai";
@@ -23,44 +26,57 @@ export class OpenAIProvider implements AtlasAIProvider {
   private readonly mock = new MockAtlasAIProvider();
 
   generateInsights(context: IntelligenceContext): Promise<Insight[]> {
-    // Home Insights: motor local — sem LLM nesta versão.
     return this.mock.generateInsights(context);
   }
 
   async generateChatReply(
     messages: ChatMessage[],
     context: IntelligenceContext,
-  ): Promise<string> {
+  ): Promise<ChatReplyResult> {
     if (!featureFlagService.isEnabled("openai")) {
-      logger.info("Atlas AI chat: flag openai desabilitada — usando mock");
+      logger.info("Atlas AI chat: flag openai desabilitada — modo limitado");
       analytics.track("atlas_ai_chat_fallback", { reason: "feature_flag_off" });
-      return this.mock.generateChatReply(messages, context);
+      return this.toLimited(await this.mock.generateChatReply(messages, context), "feature_flag_off");
     }
 
     try {
-      const { reply, model } = await invokeAtlasAiChat(messages, context);
+      const { reply, model, contextSource } = await invokeAtlasAiChat(messages);
       logger.info("Atlas AI chat: resposta OpenAI recebida", {
         model: model ?? "unknown",
         replyLength: reply.length,
+        contextSource: contextSource ?? "server",
       });
       analytics.track("atlas_ai_chat_success", {
         model: model ?? "unknown",
         replyLength: reply.length,
+        contextSource: contextSource ?? "server",
       });
-      return reply;
+      return { content: reply, mode: "openai" };
     } catch (error) {
-      logger.warning("Atlas AI chat: falha no proxy OpenAI — fallback mock", {
+      const reason =
+        error instanceof AtlasAiRateLimitError ? "rate_limited" : "error_or_timeout";
+      logger.warning("Atlas AI chat: fallback para modo limitado", {
+        reason,
         error: error instanceof Error ? error.message : String(error),
       });
-      analytics.track("atlas_ai_chat_fallback", {
-        reason: "error_or_timeout",
-      });
-      return this.mock.generateChatReply(messages, context);
+      if (reason === "rate_limited") {
+        analytics.track("atlas_ai_rate_limited", { scope: "edge" });
+      }
+      analytics.track("atlas_ai_chat_fallback", { reason });
+      const mock = await this.mock.generateChatReply(messages, context);
+      return this.toLimited(mock, reason);
     }
   }
 
   narrateEvent(event: FinancialEvent, context: IntelligenceContext): Promise<FeedItem[]> {
-    // Feed: narrativas locais — sem LLM nesta versão.
     return this.mock.narrateEvent(event, context);
+  }
+
+  private toLimited(mock: ChatReplyResult, reason: string): ChatReplyResult {
+    return {
+      content: `${LIMITED_PREFIX}\n\n${mock.content}`,
+      mode: "limited",
+      reason,
+    };
   }
 }

@@ -1,7 +1,6 @@
 import { Activity, BrainCircuit, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { analytics } from "../lib/analytics";
 import {
   MOCK_ATLAS_AI_MESSAGES,
   type AtlasAiMessage,
@@ -15,6 +14,7 @@ import { useFixedExpenses } from "../hooks/useFixedExpenses";
 import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
 import { useTransactions } from "../hooks/useTransactions";
+import { analytics } from "../lib/analytics";
 import {
   IntelligenceFeed,
   useAtlasIntelligence,
@@ -42,6 +42,7 @@ function AtlasAIPage() {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [mostrarAtividade, setMostrarAtividade] = useState(false);
+  const [modoLimitado, setModoLimitado] = useState(false);
 
   useEffect(() => {
     analytics.track("atlas_ai_opened");
@@ -69,17 +70,26 @@ function AtlasAIPage() {
 
     try {
       const resposta = await intelligence.ask(historico);
-      setMensagens((atual) => [
-        ...atual,
-        { id: idAssistant, role: "assistant", content: resposta },
-      ]);
-    } catch {
+      if (resposta.mode === "limited") {
+        setModoLimitado(true);
+      }
       setMensagens((atual) => [
         ...atual,
         {
           id: idAssistant,
           role: "assistant",
-          content: "Não consegui responder agora. Tente novamente em instantes.",
+          content: resposta.content,
+        },
+      ]);
+    } catch {
+      setModoLimitado(true);
+      setMensagens((atual) => [
+        ...atual,
+        {
+          id: idAssistant,
+          role: "assistant",
+          content:
+            "Estou em modo limitado e não consegui responder agora. Tente novamente em instantes.",
         },
       ]);
     } finally {
@@ -111,6 +121,13 @@ function AtlasAIPage() {
           Atividade
         </Button>
       </header>
+
+      {modoLimitado && (
+        <p className="atlas-ai-limited-banner" role="status">
+          Modo limitado ativo — respostas locais enquanto a IA online estiver indisponível ou
+          acima do limite de uso.
+        </p>
+      )}
 
       {mostrarAtividade && (
         <div className="atlas-ai-activity">

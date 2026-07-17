@@ -2,6 +2,7 @@ import { gerarInsights } from "../engine/insightEngine";
 import type { AtlasAIProvider } from "./AtlasAIProvider";
 import type {
   ChatMessage,
+  ChatReplyResult,
   FeedItem,
   FinancialEvent,
   Insight,
@@ -42,32 +43,34 @@ export class MockAtlasAIProvider implements AtlasAIProvider {
   async generateChatReply(
     messages: ChatMessage[],
     context: IntelligenceContext,
-  ): Promise<string> {
+  ): Promise<ChatReplyResult> {
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
     const pergunta = lastUser?.content.toLowerCase() ?? "";
     const top = rankInsights(gerarInsights(context), 1)[0];
 
+    let content: string;
     if (/saldo|patrim[oô]nio/.test(pergunta)) {
-      return `Seu saldo disponível está em ${formatMoneyBRL(context.saldo)} e o patrimônio estimado em ${formatMoneyBRL(context.patrimonio)}. ${top?.message ?? ""}`.trim();
-    }
-    if (/meta/.test(pergunta) && context.metas[0]) {
+      content =
+        `Seu saldo disponível está em ${formatMoneyBRL(context.saldo)} e o patrimônio estimado em ${formatMoneyBRL(context.patrimonio)}. ${top?.message ?? ""}`.trim();
+    } else if (/meta/.test(pergunta) && context.metas[0]) {
       const meta = context.metas[0];
       const pct = Math.round((meta.currentAmount / Math.max(meta.targetAmount, 1)) * 100);
-      return `Na meta “${meta.title}” você já avançou cerca de ${pct}%. Quer que eu priorize aportes no planejamento?`;
-    }
-    if (/conta|boleto|venc/.test(pergunta)) {
+      content = `Na meta “${meta.title}” você já avançou cerca de ${pct}%. Quer que eu priorize aportes no planejamento?`;
+    } else if (/conta|boleto|venc/.test(pergunta)) {
       if (context.contasVencidas[0]) {
-        return `Há contas em atraso. Comece por ${context.contasVencidas[0].description}.`;
+        content = `Há contas em atraso. Comece por ${context.contasVencidas[0].description}.`;
+      } else if (context.contasProximas[0]) {
+        content = `Sua próxima conta é ${context.contasProximas[0].description}, no valor de ${formatMoneyBRL(context.contasProximas[0].amount)}.`;
+      } else {
+        content = "Não vejo contas urgentes no radar agora.";
       }
-      if (context.contasProximas[0]) {
-        return `Sua próxima conta é ${context.contasProximas[0].description}, no valor de ${formatMoneyBRL(context.contasProximas[0].amount)}.`;
-      }
-      return "Não vejo contas urgentes no radar agora.";
+    } else {
+      content = top
+        ? `Com base no seu momento financeiro: ${top.message}`
+        : "Estou acompanhando suas finanças. Me pergunte sobre saldo, metas ou contas.";
     }
 
-    return top
-      ? `Com base no seu momento financeiro: ${top.message}`
-      : "Estou acompanhando suas finanças. Me pergunte sobre saldo, metas ou contas.";
+    return { content, mode: "limited", reason: "mock_provider" };
   }
 
   async narrateEvent(

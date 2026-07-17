@@ -52,6 +52,15 @@ export type ChatMessage = {
   content: string;
 };
 
+/** Resultado do chat — distingue LLM real de modo limitado (mock/fallback). */
+export type ChatReplyMode = "openai" | "limited";
+
+export type ChatReplyResult = {
+  content: string;
+  mode: ChatReplyMode;
+  reason?: string;
+};
+
 /** Snapshot de entrada do motor — somente leitura, sem mutar fontes. */
 export type IntelligenceContext = {
   saldo: number;

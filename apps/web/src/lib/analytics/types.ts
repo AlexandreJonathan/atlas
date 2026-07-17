@@ -10,7 +10,8 @@ export type AnalyticsEventName =
   | "connect_bank_clicked"
   | "atlas_ai_opened"
   | "atlas_ai_chat_success"
-  | "atlas_ai_chat_fallback";
+  | "atlas_ai_chat_fallback"
+  | "atlas_ai_rate_limited";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 

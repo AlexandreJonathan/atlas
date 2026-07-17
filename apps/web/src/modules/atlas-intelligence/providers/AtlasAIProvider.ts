@@ -1,5 +1,6 @@
 import type {
   ChatMessage,
+  ChatReplyResult,
   FeedItem,
   FinancialEvent,
   Insight,
@@ -19,7 +20,7 @@ export interface AtlasAIProvider {
   generateChatReply(
     messages: ChatMessage[],
     context: IntelligenceContext,
-  ): Promise<string>;
+  ): Promise<ChatReplyResult>;
 
   narrateEvent(
     event: FinancialEvent,

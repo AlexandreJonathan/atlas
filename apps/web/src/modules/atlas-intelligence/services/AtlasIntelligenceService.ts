@@ -5,6 +5,7 @@ import { MockAtlasAIProvider } from "../providers/MockAtlasAIProvider";
 import { OpenAIProvider } from "../providers/OpenAIProvider";
 import type {
   ChatMessage,
+  ChatReplyResult,
   FeedItem,
   FinancialEvent,
   Insight,
@@ -62,7 +63,7 @@ export class AtlasIntelligenceService {
   generateChatReply(
     messages: ChatMessage[],
     context: IntelligenceContext,
-  ): Promise<string> {
+  ): Promise<ChatReplyResult> {
     return this.provider.generateChatReply(messages, context);
   }
 
