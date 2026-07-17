@@ -9,7 +9,7 @@ import type {
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "0.9.0";
+export const APP_VERSION = "0.9.1";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;
@@ -47,6 +47,11 @@ function resolveProviders(flags: FeatureFlags): ActiveProviders {
   return { openFinance, atlasAi };
 }
 
+function resolveObservability(): AppConfig["observability"] {
+  const dsn = import.meta.env.VITE_SENTRY_DSN?.trim();
+  return { sentryDsn: dsn ? dsn : null };
+}
+
 function createAppConfig(): AppConfig {
   const env = resolveEnvironment();
   const featureFlags = resolveFeatureFlags();
@@ -57,6 +62,7 @@ function createAppConfig(): AppConfig {
     isProd: env === "production",
     featureFlags,
     providers: resolveProviders(featureFlags),
+    observability: resolveObservability(),
   };
 }
 

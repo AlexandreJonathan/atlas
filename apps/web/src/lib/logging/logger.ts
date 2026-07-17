@@ -1,4 +1,5 @@
 import { appConfig } from "../../config";
+import { SentryLogSink } from "./sentry";
 import type { LogContext, LogEntry, LogLevel, LogSink } from "./types";
 
 const LEVEL_ORDER: Record<LogLevel, number> = {
@@ -31,17 +32,6 @@ class ConsoleLogSink implements LogSink {
         console.error("[Atlas]", ...args);
         break;
     }
-  }
-}
-
-/**
- * Placeholder para integração futura com Sentry (ou similar).
- * Hoje é no-op — a assinatura já recebe o entry completo.
- */
-class FutureErrorReporterSink implements LogSink {
-  write(entry: LogEntry): void {
-    void entry;
-    // Integração futura: Sentry.captureException / captureMessage
   }
 }
 
@@ -93,10 +83,8 @@ class Logger {
 
 function createLogger(): Logger {
   const sinks: LogSink[] = [new ConsoleLogSink()];
-  if (appConfig.isProd) {
-    sinks.push(new FutureErrorReporterSink());
-  }
-  // Dev: tudo (inclui debug). Prod: info+; sink FutureErrorReporter pronto para Sentry.
+  // Sentry ativo só após initSentry() em main — sem DSN permanece no-op.
+  sinks.push(new SentryLogSink());
   const minLevel: LogLevel = appConfig.isDev ? "debug" : "info";
   return new Logger(sinks, minLevel);
 }

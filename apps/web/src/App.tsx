@@ -1,13 +1,13 @@
 import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import ForgotPassword from "./components/ForgotPassword";
 import AppShell from "./components/layout/AppShell";
-import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Register from "./components/Register";
-import ResetPassword from "./components/ResetPassword";
 
+const Login = lazy(() => import("./components/Login"));
+const Register = lazy(() => import("./components/Register"));
+const ForgotPassword = lazy(() => import("./components/ForgotPassword"));
+const ResetPassword = lazy(() => import("./components/ResetPassword"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AccountsPage = lazy(() => import("./pages/AccountsPage"));
 const ConnectBanksPage = lazy(() => import("./pages/ConnectBanksPage"));

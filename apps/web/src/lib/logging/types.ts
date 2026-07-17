@@ -11,8 +11,8 @@ export type LogEntry = {
 };
 
 /**
- * Destino de logs. Em produção, um sink futuro pode encaminhar a Sentry
- * sem alterar os call sites (`logger.error(...)`).
+ * Destino de logs. `SentryLogSink` encaminha warning/error quando
+ * `initSentry()` rodou com `VITE_SENTRY_DSN` — call sites permanecem `logger.*`.
  */
 export interface LogSink {
   write(entry: LogEntry): void;

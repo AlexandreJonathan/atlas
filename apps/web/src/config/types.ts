@@ -21,6 +21,11 @@ export type ActiveProviders = {
   atlasAi: AtlasAiProviderId;
 };
 
+export type ObservabilityConfig = {
+  /** DSN do Sentry; vazio = SDK não inicializa. */
+  sentryDsn: string | null;
+};
+
 export type AppConfig = {
   env: AppEnvironment;
   version: string;
@@ -28,4 +33,5 @@ export type AppConfig = {
   isProd: boolean;
   featureFlags: FeatureFlags;
   providers: ActiveProviders;
+  observability: ObservabilityConfig;
 };
