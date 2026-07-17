@@ -2,6 +2,7 @@ import { appConfig, featureFlagService } from "../../../config";
 import { logger } from "../../../lib/logging";
 import type { OpenFinanceProvider } from "../providers/OpenFinanceProvider";
 import { MockOpenFinanceProvider } from "../providers/MockOpenFinanceProvider";
+import { PluggyOpenFinanceProvider } from "../providers/PluggyOpenFinanceProvider";
 import type { Bank, BankId, FinancialHubTotals, OpenFinanceSnapshot } from "../types";
 import { aggregateFinancialHub } from "../utils/aggregate";
 import {
@@ -10,11 +11,15 @@ import {
   openFinanceEvents,
 } from "../utils/events";
 
+/**
+ * Factory drop-in: `VITE_OF_PROVIDER=pluggy` instancia o stub Pluggy de verdade
+ * (catálogo/snapshot vazios; connect/sync falham até a integração HTTP).
+ */
 function createOpenFinanceProvider(): OpenFinanceProvider {
   const configured = appConfig.providers.openFinance;
   if (configured === "pluggy") {
-    // Stub ainda não implementado — manter mock para não alterar UX.
-    logger.warning("Open Finance: provider pluggy solicitado; usando mock até a integração real");
+    logger.info("Open Finance: usando PluggyOpenFinanceProvider (stub drop-in)");
+    return new PluggyOpenFinanceProvider();
   }
   return new MockOpenFinanceProvider();
 }
@@ -79,5 +84,5 @@ export class OpenFinanceService {
   }
 }
 
-/** Instância padrão da aplicação (mock até a integração Pluggy). */
+/** Instância padrão — mock ou stub Pluggy conforme `AppConfig.providers.openFinance`. */
 export const openFinanceService = new OpenFinanceService(createOpenFinanceProvider());

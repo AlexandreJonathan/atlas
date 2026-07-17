@@ -5,18 +5,28 @@
 
 export type BankConnectionStatus = "available" | "connected" | "syncing" | "error" | "disconnected";
 
-export type BankId =
-  | "nubank"
-  | "inter"
-  | "c6"
-  | "itau"
-  | "santander"
-  | "bradesco"
-  | "banco_do_brasil"
-  | "caixa"
-  | "pagbank"
-  | "mercado_pago"
-  | "wise";
+/**
+ * Identificador opaco de instituição — string livre para drop-in Pluggy.
+ * O catálogo mock usa ids estáveis conhecidos; o provider real pode enviar UUIDs.
+ */
+export type BankId = string;
+
+/** Ids do catálogo mock (apenas UX/local) — não restringem o contrato do provider. */
+export const KNOWN_BANK_IDS = [
+  "nubank",
+  "inter",
+  "c6",
+  "itau",
+  "santander",
+  "bradesco",
+  "banco_do_brasil",
+  "caixa",
+  "pagbank",
+  "mercado_pago",
+  "wise",
+] as const;
+
+export type KnownBankId = (typeof KNOWN_BANK_IDS)[number];
 
 export type Bank = {
   id: BankId;

@@ -7,10 +7,12 @@ export type {
   CreditCard,
   FinancialHubTotals,
   Investment,
+  KnownBankId,
   Loan,
   OpenFinanceSnapshot,
   Pix,
 } from "./types";
+export { KNOWN_BANK_IDS } from "./types";
 
 export type { OpenFinanceProvider } from "./providers/OpenFinanceProvider";
 export { MockOpenFinanceProvider } from "./providers/MockOpenFinanceProvider";
