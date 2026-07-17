@@ -85,7 +85,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Documentar variáveis de ambiente e checklist de deploy~~ — concluído na Sprint 6 (`docs/deploy.md`: migrações, configuração de Auth no Supabase, variáveis de ambiente, build, hospedagem)
 - ✅ ~~Preparar configuração explícita de deploy para Vercel (SPA fallback, cache)~~ — concluído na Missão Primeiro Deploy Oficial (`apps/web/vercel.json`); guia não-técnico passo a passo criado em `docs/guia-deploy-fundador.md`
 - 🟡 Configurar deploy automatizado (CI/CD publicando em Vercel/Netlify a cada merge) — hoje o deploy é manual, seguindo o checklist de `docs/deploy.md`/`docs/guia-deploy-fundador.md`
-- 🟡 Ligar Sentry (ou similar) ao `FutureErrorReporterSink` / Error Boundary — fundação pronta na Sprint 16; falta apenas o SDK e DSN de produção
+- ✅ ~~Ligar Sentry ao logger / Error Boundary~~ — Sprint 19 (`@sentry/react` + `VITE_SENTRY_DSN`; sem DSN = no-op)
 - 🟢 Observabilidade e métricas de uso
 
 ## 8.1 Limpeza de Código Morto (identificado na FAT)
@@ -97,7 +97,7 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 
 - 🟡 Avaliar necessidade de gerenciador de estado global (Context API, Zustand ou Redux) à medida que a aplicação cresce
 - 🟢 Introduzir camada de cache de dados (React Query / TanStack Query) — mitigaria buscas duplicadas quando `AppShell` (onboarding) e `HomePage` carregam os mesmos hooks de perfil/metas/despesas fixas
-- 🟢 `npm run build` alerta que o bundle único (`index-*.js`) já passa de 500 kB minificado; ver seção 6 para o plano de code-splitting via `React.lazy`
+- ✅ ~~Bundle único > 500 kB~~ — mitigado na Sprint 19 (`manualChunks` + lazy auth/páginas); reavaliar chunks residuais após cada release
 
 ---
 

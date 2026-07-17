@@ -4,6 +4,27 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 19] — Alpha Hardening (Missão 19)
+
+Endurecimento de produção para Alpha privado. Sem Tool Calling, sem Pluggy HTTP, sem novas features de produto. Versão `0.9.1`.
+
+### Adicionado
+- Migração `ai_chat_rate_buckets` + rate limit na Edge `atlas-ai-chat` (usuário + IP).
+- Contexto financeiro confiável montado no servidor (RLS); cliente não envia saldo/metas ao LLM.
+- Modo limitado na Atlas IA (`ChatReplyResult`, banner, analytics `atlas_ai_rate_limited`).
+- Integração Sentry opcional (`VITE_SENTRY_DSN`, import dinâmico).
+- `roadmap/sprint-19.md`.
+
+### Alterado
+- Open Finance: `BankId` string + factory drop-in para `PluggyOpenFinanceProvider` (stub leitura vazia).
+- Vite `manualChunks` + lazy das rotas de auth.
+- Docs de deploy / arquitetura / backlog.
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 17] — Atlas AI Integration (Missão 17)
 
 Primeiro LLM real (OpenAI) no chat da Atlas IA, via Edge Function. Sem chave no front; Insights/Home intactos; fallback mock.

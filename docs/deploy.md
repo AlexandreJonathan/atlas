@@ -20,13 +20,14 @@ Todas as migrações em `supabase/migrations/` precisam existir no projeto Supab
 4. `20260714000000_create_financial_profiles_table.sql`
 5. `20260714000100_create_fixed_expenses_table.sql`
 6. `20260714100000_create_onboarding_status_table.sql`
+7. `20260716220000_create_ai_chat_rate_buckets.sql` (rate limit da Edge `atlas-ai-chat`; sem policies para anon/auth — só service role)
 
 Como aplicar:
 
 - **Manual**: Supabase Dashboard → SQL Editor → colar o conteúdo de cada arquivo (na ordem acima) → Executar.
 - **CLI**: com o projeto linkado (`supabase link`), executar `supabase db push`.
 
-Após aplicar, confirmar no Dashboard (Table Editor) que as 6 tabelas existem e que **Row Level Security está habilitado** em todas (Authentication → Policies, ou o ícone de cadeado ao lado do nome da tabela no Table Editor).
+Após aplicar, confirmar no Dashboard (Table Editor) que as tabelas de produto existem e que **Row Level Security está habilitado** (Authentication → Policies, ou o ícone de cadeado ao lado do nome da tabela no Table Editor). A tabela `ai_chat_rate_buckets` não deve ter policies para `anon`/`authenticated`.
 
 ### 2.1.1 Storage
 
@@ -59,8 +60,10 @@ Copiar `apps/web/.env.example` para `.env` (local) ou configurar como variáveis
 | `VITE_SUPABASE_URL` | Supabase Dashboard → Settings → API → Project URL | Pública, mas específica do projeto |
 | `VITE_SUPABASE_ANON_KEY` | Supabase Dashboard → Settings → API → anon public | Pública por design (protegida pelo RLS), mas ainda assim deve vir de variável de ambiente, nunca hardcoded |
 | `VITE_FF_OPENAI` | Definir `true` no front (Vite/Vercel) para ativar o chat OpenAI | Opcional; default `false` (mock). **Não** é a chave da OpenAI |
+| `VITE_SENTRY_DSN` | Projeto Sentry → Client Keys (DSN) | Opcional; sem valor o SDK não carrega |
+| `VITE_OF_PROVIDER` | `mock` (default) ou `pluggy` | `pluggy` ativa o stub drop-in (sem HTTP); use `mock` no Alpha |
 
-### 3.1 OpenAI (Sprint 17) — segredo só no Supabase
+### 3.1 OpenAI (Sprint 17/19) — segredo só no Supabase
 
 A `OPENAI_API_KEY` **nunca** vai no front-end nem nas env vars da Vercel do app Vite.
 
@@ -71,12 +74,20 @@ A `OPENAI_API_KEY` **nunca** vai no front-end nem nas env vars da Vercel do app 
 supabase secrets set OPENAI_API_KEY=sk-...
 # opcional:
 supabase secrets set OPENAI_MODEL=gpt-4.1-mini
+# CORS (recomendado em produção — origem do front, CSV):
+supabase secrets set ALLOWED_ORIGINS=https://seu-dominio.vercel.app
+# Rate limit (defaults: 20/user/h, 40/IP/h):
+# supabase secrets set AI_RATE_LIMIT_USER=20
+# supabase secrets set AI_RATE_LIMIT_IP=40
+# supabase secrets set AI_RATE_WINDOW_MS=3600000
 supabase functions deploy atlas-ai-chat
 ```
 
 3. No front (local/Vercel): `VITE_FF_OPENAI=true` além de `VITE_SUPABASE_*`.
 
-Sem a Edge Function / secret, o `OpenAIProvider` faz fallback automático para o mock (chat continua funcionando).
+Sem a Edge Function / secret, o `OpenAIProvider` faz fallback automático para **modo limitado** (resposta local rotulada — não parece chat online).
+
+A Edge **ignora** qualquer `context` enviado pelo cliente e monta o contexto financeiro via RLS.
 
 Sem essas duas variáveis `VITE_SUPABASE_*` configuradas no ambiente de build/produção, o Supabase Client não é instanciado (`lib/supabase.ts`) e a aplicação inteira exibe o aviso "Supabase não está configurado" em qualquer tela que dependa dele.
 
@@ -90,7 +101,7 @@ npm run build
 
 - `npm run build` executa `tsc -b && vite build` — qualquer erro de tipo interrompe o build (comportamento desejado).
 - O resultado fica em `apps/web/dist/` — é esse diretório que deve ser publicado/hospedado.
-- O build atual emite um aviso de que o bundle principal passa de 500 kB minificado (ver `roadmap/backlog.md`, seção 8) — não bloqueia o deploy, mas é uma dívida técnica registrada para otimização futura (code-splitting).
+- A partir da Sprint 19 o Vite usa `manualChunks` + lazy de auth/páginas; revalidar o aviso de 500 kB no log do build após cada release.
 
 ## 5. Hospedagem Recomendada
 
@@ -104,21 +115,17 @@ Qualquer provedor de hosting estático/CDN com suporte a SPA (fallback de todas 
   - Ambos já fazem fallback de SPA automaticamente para projetos Vite/React detectados; `apps/web/vercel.json` torna esse comportamento explícito (regra de rewrite `/(.*) → /index.html`, necessária para rotas como `/inicio` ou `/perfil` funcionarem em um recarregamento direto do navegador, já que o roteamento é 100% client-side via `react-router-dom`) e define `Cache-Control` de longa duração e imutável para `/assets/*` (arquivos com hash no nome gerados pelo Vite a cada build — seguro cachear "para sempre") e `no-cache`/`must-revalidate` para `index.html` (garante que o usuário sempre recebe a referência aos arquivos da versão mais recente após um novo deploy, evitando servir um `index.html` antigo apontando para assets que não existem mais).
 - **HTTPS obrigatório**: tanto Vercel quanto Netlify fornecem TLS automático; qualquer outra hospedagem deve garantir HTTPS antes de convidar usuários reais (formulários de login/senha nunca devem tramitar em HTTP puro).
 
-## 5.1 Performance do Build (revisado, não otimizado nesta missão)
+## 5.1 Performance do Build (Sprint 19)
 
-Avaliação do bundle de produção atual, documentada para decisão futura (nenhuma otimização foi aplicada agora, por estar fora do escopo desta missão):
-
-- `dist/assets/index-*.js`: **~599 kB** minificado (**~170 kB** gzip, após o Design System da Sprint 7 — `lucide-react` é tree-shakeable, então o impacto foi pequeno) — Vite/Rollup emite um aviso de "chunk maior que 500 kB". Não impede o deploy (a Vercel serve o arquivo normalmente, e o cache imutável do `vercel.json` mitiga o custo em visitas repetidas), mas é a maior oportunidade de otimização de performance de carregamento inicial.
-- `dist/assets/index-*.css`: **~27 kB** (**~5 kB** gzip, após a Sprint 7) — tamanho ainda saudável, sem preocupação.
-- **Fonte self-hosted**: `@fontsource-variable/inter` (Sprint 7) adiciona ~7 arquivos `.woff2` (um por subconjunto de caracteres, ~10–85 kB cada) — carregados pelo navegador só quando necessário (`unicode-range`), sem custo para o bundle JS/CSS.
-- **Code-splitting candidato**: os modais (`TransactionModal`, `BillModal`, `GoalModal`, `FinancialProfileModal`, `FixedExpenseModal`, todos hoje construídos sobre `components/ui/Modal.tsx`) e o `OnboardingWizard` são bons candidatos a `React.lazy`/`import()` dinâmico, pois só são necessários depois de uma interação do usuário (clique em "+ Nova...") ou apenas no primeiro acesso — já registrado em `roadmap/backlog.md`, seção 6.
-- **Assets estáticos**: apenas `favicon.svg` (referenciado); `icons.svg`, que não era referenciado por nenhum componente, foi removido na Sprint 7. Nenhuma imagem pesada (JPEG/PNG) no projeto.
+- Code-splitting: rotas autenticadas e auth em `React.lazy`; `manualChunks` separa `react-vendor`, `supabase`, `icons`, `forms`, `sentry`.
+- Sentry só é baixado quando `VITE_SENTRY_DSN` está definido (`import()` dinâmico em `initSentry`).
+- Modais / Onboarding ainda são candidatos a lazy adicional se o aviso de chunk voltar a aparecer.
 - **Cache**: `vercel.json` (seção 5) já cobre `/assets/*` com cache imutável de longa duração.
 
 ## 6. Checklist de Deploy
 
-- [ ] As 6 migrações SQL aplicadas no projeto Supabase de produção/staging (seção 2.1).
-- [ ] Row Level Security confirmado habilitado nas 6 tabelas.
+- [ ] Migrações SQL aplicadas no projeto Supabase de produção/staging (seção 2.1), incluindo `ai_chat_rate_buckets`.
+- [ ] Row Level Security confirmado habilitado nas tabelas de produto; Edge `atlas-ai-chat` redeployada após hardening.
 - [ ] "Site URL" e "Redirect URLs" configurados no Supabase Auth (seção 2.2), incluindo `/redefinir-senha`.
 - [ ] Decisão tomada e configurada sobre exigir confirmação de e-mail ou não.
 - [ ] Variáveis `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas no ambiente de build de produção (nunca a `service_role`).
@@ -128,10 +135,10 @@ Avaliação do bundle de produção atual, documentada para decisão futura (nen
 - [ ] Teste manual completo em produção: cadastro → (confirmação de e-mail, se habilitada) → login → esqueci minha senha → redefinição → onboarding guiado → transações/contas/metas/planejamento → logout.
 - [ ] Teste manual em pelo menos um dispositivo mobile real (não apenas emulação) para os fluxos de login/cadastro/onboarding.
 - [ ] Canal definido para os alpha testers reportarem bugs/feedback (ex: formulário, e-mail dedicado, ou canal de chat).
-- [ ] (Recomendado) Monitoramento de erros em produção (Sentry ou similar) configurado antes de convidar os primeiros usuários — ainda não implementado (ver `roadmap/backlog.md`).
+- [ ] (Recomendado) `VITE_SENTRY_DSN` configurado no ambiente de build antes de convidar os primeiros usuários.
 
 ## 7. Limitações Conhecidas Pós-Deploy
 
 - Sem testes automatizados (unitários/E2E) — todo o checklist acima depende de verificação manual.
-- Sem monitoramento de erros em produção — falhas reais em uso diário não geram alerta automático.
+- Monitoramento de erros depende de configurar `VITE_SENTRY_DSN` no deploy (integração pronta na Sprint 19).
 - Sem paginação nas listagens (transações/contas/metas/despesas fixas) — aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado antes de uma abertura mais ampla (ver `roadmap/backlog.md`, seção 8).

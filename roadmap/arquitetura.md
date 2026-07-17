@@ -153,7 +153,7 @@ atlas/
 │       │   │   ├── planningEngine.ts
 │       │   │   ├── atlasIntelligenceCopy.ts
 │       │   │   ├── atlasPulse.ts
-│       │   │   ├── logging/             # logger + sinks (Sentry futuro)
+│       │   │   ├── logging/             # logger + Sentry opcional (VITE_SENTRY_DSN)
 │       │   │   ├── analytics/           # AnalyticsService (sem envio externo)
 │       │   │   └── microinteractions/
 │       │   │       ├── index.ts          # API pública
@@ -377,7 +377,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 ### Logging (`src/lib/logging`)
 - API: `logger.debug` / `info` / `warning` / `error`.
 - Development: nível mínimo `debug` (console detalhado).
-- Production: nível mínimo `info` + `FutureErrorReporterSink` no-op (ponto de encaixe para Sentry).
+- Production: nível mínimo `info` + `SentryLogSink` (ativo após `initSentry()` quando `VITE_SENTRY_DSN` está definido).
 - O logger nunca propaga falha de sink para a UI.
 
 ### Feature Flags (`src/config/FeatureFlagService`)
@@ -392,8 +392,9 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Call sites mínimos nos fluxos existentes — sem mudança visual.
 
 ### AppConfig (`src/config/AppConfig.ts`)
-- Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`: mock|pluggy, `atlasAi`: mock|openai).
-- Providers reais ainda não entram em runtime: stubs continuam mock para preservar UX até Missões de integração.
+- Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`: mock|pluggy, `atlasAi`: mock|openai), `observability.sentryDsn`.
+- Open Finance: `VITE_OF_PROVIDER=pluggy` instancia o stub Pluggy de verdade (drop-in; sem HTTP). Default permanece mock.
+- Atlas AI: flag `openai` usa Edge `atlas-ai-chat` com contexto **somente servidor**; fallback explícito em modo limitado.
 
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
@@ -405,7 +406,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
 - Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
 - Não há testes automatizados (unitários, integração ou E2E) — o checklist de deploy (`docs/deploy.md`) depende de verificação manual.
-- Monitoramento de erros em produção: fundação pronta (Error Boundary + logger + sink futuro); integração Sentry ainda não ligada.
+- Monitoramento de erros em produção: Sentry opcional via `VITE_SENTRY_DSN` (sem DSN o SDK não carrega).
 - Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.
 - Não há gerenciamento de estado global genérico nem camada de cache/dados (React Query, etc.).
 - Design System (Sprint 7) é 100% tema escuro — não há alternância clara/escura nem auditoria formal de contraste WCAG AA com a nova paleta.
