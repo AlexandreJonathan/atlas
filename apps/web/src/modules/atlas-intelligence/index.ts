@@ -32,3 +32,21 @@ export {
 
 export { default as AtlasInsights } from "./components/AtlasInsights";
 export { default as IntelligenceFeed } from "./components/IntelligenceFeed";
+
+export {
+  AtlasToolRegistry,
+  atlasToolRegistry,
+  parseToolCall,
+} from "./tools/AtlasToolRegistry";
+export {
+  ATLAS_TOOL_DEFINITIONS,
+  ATLAS_TOOL_NAMES,
+  isAtlasToolName,
+} from "./tools/schemas";
+export type {
+  AtlasToolCall,
+  AtlasToolName,
+  AtlasToolResult,
+  OpenAiToolDefinition,
+} from "./tools/schemas";
+export { runAtlasToolAgent } from "./tools/runAtlasToolAgent";

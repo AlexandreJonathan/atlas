@@ -1,8 +1,9 @@
 import { getSupabaseClient } from "../../../lib/supabase";
 import type { ChatMessage } from "../types";
+import type { OpenAiToolDefinition } from "../tools/schemas";
 
 export const ATLAS_AI_CHAT_FUNCTION = "atlas-ai-chat";
-export const ATLAS_AI_CHAT_TIMEOUT_MS = 20_000;
+export const ATLAS_AI_CHAT_TIMEOUT_MS = 25_000;
 export const ATLAS_AI_CHAT_MAX_ATTEMPTS = 3;
 
 export class AtlasAiRateLimitError extends Error {
@@ -15,10 +16,23 @@ export class AtlasAiRateLimitError extends Error {
   }
 }
 
+export type AgentToolCallDto = {
+  id: string;
+  type: "function";
+  function: { name: string; arguments: string };
+};
+
+export type AgentChatMessage =
+  | { role: "system" | "user" | "assistant"; content: string | null; tool_calls?: AgentToolCallDto[] }
+  | { role: "tool"; tool_call_id: string; content: string };
+
 type EdgeChatSuccess = {
-  reply: string;
+  reply?: string;
+  content?: string | null;
+  toolCalls?: AgentToolCallDto[];
   model?: string;
   contextSource?: string;
+  mode?: "agent" | "legacy";
 };
 
 type EdgeChatErrorBody = {
@@ -74,19 +88,8 @@ function isRetryableError(error: unknown): boolean {
   return false;
 }
 
-/**
- * Invoca a Edge Function `atlas-ai-chat`.
- * Envia apenas mensagens — o contexto financeiro é montado no servidor.
- */
-export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<EdgeChatSuccess> {
+async function invokeRaw(payload: Record<string, unknown>): Promise<EdgeChatSuccess> {
   const client = getSupabaseClient();
-  const payload = {
-    messages: messages
-      .filter((m) => m.role === "user" || m.role === "assistant")
-      .slice(-12)
-      .map((m) => ({ role: m.role, content: m.content })),
-  };
-
   let lastError: unknown = new Error("Falha ao chamar atlas-ai-chat");
 
   for (let attempt = 1; attempt <= ATLAS_AI_CHAT_MAX_ATTEMPTS; attempt++) {
@@ -100,9 +103,7 @@ export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<EdgeCh
 
       if (result.error) {
         const status = extractStatus(result.error);
-        if (status === 429) {
-          throw new AtlasAiRateLimitError();
-        }
+        if (status === 429) throw new AtlasAiRateLimitError();
         lastError = result.error;
         if (attempt < ATLAS_AI_CHAT_MAX_ATTEMPTS && isRetryableError(result.error)) {
           await sleep(250 * attempt);
@@ -116,15 +117,24 @@ export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<EdgeCh
         throw new AtlasAiRateLimitError();
       }
 
-      if (data && typeof data === "object" && "reply" in data && typeof data.reply === "string") {
-        return {
-          reply: data.reply,
-          model: "model" in data && typeof data.model === "string" ? data.model : undefined,
-          contextSource:
-            "contextSource" in data && typeof data.contextSource === "string"
-              ? data.contextSource
-              : undefined,
-        };
+      if (data && typeof data === "object") {
+        const toolCalls = Array.isArray((data as EdgeChatSuccess).toolCalls)
+          ? (data as EdgeChatSuccess).toolCalls
+          : undefined;
+        const reply =
+          typeof (data as EdgeChatSuccess).reply === "string"
+            ? (data as EdgeChatSuccess).reply
+            : undefined;
+        if (toolCalls?.length || typeof reply === "string") {
+          return {
+            reply,
+            content: (data as EdgeChatSuccess).content ?? reply ?? null,
+            toolCalls,
+            model: (data as EdgeChatSuccess).model,
+            contextSource: (data as EdgeChatSuccess).contextSource,
+            mode: (data as EdgeChatSuccess).mode,
+          };
+        }
       }
 
       const detail =
@@ -144,4 +154,44 @@ export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<EdgeCh
   }
 
   throw lastError;
+}
+
+/**
+ * Invoca a Edge Function em modo legado (sem tools) — fallback.
+ * Envia apenas mensagens — o contexto financeiro é montado no servidor.
+ */
+export async function invokeAtlasAiChat(messages: ChatMessage[]): Promise<{
+  reply: string;
+  model?: string;
+  contextSource?: string;
+}> {
+  const payload = {
+    mode: "legacy",
+    messages: messages
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .slice(-12)
+      .map((m) => ({ role: m.role, content: m.content })),
+  };
+
+  const data = await invokeRaw(payload);
+  if (!data.reply) throw new Error("Resposta vazia da Edge Function");
+  return {
+    reply: data.reply,
+    model: data.model,
+    contextSource: data.contextSource,
+  };
+}
+
+/** Um turno do agente (pode devolver tool_calls ou reply final). */
+export async function invokeAtlasAiAgentTurn(input: {
+  messages: AgentChatMessage[];
+  tools: OpenAiToolDefinition[];
+  toolChoice: "auto" | "required" | "none";
+}): Promise<EdgeChatSuccess> {
+  return invokeRaw({
+    mode: "agent",
+    messages: input.messages,
+    tools: input.tools,
+    toolChoice: input.toolChoice,
+  });
 }
