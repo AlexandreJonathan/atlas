@@ -4,6 +4,26 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 21] — Pluggy Integration (Missão 21)
+
+Integração real com a Pluggy via Edge Function. Contrato da FDL e UX preservados. Versão `0.9.3`.
+
+### Adicionado
+- Edge Function `pluggy-proxy` (API Key server-side, Connect Token, register/sync, snapshot, connectors).
+- Migração `pluggy_connections`.
+- Módulo `src/modules/pluggy/` (client com timeout/retry, mapper, overlay Connect).
+- Analytics `pluggy_connect_*` / `pluggy_sync_*`.
+- `roadmap/sprint-21.md`.
+
+### Alterado
+- `PluggyOpenFinanceProvider` e `PluggyFinancialDataProvider` deixam de ser stubs.
+- Docs de deploy (secrets Pluggy).
+
+### Validado
+- `npm run lint` e `npm run build` sem erros.
+
+---
+
 ## [Sprint 20] — Financial Data Layer (Missão 20)
 
 Camada única de dados financeiros antes da Pluggy real. Sem mudança de UX. Versão `0.9.2`.

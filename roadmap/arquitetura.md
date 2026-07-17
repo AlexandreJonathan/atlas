@@ -111,14 +111,20 @@ atlas/
 │       │   ├── modules/
 │       │   │   ├── financial-data/     # Financial Data Layer (Missão 20)
 │       │   │   │       ├── types/
-│       │   │   │       ├── providers/   # Mock + stub Pluggy
+│       │   │   │       ├── providers/   # Mock + Pluggy (real via Edge)
 │       │   │   │       ├── services/    # FinancialDataService (cache/sync)
 │       │   │   │       ├── hooks/       # useFinancialData
 │       │   │   │       ├── utils/
 │       │   │   │       └── index.ts
+│       │   │   ├── pluggy/             # Infra Pluggy (Missão 21) — Edge client + Connect
+│       │   │   │       ├── pluggyEdgeClient.ts
+│       │   │   │       ├── mapPluggySnapshot.ts
+│       │   │   │       ├── openPluggyConnect.tsx
+│       │   │   │       ├── types.ts
+│       │   │   │       └── index.ts
 │       │   │   ├── open-finance/
 │       │   │   │       ├── types/
-│       │   │   │       ├── providers/   # interface + Mock + stub Pluggy
+│       │   │   │       ├── providers/   # interface + Mock + Pluggy real
 │       │   │   │       ├── services/    # OpenFinanceService
 │       │   │   │       ├── mocks/
 │       │   │   │       ├── utils/
@@ -402,16 +408,22 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Centraliza: `env`, `version`, `featureFlags`, `providers` (`openFinance`, `atlasAi`, `financialData`), `observability.sentryDsn`.
 - Open Finance: `VITE_OF_PROVIDER=pluggy` instancia o stub Pluggy de verdade (drop-in; sem HTTP). Default permanece mock.
 - Atlas AI: flag `openai` usa Edge `atlas-ai-chat` com contexto **somente servidor**; fallback explícito em modo limitado.
-- Financial Data: `VITE_FINANCIAL_DATA_PROVIDER=pluggy` seleciona `PluggyFinancialDataProvider` (stub); default `mock`.
+- Financial Data: `VITE_FINANCIAL_DATA_PROVIDER=pluggy` seleciona `PluggyFinancialDataProvider` (Edge real); default `mock`.
 
 ### Financial Data Layer (Sprint 20)
 - Módulo `src/modules/financial-data/` — **única fonte de leitura** de saldo, contas (bills), cartões, metas, receitas/despesas e patrimônio para Home / Atlas IA / AppShell / Investimentos.
-- Fluxo: UI → `useFinancialData` / `FinancialDataService` → `FinancialDataProvider` (`Mock` | `Pluggy` stub).
+- Fluxo: UI → `useFinancialData` / `FinancialDataService` → `FinancialDataProvider` (`Mock` | `Pluggy`).
 - `MockFinancialDataProvider`: ledger Supabase + snapshot OF via `openFinanceService` + investimentos de estudo.
-- `PluggyFinancialDataProvider`: ledger Supabase + `PluggyOpenFinanceProvider.getSnapshot()` (vazio até integração HTTP).
+- `PluggyFinancialDataProvider`: ledger Supabase + snapshot OF via Edge `pluggy-proxy` (contrato `fetchSnapshot` inalterado).
 - Cache em memória compartilhado entre montagens; `sync()` / `invalidate(scope)`; estados `loading` / `syncing`; mutações otimistas no ledger.
 - Hub Open Finance (`/contas`) continua em `openFinanceService` para connect/sync de instituições — a FDL só lê o snapshot para consolidar cartões/contas bancárias no modelo unificado.
 - Hooks CRUD legados (`useTransactions`, etc.) permanecem como adapters internos/legado; páginas principais não os chamam mais.
+
+### Pluggy Integration (Sprint 21)
+- Secrets `PLUGGY_CLIENT_ID` / `PLUGGY_CLIENT_SECRET` **somente** na Edge (`pluggy-proxy`); front só chama `functions.invoke` com JWT.
+- Fluxo Connect: Edge emite Connect Token → overlay `react-pluggy-connect` → `register_item` grava em `pluggy_connections` → sync/snapshot puxa accounts/transactions/investments.
+- Timeout + retry no client (`pluggyEdgeClient`); logs + analytics (`pluggy_*`).
+- Saldo/receitas/despesas da Home continuam no ledger Atlas (não misturam txs Pluggy no cálculo) — evita mudança de UX; OF Pluggy alimenta contas/cartões/investimentos do snapshot.
 
 ## 12. Limitações Conhecidas da Arquitetura Atual
 

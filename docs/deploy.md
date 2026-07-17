@@ -21,6 +21,7 @@ Todas as migrações em `supabase/migrations/` precisam existir no projeto Supab
 5. `20260714000100_create_fixed_expenses_table.sql`
 6. `20260714100000_create_onboarding_status_table.sql`
 7. `20260716220000_create_ai_chat_rate_buckets.sql` (rate limit da Edge `atlas-ai-chat`; sem policies para anon/auth — só service role)
+8. `20260716230000_create_pluggy_connections.sql` (itens Pluggy ↔ usuário; só service role na Edge)
 
 Como aplicar:
 
@@ -61,8 +62,8 @@ Copiar `apps/web/.env.example` para `.env` (local) ou configurar como variáveis
 | `VITE_SUPABASE_ANON_KEY` | Supabase Dashboard → Settings → API → anon public | Pública por design (protegida pelo RLS), mas ainda assim deve vir de variável de ambiente, nunca hardcoded |
 | `VITE_FF_OPENAI` | Definir `true` no front (Vite/Vercel) para ativar o chat OpenAI | Opcional; default `false` (mock). **Não** é a chave da OpenAI |
 | `VITE_SENTRY_DSN` | Projeto Sentry → Client Keys (DSN) | Opcional; sem valor o SDK não carrega |
-| `VITE_OF_PROVIDER` | `mock` (default) ou `pluggy` | `pluggy` ativa o stub drop-in (sem HTTP); use `mock` no Alpha |
-| `VITE_FINANCIAL_DATA_PROVIDER` | `mock` (default) ou `pluggy` | Financial Data Layer; `pluggy` = stub OF via PluggyProvider |
+| `VITE_FINANCIAL_DATA_PROVIDER` | `mock` (default) ou `pluggy` | Financial Data Layer; `pluggy` = Edge `pluggy-proxy` |
+| `VITE_OF_PROVIDER` | `mock` (default) ou `pluggy` | Hub `/contas`; use `pluggy` junto com a FDL para connect real |
 
 ### 3.1 OpenAI (Sprint 17/19) — segredo só no Supabase
 
@@ -89,6 +90,26 @@ supabase functions deploy atlas-ai-chat
 Sem a Edge Function / secret, o `OpenAIProvider` faz fallback automático para **modo limitado** (resposta local rotulada — não parece chat online).
 
 A Edge **ignora** qualquer `context` enviado pelo cliente e monta o contexto financeiro via RLS.
+
+### 3.2 Pluggy (Sprint 21) — segredo só no Supabase
+
+`PLUGGY_CLIENT_ID` / `PLUGGY_CLIENT_SECRET` **nunca** vão no front-end.
+
+1. Criar app em https://dashboard.pluggy.ai  
+2. Aplicar migração `20260716230000_create_pluggy_connections.sql`  
+3. No projeto Supabase (CLI linkado):
+
+```bash
+supabase secrets set PLUGGY_CLIENT_ID=...
+supabase secrets set PLUGGY_CLIENT_SECRET=...
+# opcional (default true):
+# supabase secrets set PLUGGY_INCLUDE_SANDBOX=true
+supabase functions deploy pluggy-proxy
+```
+
+4. No front: `VITE_FINANCIAL_DATA_PROVIDER=pluggy` e, para o hub de contas, `VITE_OF_PROVIDER=pluggy`.
+
+Sem secrets, a Edge responde `503` e os providers Pluggy fazem fallback seguro (ledger-only / catálogo vazio) sem quebrar a UI.
 
 Sem essas duas variáveis `VITE_SUPABASE_*` configuradas no ambiente de build/produção, o Supabase Client não é instanciado (`lib/supabase.ts`) e a aplicação inteira exibe o aviso "Supabase não está configurado" em qualquer tela que dependa dele.
 
@@ -125,8 +146,8 @@ Qualquer provedor de hosting estático/CDN com suporte a SPA (fallback de todas 
 
 ## 6. Checklist de Deploy
 
-- [ ] Migrações SQL aplicadas no projeto Supabase de produção/staging (seção 2.1), incluindo `ai_chat_rate_buckets`.
-- [ ] Row Level Security confirmado habilitado nas tabelas de produto; Edge `atlas-ai-chat` redeployada após hardening.
+- [ ] Migrações SQL aplicadas no projeto Supabase de produção/staging (seção 2.1), incluindo `ai_chat_rate_buckets` e `pluggy_connections`.
+- [ ] Row Level Security confirmado habilitado nas tabelas de produto; Edges `atlas-ai-chat` e `pluggy-proxy` deployadas quando forem usadas.
 - [ ] "Site URL" e "Redirect URLs" configurados no Supabase Auth (seção 2.2), incluindo `/redefinir-senha`.
 - [ ] Decisão tomada e configurada sobre exigir confirmação de e-mail ou não.
 - [ ] Variáveis `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas no ambiente de build de produção (nunca a `service_role`).

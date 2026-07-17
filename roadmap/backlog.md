@@ -76,7 +76,9 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Home Premium (Hero, Pulse, Intelligence conversacional, mobile-first)~~ — concluído na Sprint 9
 - ✅ ~~Implementar `triggerMicrointeraction` (animação/som/haptic)~~ — concluído na Sprint 11 (`src/lib/microinteractions`)
 - 🟢 Code-splitting das páginas das abas e dos 5 modais/`OnboardingWizard` via `React.lazy` — para mitigar o aviso de bundle >500 kB
-- 🔴 Open Finance real (Pluggy) — fundação Adapter/Provider + mock + stub concluídos na Sprint 10 (`src/modules/open-finance/`); falta Connect Widget, API e persistência
+- ✅ ~~Open Finance real (Pluggy)~~ — Sprint 21: Edge `pluggy-proxy`, Connect Widget, `pluggy_connections`, providers reais (FDL + OF)
+- 🟡 Webhooks Pluggy (`item/updated`) para sync push em vez de só pull sob demanda
+- 🟡 Merge opcional de transações Pluggy no ledger Atlas (hoje OF não altera saldo da Home)
 - 🔴 IA real (LLM) na aba Atlas IA / Atlas Pulse — Sprint 12 entregou MockAtlasAIProvider + stub OpenAI + insights/feed; falta conectar LLM
 - 🟡 Investimentos reais (somente leitura/estudo primeiro; a Atlas não vende investimentos) — estrutura na Sprint 8
 
