@@ -3,6 +3,7 @@ import { MOCK_INVESTMENTS } from "../data/mockInvestments";
 import Card from "../components/ui/Card";
 import MiniBarChart from "../components/ui/MiniBarChart";
 import StatCard from "../components/ui/StatCard";
+import { useFinancialData } from "../modules/financial-data";
 import "./AccountsPage.css";
 import "./InvestmentsPage.css";
 
@@ -11,8 +12,15 @@ function formatarMoeda(valor: number): string {
 }
 
 function InvestmentsPage() {
-  const { patrimonioInvestido, rendimentoMensalPercentual, rendimentoMensalValor, distribuicao, oportunidades } =
-    MOCK_INVESTMENTS;
+  const { investments } = useFinancialData();
+  const data = investments ?? MOCK_INVESTMENTS;
+  const {
+    patrimonioInvestido,
+    rendimentoMensalPercentual,
+    rendimentoMensalValor,
+    distribuicao,
+    oportunidades,
+  } = data;
 
   return (
     <div className="atlas-page-shell atlas-page">

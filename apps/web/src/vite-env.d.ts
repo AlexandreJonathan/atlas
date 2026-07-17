@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly VITE_FF_NOTIFICATIONS?: string;
   /** Provider Open Finance pretendido: `mock` | `pluggy` (pluggy só após integração). */
   readonly VITE_OF_PROVIDER?: string;
+  /** Financial Data Layer: `mock` (default) | `pluggy` (stub OF via PluggyProvider). */
+  readonly VITE_FINANCIAL_DATA_PROVIDER?: string;
   /** DSN do Sentry (opcional). Sem valor, o SDK não é carregado. */
   readonly VITE_SENTRY_DSN?: string;
 }

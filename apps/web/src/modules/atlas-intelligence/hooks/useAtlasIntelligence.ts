@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MOCK_INVESTMENTS } from "../../../data/mockInvestments";
-import type { useBills } from "../../../hooks/useBills";
-import type { useFinancialSummary } from "../../../hooks/useFinancialSummary";
-import type { useGoals } from "../../../hooks/useGoals";
 import type { usePlanning } from "../../../hooks/usePlanning";
-import type { useTransactions } from "../../../hooks/useTransactions";
+import type { FinancialSnapshot } from "../../financial-data";
 import { atlasIntelligenceService } from "../services/AtlasIntelligenceService";
 import type {
   ChatMessage,
@@ -16,51 +12,56 @@ import type {
 } from "../types";
 import { getFeedItems, subscribeFeed } from "../utils/feedStore";
 
-type ResumoSlice = ReturnType<typeof useFinancialSummary>;
-type ContasSlice = ReturnType<typeof useBills>;
-type MetasSlice = ReturnType<typeof useGoals>;
-type TransacoesSlice = ReturnType<typeof useTransactions>;
 type PlanejamentoSlice = Pick<ReturnType<typeof usePlanning>, "resultado">;
 
-function buildContext(input: {
-  saldo: number;
-  receitasDoMes: number;
-  despesasDoMes: number;
-  contasProximas: ContasSlice["contasVencendoEmBreve"];
-  contasVencidas: ContasSlice["contasVencidas"];
-  metas: MetasSlice["goals"];
-  transactions: TransacoesSlice["transactions"];
-  risco: PlanejamentoSlice["resultado"] extends { risco: infer R } | null | undefined ? R | null : null;
-  contasError: boolean;
-  metasError: boolean;
-  txError: boolean;
-}): IntelligenceContext {
-  const investimentos = MOCK_INVESTMENTS.patrimonioInvestido;
+function buildContextFromSnapshot(
+  snapshot: FinancialSnapshot | null,
+  risco: PlanejamentoSlice["resultado"] extends { risco: infer R } | null | undefined ? R | null : null,
+): IntelligenceContext {
+  if (!snapshot) {
+    return {
+      saldo: 0,
+      patrimonio: 0,
+      receitasDoMes: 0,
+      despesasDoMes: 0,
+      contasProximas: [],
+      contasVencidas: [],
+      metas: [],
+      investimentosPatrimonio: 0,
+      risco: risco ?? null,
+      transacoesRecentes: [],
+    };
+  }
+
+  const billsError = Boolean(snapshot.errors.bills);
+  const metasError = Boolean(snapshot.errors.goals);
+  const txError = Boolean(snapshot.errors.transactions);
+
   return {
-    saldo: input.saldo,
-    patrimonio: input.saldo + investimentos,
-    receitasDoMes: input.receitasDoMes,
-    despesasDoMes: input.despesasDoMes,
-    contasProximas: (input.contasError ? [] : input.contasProximas).map((c) => ({
+    saldo: snapshot.saldo,
+    patrimonio: snapshot.patrimonio,
+    receitasDoMes: snapshot.receitasDoMes,
+    despesasDoMes: snapshot.despesasDoMes,
+    contasProximas: (billsError ? [] : snapshot.contasVencendoEmBreve).map((c) => ({
       id: c.id,
       description: c.description,
       dueDate: c.dueDate,
       amount: c.amount,
     })),
-    contasVencidas: (input.contasError ? [] : input.contasVencidas).map((c) => ({
+    contasVencidas: (billsError ? [] : snapshot.contasVencidas).map((c) => ({
       id: c.id,
       description: c.description,
       amount: c.amount,
     })),
-    metas: (input.metasError ? [] : input.metas).map((g) => ({
+    metas: (metasError ? [] : snapshot.goals).map((g) => ({
       id: g.id,
       title: g.title,
       targetAmount: g.targetAmount,
       currentAmount: g.currentAmount,
     })),
-    investimentosPatrimonio: investimentos,
-    risco: input.risco ?? null,
-    transacoesRecentes: (input.txError ? [] : input.transactions).slice(0, 20).map((t) => ({
+    investimentosPatrimonio: snapshot.investimentosPatrimonio,
+    risco: risco ?? null,
+    transacoesRecentes: (txError ? [] : snapshot.transactions).slice(0, 20).map((t) => ({
       id: t.id,
       type: t.type,
       description: t.description,
@@ -70,13 +71,11 @@ function buildContext(input: {
 }
 
 /**
- * Hook da Atlas Intelligence — compõe contexto e fala só com o Service.
+ * Hook da Atlas Intelligence — contexto vem da Financial Data Layer.
  */
 export function useAtlasIntelligence(
-  resumo: ResumoSlice,
-  contas: ContasSlice,
-  metas: MetasSlice,
-  transacoes: TransacoesSlice,
+  snapshot: FinancialSnapshot | null,
+  fontesLoading: boolean,
   planejamento: PlanejamentoSlice,
 ) {
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -85,43 +84,11 @@ export function useAtlasIntelligence(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fontesLoading =
-    resumo.loading || contas.loading || metas.loading || transacoes.loading;
-
   const risco = planejamento.resultado?.risco ?? null;
-  const contasProximas = contas.contasVencendoEmBreve;
-  const contasVencidas = contas.contasVencidas;
-  const goals = metas.goals;
-  const transactions = transacoes.transactions;
 
   const context = useMemo(
-    () =>
-      buildContext({
-        saldo: resumo.saldo,
-        receitasDoMes: resumo.receitasDoMes,
-        despesasDoMes: resumo.despesasDoMes,
-        contasProximas,
-        contasVencidas,
-        metas: goals,
-        transactions,
-        risco,
-        contasError: Boolean(contas.error),
-        metasError: Boolean(metas.error),
-        txError: Boolean(transacoes.error),
-      }),
-    [
-      resumo.saldo,
-      resumo.receitasDoMes,
-      resumo.despesasDoMes,
-      contasProximas,
-      contasVencidas,
-      goals,
-      transactions,
-      risco,
-      contas.error,
-      metas.error,
-      transacoes.error,
-    ],
+    () => buildContextFromSnapshot(snapshot, risco),
+    [snapshot, risco],
   );
 
   const refresh = useCallback(async () => {

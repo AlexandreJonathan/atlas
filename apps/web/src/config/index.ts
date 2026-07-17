@@ -7,6 +7,7 @@ export type {
   AtlasAiProviderId,
   FeatureFlagKey,
   FeatureFlags,
+  FinancialDataProviderId,
   ObservabilityConfig,
   OpenFinanceProviderId,
 } from "./types";

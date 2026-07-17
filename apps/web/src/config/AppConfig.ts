@@ -5,11 +5,12 @@ import type {
   AppEnvironment,
   AtlasAiProviderId,
   FeatureFlags,
+  FinancialDataProviderId,
   OpenFinanceProviderId,
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "0.9.1";
+export const APP_VERSION = "0.9.2";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;
@@ -44,7 +45,10 @@ function resolveProviders(flags: FeatureFlags): ActiveProviders {
   // OpenAI (chat via Edge Function) só quando a flag estiver ligada.
   const atlasAi: AtlasAiProviderId = flags.openai ? "openai" : "mock";
 
-  return { openFinance, atlasAi };
+  const fdEnv = import.meta.env.VITE_FINANCIAL_DATA_PROVIDER?.trim().toLowerCase();
+  const financialData: FinancialDataProviderId = fdEnv === "pluggy" ? "pluggy" : "mock";
+
+  return { openFinance, atlasAi, financialData };
 }
 
 function resolveObservability(): AppConfig["observability"] {

@@ -7,36 +7,21 @@ import {
 } from "../data/mockAtlasAiChat";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import { useBills } from "../hooks/useBills";
-import { useFinancialProfile } from "../hooks/useFinancialProfile";
-import { useFinancialSummary } from "../hooks/useFinancialSummary";
-import { useFixedExpenses } from "../hooks/useFixedExpenses";
-import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
-import { useTransactions } from "../hooks/useTransactions";
 import { analytics } from "../lib/analytics";
 import {
   IntelligenceFeed,
   useAtlasIntelligence,
   type ChatMessage,
 } from "../modules/atlas-intelligence";
+import { useFinancialData } from "../modules/financial-data";
 import "./AtlasAIPage.css";
 
 function AtlasAIPage() {
-  const transacoes = useTransactions();
-  const contas = useBills();
-  const metas = useGoals();
-  const perfil = useFinancialProfile();
-  const despesasFixas = useFixedExpenses();
-  const resumo = useFinancialSummary(transacoes, contas);
-  const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
-  const intelligence = useAtlasIntelligence(
-    resumo,
-    contas,
-    metas,
-    transacoes,
-    planejamento,
-  );
+  const financial = useFinancialData();
+  const { contas, perfil, despesasFixas, resumo, snapshot, loading } = financial;
+  const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, financial.metas);
+  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
 
   const [mensagens, setMensagens] = useState<AtlasAiMessage[]>(MOCK_ATLAS_AI_MESSAGES);
   const [texto, setTexto] = useState("");

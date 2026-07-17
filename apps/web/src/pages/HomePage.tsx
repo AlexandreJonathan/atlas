@@ -15,17 +15,11 @@ import WealthHero from "../components/home/WealthHero";
 import "../components/Panels.css";
 import GoalModal from "../components/GoalModal";
 import TransactionModal from "../components/TransactionModal";
-import { MOCK_INVESTMENTS } from "../data/mockInvestments";
 import { useAuth } from "../hooks/useAuth";
-import { useBills } from "../hooks/useBills";
-import { useFinancialProfile } from "../hooks/useFinancialProfile";
-import { useFinancialSummary } from "../hooks/useFinancialSummary";
-import { useFixedExpenses } from "../hooks/useFixedExpenses";
-import { useGoals } from "../hooks/useGoals";
 import { usePlanning } from "../hooks/usePlanning";
-import { useTransactions } from "../hooks/useTransactions";
 import { triggerMicrointeraction } from "../lib/microinteractions";
 import { AtlasInsights, useAtlasIntelligence } from "../modules/atlas-intelligence";
+import { useFinancialData } from "../modules/financial-data";
 import type { TransactionType } from "../types/transaction";
 import "./HomePage.css";
 
@@ -37,22 +31,11 @@ type ModalAberto =
 
 function HomePage() {
   const { user } = useAuth();
+  const financial = useFinancialData();
+  const { transacoes, contas, metas, perfil, despesasFixas, resumo, snapshot, loading } = financial;
 
-  const transacoes = useTransactions();
-  const contas = useBills();
-  const metas = useGoals();
-  const perfil = useFinancialProfile();
-  const despesasFixas = useFixedExpenses();
-
-  const resumo = useFinancialSummary(transacoes, contas);
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
-  const intelligence = useAtlasIntelligence(
-    resumo,
-    contas,
-    metas,
-    transacoes,
-    planejamento,
-  );
+  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -61,7 +44,7 @@ function HomePage() {
   }, []);
 
   const nome = user?.user_metadata?.nome as string | undefined;
-  const patrimonioTotal = resumo.saldo + MOCK_INVESTMENTS.patrimonioInvestido;
+  const patrimonioTotal = financial.patrimonio;
 
   function handleQuickAction(id: QuickActionId) {
     if (id === "receita") setModalAberto({ kind: "transaction", tipo: "receita" });
@@ -75,7 +58,6 @@ function HomePage() {
       <HomeHeader nome={nome} email={user?.email} />
 
       <main className="atlas-home-main">
-        {/* Quanto tenho */}
         <WealthHero
           patrimonioTotal={patrimonioTotal}
           saldoDisponivel={resumo.saldo}
@@ -92,13 +74,10 @@ function HomePage() {
 
         <QuickActions onAction={handleQuickAction} />
 
-        {/* O que preciso fazer hoje */}
         <BillsTimeline contas={contas} />
 
-        {/* O que aconteceu */}
         <TransactionsPreview transacoes={transacoes} />
 
-        {/* Um único bloco de insights (sem Panel/Feed) */}
         <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
 
         <GoalsFocus metas={metas} />
@@ -109,7 +88,7 @@ function HomePage() {
           despesasFixas={despesasFixas}
         />
 
-        <InvestmentsTeaser />
+        <InvestmentsTeaser investments={financial.investments} />
 
         <Link to="/atlas-ia" className="atlas-surface atlas-home-ia-cta">
           <span className="atlas-home-ia-cta-icon" aria-hidden="true">

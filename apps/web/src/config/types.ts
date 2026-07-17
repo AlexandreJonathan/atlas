@@ -7,6 +7,9 @@ export type OpenFinanceProviderId = "mock" | "pluggy";
 /** Provedor ativo de Atlas Intelligence (Adapter/Provider — Sprint 12). */
 export type AtlasAiProviderId = "mock" | "openai";
 
+/** Provedor ativo da Financial Data Layer (Missão 20). */
+export type FinancialDataProviderId = "mock" | "pluggy";
+
 /** Chaves de feature flag suportadas pela fundação de qualidade. */
 export type FeatureFlagKey =
   | "openai"
@@ -19,6 +22,7 @@ export type FeatureFlags = Record<FeatureFlagKey, boolean>;
 export type ActiveProviders = {
   openFinance: OpenFinanceProviderId;
   atlasAi: AtlasAiProviderId;
+  financialData: FinancialDataProviderId;
 };
 
 export type ObservabilityConfig = {

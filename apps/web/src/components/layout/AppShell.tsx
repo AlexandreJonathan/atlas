@@ -1,28 +1,23 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useFinancialProfile } from "../../hooks/useFinancialProfile";
-import { useFixedExpenses } from "../../hooks/useFixedExpenses";
-import { useGoals } from "../../hooks/useGoals";
 import { useOnboarding } from "../../hooks/useOnboarding";
 import {
   startOpenFinanceMicrointeractionBridge,
   ToastHost,
 } from "../../lib/microinteractions";
+import { useFinancialData } from "../../modules/financial-data";
 import OnboardingWizard from "../onboarding/OnboardingWizard";
 import "./AppShell.css";
 import BottomNavigation from "./BottomNavigation";
 
-// Shell autenticado: Bottom Navigation + Outlet das abas. O onboarding
-// continua substituindo o app inteiro até ser concluído ou adiado na sessão
-// (mesma regra que vivia no Dashboard monolítico).
+// Shell autenticado: Bottom Navigation + Outlet das abas.
+// Perfil/metas/despesas fixas vêm da Financial Data Layer (cache compartilhado).
 function AppShell() {
-  const perfil = useFinancialProfile();
-  const despesasFixas = useFixedExpenses();
-  const metas = useGoals();
+  const { perfil, despesasFixas, metas, loading: financialLoading } = useFinancialData();
 
   const onboarding = useOnboarding({
     perfilJaConfigurado: perfil.profile != null,
-    perfilCarregando: perfil.loading,
+    perfilCarregando: financialLoading || perfil.loading,
   });
   const [onboardingOcultoNestaSessao, setOnboardingOcultoNestaSessao] = useState(false);
 

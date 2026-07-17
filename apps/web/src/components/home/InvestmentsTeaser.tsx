@@ -1,14 +1,21 @@
 import { ChevronRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import type { MockInvestmentsSnapshot } from "../../data/mockInvestments";
 import { MOCK_INVESTMENTS } from "../../data/mockInvestments";
 import "./InvestmentsTeaser.css";
+
+type InvestmentsTeaserProps = {
+  /** Preferir dados da Financial Data Layer; fallback só para demos isolados. */
+  investments?: MockInvestmentsSnapshot | null;
+};
 
 function formatarMoeda(valor: number): string {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function InvestmentsTeaser() {
-  const { patrimonioInvestido, rendimentoMensalPercentual } = MOCK_INVESTMENTS;
+function InvestmentsTeaser({ investments }: InvestmentsTeaserProps) {
+  const data = investments ?? MOCK_INVESTMENTS;
+  const { patrimonioInvestido, rendimentoMensalPercentual } = data;
 
   return (
     <section className="atlas-surface atlas-surface-pad atlas-invest-teaser" aria-labelledby="invest-teaser-titulo">
