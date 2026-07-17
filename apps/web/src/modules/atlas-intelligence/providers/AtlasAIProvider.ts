@@ -8,7 +8,8 @@ import type {
 
 /**
  * Contrato estável para o cérebro da Atlas.
- * Mock hoje; OpenAI no futuro — a UI só fala com o Service.
+ * Implementações: MockAtlasAIProvider | OpenAIProvider.
+ * A UI só fala com AtlasIntelligenceService.
  */
 export interface AtlasAIProvider {
   readonly name: string;

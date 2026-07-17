@@ -8,7 +8,9 @@ export type AnalyticsEventName =
   | "onboarding_completed"
   | "home_opened"
   | "connect_bank_clicked"
-  | "atlas_ai_opened";
+  | "atlas_ai_opened"
+  | "atlas_ai_chat_success"
+  | "atlas_ai_chat_fallback";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 

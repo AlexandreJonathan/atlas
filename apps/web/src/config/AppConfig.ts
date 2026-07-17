@@ -9,7 +9,7 @@ import type {
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "0.8.1";
+export const APP_VERSION = "0.9.0";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;
@@ -41,8 +41,7 @@ function resolveProviders(flags: FeatureFlags): ActiveProviders {
   const openFinance: OpenFinanceProviderId =
     flags.openFinance && ofEnv === "pluggy" ? "pluggy" : "mock";
 
-  // OpenAI só entra como provider ativo quando a flag estiver ligada.
-  // Enquanto o stub não estiver implementado, o default seguro é mock.
+  // OpenAI (chat via Edge Function) só quando a flag estiver ligada.
   const atlasAi: AtlasAiProviderId = flags.openai ? "openai" : "mock";
 
   return { openFinance, atlasAi };

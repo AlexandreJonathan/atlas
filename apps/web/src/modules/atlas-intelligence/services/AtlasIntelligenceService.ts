@@ -2,6 +2,7 @@ import { appConfig, featureFlagService } from "../../../config";
 import { logger } from "../../../lib/logging";
 import type { AtlasAIProvider } from "../providers/AtlasAIProvider";
 import { MockAtlasAIProvider } from "../providers/MockAtlasAIProvider";
+import { OpenAIProvider } from "../providers/OpenAIProvider";
 import type {
   ChatMessage,
   FeedItem,
@@ -12,11 +13,20 @@ import type {
 import { prependFeedItems } from "../utils/feedStore";
 import { rankInsights } from "../utils/format";
 
+/**
+ * Factory Adapter/Provider:
+ * - flag openai ligada → OpenAIProvider (chat via Edge Function; insights/mock local)
+ * - caso contrário → MockAtlasAIProvider
+ */
 function createAtlasAiProvider(): AtlasAIProvider {
-  if (appConfig.providers.atlasAi === "openai") {
-    // Stub ainda não implementado — manter mock para não alterar UX.
-    logger.warning("Atlas AI: provider openai solicitado; usando mock até a integração real");
+  if (featureFlagService.isEnabled("openai") && appConfig.providers.atlasAi === "openai") {
+    logger.info("Atlas AI: OpenAIProvider ativo", {
+      provider: appConfig.providers.atlasAi,
+    });
+    return new OpenAIProvider();
   }
+
+  logger.info("Atlas AI: MockAtlasAIProvider ativo");
   return new MockAtlasAIProvider();
 }
 
@@ -66,5 +76,5 @@ export class AtlasIntelligenceService {
   }
 }
 
-/** Instância padrão (mock até integração OpenAI). */
+/** Instância padrão da aplicação. */
 export const atlasIntelligenceService = new AtlasIntelligenceService(createAtlasAiProvider());
