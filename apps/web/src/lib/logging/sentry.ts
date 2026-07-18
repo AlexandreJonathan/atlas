@@ -1,4 +1,5 @@
 import { appConfig } from "../../config";
+import { getRequestId } from "../observability";
 import type { LogEntry, LogSink } from "./types";
 
 type SentryModule = typeof import("@sentry/react");
@@ -20,18 +21,33 @@ export async function initSentry(): Promise<void> {
   });
 }
 
+function applyRequestIdTag(): void {
+  if (!sentry) return;
+  const requestId = getRequestId();
+  if (requestId) {
+    sentry.setTag("request_id", requestId);
+  }
+}
+
 /**
  * Encaminha warning/error para Sentry quando inicializado.
  * Sem DSN / antes do init permanece no-op.
+ * Sempre anexa tag `request_id` quando houver correlação ativa.
  */
 export class SentryLogSink implements LogSink {
   write(entry: LogEntry): void {
     if (!sentry) return;
     if (entry.level !== "warning" && entry.level !== "error") return;
 
+    applyRequestIdTag();
+
+    const requestId =
+      typeof entry.context?.requestId === "string" ? entry.context.requestId : getRequestId();
+
     if (entry.error !== undefined) {
       sentry.captureException(entry.error, {
         level: entry.level === "warning" ? "warning" : "error",
+        tags: requestId ? { request_id: requestId } : undefined,
         extra: { message: entry.message, ...entry.context },
       });
       return;
@@ -39,6 +55,7 @@ export class SentryLogSink implements LogSink {
 
     sentry.captureMessage(entry.message, {
       level: entry.level === "warning" ? "warning" : "error",
+      tags: requestId ? { request_id: requestId } : undefined,
       extra: entry.context,
     });
   }

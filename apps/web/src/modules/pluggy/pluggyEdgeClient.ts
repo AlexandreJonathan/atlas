@@ -1,5 +1,10 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { logger } from "../../lib/logging";
+import {
+  createRequestId,
+  requestIdHeaders,
+  withRequestIdAsync,
+} from "../../lib/observability";
 import type {
   PluggyConnectTokenResponse,
   PluggyConnectorDto,
@@ -57,48 +62,60 @@ async function invokePluggyProxy<T>(
   action: PluggyEdgeAction,
   body: Record<string, unknown> = {},
 ): Promise<T> {
-  const client = getSupabaseClient();
-  let lastError: unknown = new Error("Falha ao chamar pluggy-proxy");
+  const requestId = createRequestId();
 
-  for (let attempt = 1; attempt <= PLUGGY_PROXY_MAX_ATTEMPTS; attempt++) {
-    try {
-      const result = await withTimeout(
-        client.functions.invoke<T & { error?: string }>(PLUGGY_PROXY_FUNCTION, {
-          body: { action, ...body },
-        }),
-        PLUGGY_PROXY_TIMEOUT_MS,
-      );
+  return withRequestIdAsync(requestId, async () => {
+    const client = getSupabaseClient();
+    let lastError: unknown = new Error("Falha ao chamar pluggy-proxy");
 
-      if (result.error) {
-        lastError = result.error;
-        if (attempt < PLUGGY_PROXY_MAX_ATTEMPTS && isRetryable(result.error)) {
+    logger.info("pluggy-proxy invoke", { action, requestId });
+
+    for (let attempt = 1; attempt <= PLUGGY_PROXY_MAX_ATTEMPTS; attempt++) {
+      try {
+        const result = await withTimeout(
+          client.functions.invoke<T & { error?: string; requestId?: string }>(
+            PLUGGY_PROXY_FUNCTION,
+            {
+              body: { action, ...body },
+              headers: requestIdHeaders(requestId),
+            },
+          ),
+          PLUGGY_PROXY_TIMEOUT_MS,
+        );
+
+        if (result.error) {
+          lastError = result.error;
+          if (attempt < PLUGGY_PROXY_MAX_ATTEMPTS && isRetryable(result.error)) {
+            await sleep(300 * attempt);
+            continue;
+          }
+          throw result.error;
+        }
+
+        const data = result.data;
+        if (data && typeof data === "object" && "error" in data && data.error) {
+          throw new Error(String(data.error));
+        }
+        logger.info("pluggy-proxy invoke ok", { action, requestId });
+        return data as T;
+      } catch (error) {
+        lastError = error;
+        logger.warning("pluggy-proxy invoke falhou", {
+          action,
+          attempt,
+          requestId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        if (attempt < PLUGGY_PROXY_MAX_ATTEMPTS && isRetryable(error)) {
           await sleep(300 * attempt);
           continue;
         }
-        throw result.error;
+        throw error;
       }
-
-      const data = result.data;
-      if (data && typeof data === "object" && "error" in data && data.error) {
-        throw new Error(String(data.error));
-      }
-      return data as T;
-    } catch (error) {
-      lastError = error;
-      logger.warning("pluggy-proxy invoke falhou", {
-        action,
-        attempt,
-        error: error instanceof Error ? error.message : String(error),
-      });
-      if (attempt < PLUGGY_PROXY_MAX_ATTEMPTS && isRetryable(error)) {
-        await sleep(300 * attempt);
-        continue;
-      }
-      throw error;
     }
-  }
 
-  throw lastError;
+    throw lastError;
+  });
 }
 
 export function createPluggyConnectToken(): Promise<PluggyConnectTokenResponse> {

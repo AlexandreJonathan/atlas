@@ -1,4 +1,5 @@
 import { appConfig } from "../../config";
+import { getRequestId } from "../observability";
 import { SentryLogSink } from "./sentry";
 import type { LogContext, LogEntry, LogLevel, LogSink } from "./types";
 
@@ -9,27 +10,37 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
   error: 40,
 };
 
-/** Console detalhado — usado em development. */
-class ConsoleLogSink implements LogSink {
+/**
+ * Sink estruturado — uma linha JSON por evento (facilita correlação em prod).
+ */
+class StructuredConsoleLogSink implements LogSink {
   write(entry: LogEntry): void {
-    const payload = {
-      ...entry.context,
-      ...(entry.error !== undefined ? { error: entry.error } : {}),
-    };
-    const args = Object.keys(payload).length > 0 ? [entry.message, payload] : [entry.message];
+    const line = JSON.stringify({
+      ts: entry.timestamp,
+      level: entry.level,
+      msg: entry.message,
+      requestId: entry.context?.requestId ?? null,
+      context: entry.context ?? undefined,
+      error:
+        entry.error instanceof Error
+          ? { name: entry.error.name, message: entry.error.message }
+          : entry.error !== undefined
+            ? String(entry.error)
+            : undefined,
+    });
 
     switch (entry.level) {
       case "debug":
-        console.debug("[Atlas]", ...args);
+        console.debug(line);
         break;
       case "info":
-        console.info("[Atlas]", ...args);
+        console.info(line);
         break;
       case "warning":
-        console.warn("[Atlas]", ...args);
+        console.warn(line);
         break;
       case "error":
-        console.error("[Atlas]", ...args);
+        console.error(line);
         break;
     }
   }
@@ -63,11 +74,17 @@ class Logger {
   private write(level: LogLevel, message: string, context?: LogContext, error?: unknown): void {
     if (LEVEL_ORDER[level] < LEVEL_ORDER[this.minLevel]) return;
 
+    const requestId = getRequestId();
+    const mergedContext: LogContext = {
+      ...(context ?? {}),
+      ...(requestId ? { requestId } : {}),
+    };
+
     const entry: LogEntry = {
       level,
       message,
       timestamp: new Date().toISOString(),
-      context,
+      context: Object.keys(mergedContext).length > 0 ? mergedContext : undefined,
       error,
     };
 
@@ -82,7 +99,7 @@ class Logger {
 }
 
 function createLogger(): Logger {
-  const sinks: LogSink[] = [new ConsoleLogSink()];
+  const sinks: LogSink[] = [new StructuredConsoleLogSink()];
   // Sentry ativo só após initSentry() em main — sem DSN permanece no-op.
   sinks.push(new SentryLogSink());
   const minLevel: LogLevel = appConfig.isDev ? "debug" : "info";

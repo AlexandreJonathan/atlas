@@ -47,12 +47,21 @@ function resolveCorsOrigin(req: Request): string {
   return allowed[0] ?? "*";
 }
 
-function corsHeaders(req: Request): Record<string, string> {
+function resolveRequestId(req: Request): string {
+  const incoming = req.headers.get("x-request-id")?.trim();
+  if (incoming && incoming.length > 0 && incoming.length <= 128) return incoming;
+  return crypto.randomUUID();
+}
+
+function corsHeaders(req: Request, requestId?: string): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": resolveCorsOrigin(req),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-request-id",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Expose-Headers": "x-request-id",
     Vary: "Origin",
+    ...(requestId ? { "x-request-id": requestId } : {}),
   };
 }
 
@@ -61,10 +70,20 @@ function jsonResponse(
   body: unknown,
   status = 200,
   extra: Record<string, string> = {},
+  requestId?: string,
 ): Response {
-  return new Response(JSON.stringify(body), {
+  const rid = requestId ?? resolveRequestId(req);
+  const payload =
+    body && typeof body === "object" && !Array.isArray(body)
+      ? { ...(body as Record<string, unknown>), requestId: rid }
+      : body;
+  return new Response(JSON.stringify(payload), {
     status,
-    headers: { ...corsHeaders(req), "Content-Type": "application/json", ...extra },
+    headers: {
+      ...corsHeaders(req, rid),
+      "Content-Type": "application/json",
+      ...extra,
+    },
   });
 }
 
@@ -428,35 +447,39 @@ async function handleListConnectors(): Promise<unknown> {
 }
 
 Deno.serve(async (req) => {
+  const requestId = resolveRequestId(req);
+  const respond = (body: unknown, status = 200) =>
+    jsonResponse(req, body, status, {}, requestId);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders(req) });
+    return new Response("ok", { headers: corsHeaders(req, requestId) });
   }
   if (req.method !== "POST") {
-    return jsonResponse(req, { error: "Method not allowed" }, 405);
+    return respond({ error: "Method not allowed" }, 405);
   }
 
   let body: Body;
   try {
     body = await req.json();
   } catch {
-    return jsonResponse(req, { error: "Invalid JSON body" }, 400);
+    return respond({ error: "Invalid JSON body" }, 400);
   }
 
   const action = body.action;
   if (!action) {
-    return jsonResponse(req, { error: "action required" }, 400);
+    return respond({ error: "action required" }, 400);
   }
 
   try {
     const { userId, admin } = await requireUser(req);
+    console.info("[pluggy-proxy] action", { requestId, userId, action });
 
     switch (action) {
       case "connect_token":
-        return jsonResponse(req, await handleConnectToken(userId));
+        return respond(await handleConnectToken(userId));
       case "register_item": {
-        if (!body.itemId) return jsonResponse(req, { error: "itemId required" }, 400);
-        return jsonResponse(
-          req,
+        if (!body.itemId) return respond({ error: "itemId required" }, 400);
+        return respond(
           await handleRegisterItem(
             admin,
             userId,
@@ -467,33 +490,33 @@ Deno.serve(async (req) => {
         );
       }
       case "unregister_item": {
-        if (!body.itemId) return jsonResponse(req, { error: "itemId required" }, 400);
-        return jsonResponse(req, await handleUnregisterItem(admin, userId, body.itemId));
+        if (!body.itemId) return respond({ error: "itemId required" }, 400);
+        return respond(await handleUnregisterItem(admin, userId, body.itemId));
       }
       case "sync_item": {
-        if (!body.itemId) return jsonResponse(req, { error: "itemId required" }, 400);
-        return jsonResponse(req, await handleSyncItem(admin, userId, body.itemId));
+        if (!body.itemId) return respond({ error: "itemId required" }, 400);
+        return respond(await handleSyncItem(admin, userId, body.itemId));
       }
       case "get_snapshot":
-        return jsonResponse(req, await handleGetSnapshot(admin, userId));
+        return respond(await handleGetSnapshot(admin, userId));
       case "list_connectors":
-        return jsonResponse(req, await handleListConnectors());
+        return respond(await handleListConnectors());
       default:
-        return jsonResponse(req, { error: "Unknown action" }, 400);
+        return respond({ error: "Unknown action" }, 400);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNEXPECTED";
     if (message === "UNAUTHORIZED") {
-      return jsonResponse(req, { error: "Unauthorized" }, 401);
+      return respond({ error: "Unauthorized" }, 401);
     }
     if (message === "PLUGGY_CREDENTIALS_MISSING") {
-      console.error("[pluggy-proxy] missing PLUGGY_CLIENT_ID/SECRET");
-      return jsonResponse(req, { error: "Pluggy not configured" }, 503);
+      console.error("[pluggy-proxy] missing PLUGGY_CLIENT_ID/SECRET", { requestId });
+      return respond({ error: "Pluggy not configured" }, 503);
     }
     if (message === "ITEM_NOT_FOUND") {
-      return jsonResponse(req, { error: "Item not found" }, 404);
+      return respond({ error: "Item not found" }, 404);
     }
-    console.error("[pluggy-proxy] error", message);
-    return jsonResponse(req, { error: "Pluggy proxy error", code: message }, 502);
+    console.error("[pluggy-proxy] error", { requestId, message });
+    return respond({ error: "Pluggy proxy error", code: message }, 502);
   }
 });

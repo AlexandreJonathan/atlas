@@ -41,15 +41,24 @@ const USER_LIMIT = Number(Deno.env.get("AI_RATE_LIMIT_USER") ?? "20");
 const IP_LIMIT = Number(Deno.env.get("AI_RATE_LIMIT_IP") ?? "40");
 const WINDOW_MS = Number(Deno.env.get("AI_RATE_WINDOW_MS") ?? String(60 * 60 * 1000));
 
-function corsHeaders(req: Request): Record<string, string> {
+function resolveRequestId(req: Request): string {
+  const incoming = req.headers.get("x-request-id")?.trim();
+  if (incoming && incoming.length > 0 && incoming.length <= 128) return incoming;
+  return crypto.randomUUID();
+}
+
+function corsHeaders(req: Request, requestId?: string): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": resolveCorsOrigin(
       req,
       Deno.env.get("ALLOWED_ORIGINS") ?? "",
     ),
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-request-id",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Expose-Headers": "x-request-id",
     Vary: "Origin",
+    ...(requestId ? { "x-request-id": requestId } : {}),
   };
 }
 
@@ -58,10 +67,20 @@ function jsonResponse(
   body: unknown,
   status = 200,
   extra: Record<string, string> = {},
+  requestId?: string,
 ): Response {
-  return new Response(JSON.stringify(body), {
+  const rid = requestId ?? resolveRequestId(req);
+  const payload =
+    body && typeof body === "object" && !Array.isArray(body)
+      ? { ...(body as Record<string, unknown>), requestId: rid }
+      : body;
+  return new Response(JSON.stringify(payload), {
     status,
-    headers: { ...corsHeaders(req), "Content-Type": "application/json", ...extra },
+    headers: {
+      ...corsHeaders(req, rid),
+      "Content-Type": "application/json",
+      ...extra,
+    },
   });
 }
 
@@ -295,12 +314,19 @@ function buildSystemPrompt(context: FinancialContext): string {
 }
 
 Deno.serve(async (req) => {
+  const requestId = resolveRequestId(req);
+  const respond = (
+    body: unknown,
+    status = 200,
+    extra: Record<string, string> = {},
+  ) => jsonResponse(req, body, status, extra, requestId);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders(req) });
+    return new Response("ok", { headers: corsHeaders(req, requestId) });
   }
 
   if (req.method !== "POST") {
-    return jsonResponse(req, { error: "Method not allowed" }, 405);
+    return respond({ error: "Method not allowed" }, 405);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -309,17 +335,17 @@ Deno.serve(async (req) => {
   const apiKey = Deno.env.get("OPENAI_API_KEY");
 
   if (!supabaseUrl || !anonKey || !serviceKey) {
-    console.error("[atlas-ai-chat] Supabase env ausente");
-    return jsonResponse(req, { error: "Server misconfigured" }, 500);
+    console.error("[atlas-ai-chat] Supabase env ausente", { requestId });
+    return respond({ error: "Server misconfigured" }, 500);
   }
   if (!apiKey) {
-    console.error("[atlas-ai-chat] OPENAI_API_KEY ausente");
-    return jsonResponse(req, { error: "OPENAI_API_KEY not configured" }, 500);
+    console.error("[atlas-ai-chat] OPENAI_API_KEY ausente", { requestId });
+    return respond({ error: "OPENAI_API_KEY not configured" }, 500);
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    return jsonResponse(req, { error: "Unauthorized" }, 401);
+    return respond({ error: "Unauthorized" }, 401);
   }
 
   const userClient = createClient(supabaseUrl, anonKey, {
@@ -329,8 +355,8 @@ Deno.serve(async (req) => {
 
   const { data: userData, error: userError } = await userClient.auth.getUser();
   if (userError || !userData.user) {
-    console.warn("[atlas-ai-chat] getUser failed", userError?.message);
-    return jsonResponse(req, { error: "Unauthorized" }, 401);
+    console.warn("[atlas-ai-chat] getUser failed", { requestId, error: userError?.message });
+    return respond({ error: "Unauthorized" }, 401);
   }
 
   const userId = userData.user.id;
@@ -338,8 +364,7 @@ Deno.serve(async (req) => {
 
   const userLimit = await enforceRateLimit(admin, `user:${userId}`, USER_LIMIT);
   if (!userLimit.ok) {
-    return jsonResponse(
-      req,
+    return respond(
       { error: "rate_limited", scope: "user" },
       429,
       { "Retry-After": String(userLimit.retryAfterSec) },
@@ -348,8 +373,7 @@ Deno.serve(async (req) => {
 
   const ipLimit = await enforceRateLimit(admin, `ip:${ipHash}`, IP_LIMIT);
   if (!ipLimit.ok) {
-    return jsonResponse(
-      req,
+    return respond(
       { error: "rate_limited", scope: "ip" },
       429,
       { "Retry-After": String(ipLimit.retryAfterSec) },
@@ -360,7 +384,7 @@ Deno.serve(async (req) => {
   try {
     payload = await req.json();
   } catch {
-    return jsonResponse(req, { error: "Invalid JSON body" }, 400);
+    return respond({ error: "Invalid JSON body" }, 400);
   }
 
   const mode = payload.mode === "agent" ? "agent" : "legacy";
@@ -369,15 +393,16 @@ Deno.serve(async (req) => {
   if (mode === "agent") {
     const validated = validateAgentClientPayload(payload);
     if (!validated.ok) {
-      console.warn("[atlas-ai-chat] trust violation", { userId, code: validated.code });
-      return jsonResponse(
-        req,
-        { error: "trust_violation", code: validated.code },
-        400,
-      );
+      console.warn("[atlas-ai-chat] trust violation", {
+        requestId,
+        userId,
+        code: validated.code,
+      });
+      return respond({ error: "trust_violation", code: validated.code }, 400);
     }
 
     try {
+      console.info("[atlas-ai-chat] agent start", { requestId, userId });
       const result = await runServerAgentLoop({
         apiKey,
         model,
@@ -387,7 +412,7 @@ Deno.serve(async (req) => {
         userId,
       });
 
-      return jsonResponse(req, {
+      return respond({
         mode: "agent",
         reply: result.reply,
         content: result.reply,
@@ -398,30 +423,26 @@ Deno.serve(async (req) => {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "unexpected";
-      console.error("[atlas-ai-chat] agent failed", message);
+      console.error("[atlas-ai-chat] agent failed", { requestId, message });
       if (message === "OPENAI_REQUEST_FAILED") {
-        return jsonResponse(req, { error: "OpenAI request failed" }, 502);
+        return respond({ error: "OpenAI request failed" }, 502);
       }
       if (message === "UNKNOWN_TOOLS_ONLY") {
-        return jsonResponse(req, { error: "unknown_tools_rejected" }, 502);
+        return respond({ error: "unknown_tools_rejected" }, 502);
       }
       if (message === "EMPTY_MODEL_REPLY") {
-        return jsonResponse(req, { error: "Empty model reply" }, 502);
+        return respond({ error: "Empty model reply" }, 502);
       }
       if (message === "AGENT_ROUND_LIMIT") {
-        return jsonResponse(req, { error: "agent_round_limit" }, 502);
+        return respond({ error: "agent_round_limit" }, 502);
       }
-      return jsonResponse(req, { error: "Unexpected proxy error" }, 500);
+      return respond({ error: "Unexpected proxy error" }, 500);
     }
   }
 
   // Legacy: também rejeita context/tools do cliente (ignora silenciosamente tools; bloqueia context).
   if (Object.prototype.hasOwnProperty.call(payload, "context") && payload.context != null) {
-    return jsonResponse(
-      req,
-      { error: "trust_violation", code: "client_context_forbidden" },
-      400,
-    );
+    return respond({ error: "trust_violation", code: "client_context_forbidden" }, 400);
   }
 
   const messages = Array.isArray(payload.messages) ? (payload.messages as IncomingMessage[]) : [];
@@ -434,18 +455,19 @@ Deno.serve(async (req) => {
     .map((m) => ({ role: m.role, content: String(m.content).slice(0, 4000) }));
 
   if (history.length === 0) {
-    return jsonResponse(req, { error: "messages required" }, 400);
+    return respond({ error: "messages required" }, 400);
   }
 
   let context: FinancialContext;
   try {
     context = await loadTrustedContext(userClient);
   } catch (error) {
-    console.error("[atlas-ai-chat] context load failed", error);
-    return jsonResponse(req, { error: "Failed to load financial context" }, 500);
+    console.error("[atlas-ai-chat] context load failed", { requestId, error });
+    return respond({ error: "Failed to load financial context" }, 500);
   }
 
   console.info("[atlas-ai-chat] legacy request", {
+    requestId,
     userId,
     messageCount: history.length,
     contextSaldo: context.saldo,
@@ -469,16 +491,16 @@ Deno.serve(async (req) => {
     const openaiJson = await openaiRes.json();
 
     if (!openaiRes.ok) {
-      console.error("[atlas-ai-chat] OpenAI error", openaiRes.status);
-      return jsonResponse(req, { error: "OpenAI request failed" }, 502);
+      console.error("[atlas-ai-chat] OpenAI error", { requestId, status: openaiRes.status });
+      return respond({ error: "OpenAI request failed" }, 502);
     }
 
     const reply = openaiJson?.choices?.[0]?.message?.content?.trim();
     if (!reply || typeof reply !== "string") {
-      return jsonResponse(req, { error: "Empty model reply" }, 502);
+      return respond({ error: "Empty model reply" }, 502);
     }
 
-    return jsonResponse(req, {
+    return respond({
       mode: "legacy",
       reply,
       model,
@@ -486,7 +508,7 @@ Deno.serve(async (req) => {
       usage: openaiJson?.usage ?? null,
     });
   } catch (error) {
-    console.error("[atlas-ai-chat] unexpected", error);
-    return jsonResponse(req, { error: "Unexpected proxy error" }, 500);
+    console.error("[atlas-ai-chat] unexpected", { requestId, error });
+    return respond({ error: "Unexpected proxy error" }, 500);
   }
 });
