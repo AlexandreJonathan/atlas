@@ -45,9 +45,14 @@ function HomePage() {
   const { transacoes, contas, metas, perfil, despesasFixas, resumo, snapshot, loading } = financial;
 
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
-  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
   const budgetPlanner = useBudgetPlanner();
   const financialPlanner = useFinancialPlanner();
+  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento, {
+    budgetSummary: budgetPlanner.summary,
+    budgetViews: budgetPlanner.views,
+    plan: financialPlanner.plan,
+    transactions: transacoes.transactions,
+  });
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -90,7 +95,13 @@ function HomePage() {
 
         <TransactionsPreview transacoes={transacoes} />
 
-        <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
+        <AtlasInsights
+          recommendations={intelligence.topRecommendations}
+          insights={intelligence.topInsights}
+          loading={intelligence.loading || budgetPlanner.loading || financialPlanner.loading}
+          error={intelligence.error}
+          onRetry={() => void intelligence.refresh()}
+        />
 
         {featureFlagService.isEnabled("budgetPlanner") ? (
           <BudgetSummaryCard

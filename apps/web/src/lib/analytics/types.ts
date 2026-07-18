@@ -33,7 +33,8 @@ export type AnalyticsEventName =
   | "budget_month_ensured"
   | "budget_category_limit_set"
   | "budget_category_limit_removed"
-  | "financial_planner_opened";
+  | "financial_planner_opened"
+  | "atlas_intelligence_recommendations_generated";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 

@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { featureFlagService } from "../../../config";
 import type { usePlanning } from "../../../hooks/usePlanning";
 import type { FinancialSnapshot } from "../../financial-data";
+import {
+  buildRecommendationContext,
+  type RecommendationEnrichment,
+} from "../engine/recommendations/buildRecommendationContext";
+import { mapRecommendationToInsight } from "../engine/recommendations/mapRecommendationToInsight";
+import { recommendationEngine } from "../engine/recommendations/RecommendationEngine";
+import { serializeRecommendationsForChat } from "../intelligence/chatHooks";
 import { atlasIntelligenceService } from "../services/AtlasIntelligenceService";
 import type {
   ChatMessage,
@@ -9,6 +17,7 @@ import type {
   FinancialEvent,
   Insight,
   IntelligenceContext,
+  Recommendation,
 } from "../types";
 import { getFeedItems, subscribeFeed } from "../utils/feedStore";
 
@@ -16,7 +25,9 @@ type PlanejamentoSlice = Pick<ReturnType<typeof usePlanning>, "resultado">;
 
 function buildContextFromSnapshot(
   snapshot: FinancialSnapshot | null,
-  risco: PlanejamentoSlice["resultado"] extends { risco: infer R } | null | undefined ? R | null : null,
+  risco: PlanejamentoSlice["resultado"] extends { risco: infer R } | null | undefined
+    ? R | null
+    : null,
 ): IntelligenceContext {
   if (!snapshot) {
     return {
@@ -70,41 +81,84 @@ function buildContextFromSnapshot(
   };
 }
 
+const EMPTY_ENRICHMENT: RecommendationEnrichment = {
+  budgetSummary: null,
+  budgetViews: [],
+  plan: null,
+  transactions: [],
+};
+
 /**
- * Hook da Atlas Intelligence — contexto vem da Financial Data Layer.
+ * Hook da Atlas Intelligence — contexto vem da FDL + enriquecimento Budget/Planner (v2).
  */
 export function useAtlasIntelligence(
   snapshot: FinancialSnapshot | null,
   fontesLoading: boolean,
   planejamento: PlanejamentoSlice,
+  enrichment: RecommendationEnrichment = EMPTY_ENRICHMENT,
 ) {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [topInsights, setTopInsights] = useState<Insight[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [topRecommendations, setTopRecommendations] = useState<Recommendation[]>([]);
   const [feed, setFeed] = useState<FeedItem[]>(() => getFeedItems());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const risco = planejamento.resultado?.risco ?? null;
+  const v2Enabled = featureFlagService.isEnabled("atlasIntelligenceV2");
 
   const context = useMemo(
     () => buildContextFromSnapshot(snapshot, risco),
     [snapshot, risco],
   );
 
+  const recommendationContext = useMemo(
+    () =>
+      buildRecommendationContext(snapshot, {
+        budgetSummary: enrichment.budgetSummary,
+        budgetViews: enrichment.budgetViews,
+        plan: enrichment.plan,
+        transactions: enrichment.transactions,
+      }),
+    [
+      snapshot,
+      enrichment.budgetSummary,
+      enrichment.budgetViews,
+      enrichment.plan,
+      enrichment.transactions,
+    ],
+  );
+
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const all = await atlasIntelligenceService.generateInsights(context);
-      const top = await atlasIntelligenceService.getTopInsights(context, 3);
-      setInsights(all);
-      setTopInsights(top);
+      if (v2Enabled) {
+        const all = recommendationEngine.evaluate(recommendationContext);
+        const top = all.slice(0, 3);
+        setRecommendations(all);
+        setTopRecommendations(top);
+        setInsights(all.map(mapRecommendationToInsight));
+        setTopInsights(top.map(mapRecommendationToInsight));
+      } else {
+        const all = await atlasIntelligenceService.generateInsights(context);
+        const top = await atlasIntelligenceService.getTopInsights(context, 3);
+        setInsights(all);
+        setTopInsights(top);
+        setRecommendations([]);
+        setTopRecommendations([]);
+      }
     } catch (erro) {
-      setError(erro instanceof Error ? erro.message : "Não foi possível gerar insights.");
+      setError(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível gerar insights.",
+      );
     } finally {
       setLoading(false);
     }
-  }, [context]);
+  }, [v2Enabled, recommendationContext, context]);
 
   useEffect(() => {
     if (fontesLoading) return;
@@ -128,15 +182,22 @@ export function useAtlasIntelligence(
 
   const ask = useCallback(
     async (messages: ChatMessage[]): Promise<ChatReplyResult> => {
+      // Prep v2.1: recomendações locais disponíveis para o provider mock;
+      // não são enviadas à Edge (trust boundary).
+      void serializeRecommendationsForChat(topRecommendations);
       return atlasIntelligenceService.generateChatReply(messages, context);
     },
-    [context],
+    [context, topRecommendations],
   );
 
   return {
     context,
+    recommendationContext,
     insights,
     topInsights,
+    recommendations,
+    topRecommendations,
+    recommendationsForChat: serializeRecommendationsForChat(topRecommendations),
     feed,
     loading: fontesLoading || loading,
     error,
@@ -144,5 +205,6 @@ export function useAtlasIntelligence(
     publishEvent,
     ask,
     providerName: atlasIntelligenceService.getProviderName(),
+    v2Enabled,
   };
 }

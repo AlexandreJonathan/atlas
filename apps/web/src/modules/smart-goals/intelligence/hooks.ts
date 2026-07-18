@@ -1,6 +1,7 @@
 /**
- * Pontos de integração futuros com Atlas Intelligence (v1.1+).
- * NÃO gera sugestões automáticas nesta versão.
+ * Pontos de integração com Atlas Intelligence.
+ * Sugestões automáticas vêm do RecommendationEngine (v2) — este stub
+ * apenas serializa metas para contexto futuro do chat.
  */
 
 import type { Goal } from "../../../types/goal";
@@ -33,7 +34,8 @@ export function serializeGoalsForIntelligence(
 }
 
 /**
- * Placeholder — retorna lista vazia até Smart Goals Insights (v1.1).
+ * Delegado ao RecommendationEngine (GoalRecommendationRule) na Home.
+ * Mantido para compatibilidade — retorna vazio de propósito.
  */
 export function suggestGoalInsights(
   context: SmartGoalsIntelligenceContext,

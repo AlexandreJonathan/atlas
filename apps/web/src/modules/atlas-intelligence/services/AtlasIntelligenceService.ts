@@ -11,6 +11,8 @@ import type {
   Insight,
   IntelligenceContext,
 } from "../types";
+import { recommendationEngine } from "../engine/recommendations/RecommendationEngine";
+import type { Recommendation, RecommendationContext } from "../types/recommendation";
 import { prependFeedItems } from "../utils/feedStore";
 import { rankInsights } from "../utils/format";
 
@@ -18,6 +20,7 @@ import { rankInsights } from "../utils/format";
  * Factory Adapter/Provider:
  * - flag openai ligada → OpenAIProvider (chat via Edge Function; insights/mock local)
  * - caso contrário → MockAtlasAIProvider
+ * Insights proativos v2 vêm do RecommendationEngine (local), não do LLM.
  */
 function createAtlasAiProvider(): AtlasAIProvider {
   if (featureFlagService.isEnabled("openai") && appConfig.providers.atlasAi === "openai") {
@@ -58,6 +61,15 @@ export class AtlasIntelligenceService {
   async getTopInsights(context: IntelligenceContext, limit = 3): Promise<Insight[]> {
     const all = await this.provider.generateInsights(context);
     return rankInsights(all, limit);
+  }
+
+  /** RecommendationEngine v2 — regras locais, sem OpenAI. */
+  generateRecommendations(context: RecommendationContext): Recommendation[] {
+    return recommendationEngine.evaluate(context);
+  }
+
+  getTopRecommendations(context: RecommendationContext, limit = 3): Recommendation[] {
+    return recommendationEngine.getTop(context, limit);
   }
 
   generateChatReply(

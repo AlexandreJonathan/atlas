@@ -14,14 +14,23 @@ import {
   useAtlasIntelligence,
   type ChatMessage,
 } from "../modules/atlas-intelligence";
+import { useBudgetPlanner } from "../modules/budget-planner";
+import { useFinancialPlanner } from "../modules/financial-planner";
 import { useFinancialData } from "../modules/financial-data";
 import "./AtlasAIPage.css";
 
 function AtlasAIPage() {
   const financial = useFinancialData();
-  const { contas, perfil, despesasFixas, resumo, snapshot, loading } = financial;
+  const { contas, perfil, despesasFixas, resumo, snapshot, loading, transacoes } = financial;
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, financial.metas);
-  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
+  const budgetPlanner = useBudgetPlanner();
+  const financialPlanner = useFinancialPlanner();
+  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento, {
+    budgetSummary: budgetPlanner.summary,
+    budgetViews: budgetPlanner.views,
+    plan: financialPlanner.plan,
+    transactions: transacoes.transactions,
+  });
 
   const [mensagens, setMensagens] = useState<AtlasAiMessage[]>(MOCK_ATLAS_AI_MESSAGES);
   const [texto, setTexto] = useState("");

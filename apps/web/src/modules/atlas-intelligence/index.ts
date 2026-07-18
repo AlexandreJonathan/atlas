@@ -11,6 +11,10 @@ export type {
   InsightCategory,
   InsightTone,
   IntelligenceContext,
+  Recommendation,
+  RecommendationCategory,
+  RecommendationContext,
+  RecommendationRule,
 } from "./types";
 
 export type { AtlasAIProvider } from "./providers/AtlasAIProvider";
@@ -21,6 +25,13 @@ export {
   atlasIntelligenceService,
 } from "./services/AtlasIntelligenceService";
 export { gerarInsights } from "./engine/insightEngine";
+export {
+  RecommendationEngine,
+  recommendationEngine,
+  rankRecommendations,
+} from "./engine/recommendations/RecommendationEngine";
+export { buildRecommendationContext } from "./engine/recommendations/buildRecommendationContext";
+export { serializeRecommendationsForChat } from "./intelligence/chatHooks";
 export { useAtlasIntelligence } from "./hooks/useAtlasIntelligence";
 export { rankInsights, formatMoneyBRL } from "./utils/format";
 export {

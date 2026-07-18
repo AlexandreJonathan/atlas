@@ -88,6 +88,43 @@
   line-height: var(--line-height-base);
 }
 
+.atlas-insights-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.atlas-insights-category,
+.atlas-insights-priority {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.atlas-insights-action {
+  margin-top: var(--space-2) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.atlas-insights-action-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand);
+}
+
+.atlas-insights-retry {
+  margin-top: var(--space-2);
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-brand);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .atlas-insights-item-positiva {
   border-color: rgba(45, 212, 191, 0.28);
 }
