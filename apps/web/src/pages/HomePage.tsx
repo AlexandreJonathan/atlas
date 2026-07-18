@@ -22,6 +22,10 @@ import { AtlasInsights, useAtlasIntelligence } from "../modules/atlas-intelligen
 import { useFinancialData } from "../modules/financial-data";
 import { BudgetSummaryCard, useBudgetPlanner } from "../modules/budget-planner";
 import {
+  FinancialPlannerSummaryCard,
+  useFinancialPlanner,
+} from "../modules/financial-planner";
+import {
   SmartGoalsSummaryCard,
   buildSmartGoalsSummary,
 } from "../modules/smart-goals";
@@ -43,6 +47,7 @@ function HomePage() {
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
   const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
   const budgetPlanner = useBudgetPlanner();
+  const financialPlanner = useFinancialPlanner();
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -102,6 +107,14 @@ function HomePage() {
         ) : null}
 
         <GoalsFocus metas={metas} />
+
+        {featureFlagService.isEnabled("financialPlanner") ? (
+          <FinancialPlannerSummaryCard
+            plan={financialPlanner.plan}
+            configured={financialPlanner.configured}
+            loading={financialPlanner.loading}
+          />
+        ) : null}
 
         <PlanningSnapshot
           perfil={perfil}

@@ -32,7 +32,8 @@ export type AnalyticsEventName =
   | "budget_planner_opened"
   | "budget_month_ensured"
   | "budget_category_limit_set"
-  | "budget_category_limit_removed";
+  | "budget_category_limit_removed"
+  | "financial_planner_opened";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 

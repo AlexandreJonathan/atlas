@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_FF_NOTIFICATIONS?: string;
   readonly VITE_FF_SMART_GOALS?: string;
   readonly VITE_FF_BUDGET_PLANNER?: string;
+  readonly VITE_FF_FINANCIAL_PLANNER?: string;
   /** Provider Open Finance pretendido: `mock` | `pluggy` (pluggy só após integração). */
   readonly VITE_OF_PROVIDER?: string;
   /** Financial Data Layer: `mock` (default) | `pluggy` (stub OF via PluggyProvider). */

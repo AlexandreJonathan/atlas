@@ -23,6 +23,11 @@ const BudgetPlannerPage = lazy(() =>
     default: m.BudgetPlannerPage,
   })),
 );
+const FinancialPlannerPage = lazy(() =>
+  import("./modules/financial-planner").then((m) => ({
+    default: m.FinancialPlannerPage,
+  })),
+);
 
 function PageFallback() {
   return <div className="atlas-page-loader">Carregando...</div>;
@@ -52,6 +57,7 @@ function App() {
           <Route path="/investimentos" element={<InvestmentsPage />} />
           <Route path="/metas" element={<SmartGoalsPage />} />
           <Route path="/orcamento" element={<BudgetPlannerPage />} />
+          <Route path="/planejamento" element={<FinancialPlannerPage />} />
           <Route path="/atlas-ia" element={<AtlasAIPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
         </Route>

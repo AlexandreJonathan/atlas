@@ -12,6 +12,7 @@ export default defineConfig({
         "src/modules/atlas-intelligence/**/*.ts",
         "src/modules/smart-goals/**/*.ts",
         "src/modules/budget-planner/**/*.ts",
+        "src/modules/financial-planner/**/*.ts",
         "src/modules/pluggy/**/*.ts",
         "src/lib/observability/**/*.ts",
         "src/lib/logging/**/*.ts",

@@ -17,7 +17,8 @@ export type FeatureFlagKey =
   | "investments"
   | "notifications"
   | "smartGoals"
-  | "budgetPlanner";
+  | "budgetPlanner"
+  | "financialPlanner";
 
 export type FeatureFlags = Record<FeatureFlagKey, boolean>;
 
