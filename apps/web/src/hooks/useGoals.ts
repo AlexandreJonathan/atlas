@@ -14,6 +14,8 @@ type NovaMeta = {
   title: string;
   targetAmount: number;
   targetDate: string | null;
+  description?: string | null;
+  category?: import("../types/goal").GoalCategory;
 };
 
 export function useGoals() {
