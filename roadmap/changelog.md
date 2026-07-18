@@ -4,6 +4,22 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 28] — Alpha Deployment Preparation (Missão 28)
+
+Preparação operacional do Alpha — documentação e validador de ambiente. Sem features.
+
+### Adicionado
+- `docs/alpha-deploy.md` (guia completo: login, link, Edges, secrets, front, smoke, rollback).
+- `docs/alpha-production-checklist.md`.
+- `scripts/validate-alpha-env.mjs` (`--strict`, `--json`).
+- `roadmap/sprint-28.md`.
+
+### Alterado
+- `apps/web/.env.example` alinhado ao Alpha.
+- Ponteiros em `docs/deploy.md`.
+
+---
+
 ## [Sprint 27] — Alpha Deployment & Validation (Missão 27)
 
 Auditoria operacional do Alpha — **GO negado** até ambiente remoto válido.

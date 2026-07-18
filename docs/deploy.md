@@ -2,7 +2,10 @@
 
 Este documento descreve como preparar e publicar o Atlas (front-end `apps/web`) em um ambiente acessível fora da máquina de desenvolvimento. Ele complementa `roadmap/arquitetura.md` (arquitetura) e `roadmap/backlog.md` (dívidas técnicas conhecidas).
 
-> **Procurando um passo a passo sem jargão técnico?** Ver [`docs/guia-deploy-fundador.md`](./guia-deploy-fundador.md) — mesmo processo, explicado para quem não programa. Este documento (`deploy.md`) é a referência técnica; o outro é o guia operacional.
+> **Alpha privado (procedimento completo + smoke + rollback):** [`docs/alpha-deploy.md`](./alpha-deploy.md)  
+> **Checklist final (marcar □):** [`docs/alpha-production-checklist.md`](./alpha-production-checklist.md)  
+> **Validador pré-deploy:** `node scripts/validate-alpha-env.mjs` (use `--strict` no dia do Alpha)  
+> **Sem jargão:** [`docs/guia-deploy-fundador.md`](./guia-deploy-fundador.md)
 
 ## 1. Visão Geral
 
