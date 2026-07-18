@@ -47,6 +47,8 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - 🟡 Budget Planner v1.1 — recomendações IA, templates de orçamento, histórico multi-mês, Bottom Nav
 - ✅ ~~Financial Planner~~ — v1.0.2 (`/planejamento`, composição FDL + Budget + Goals)
 - 🟡 Financial Planner v1.1 — cenários what-if, persistência de horizonte, IA de recomendações, prever gastos variáveis
+- ✅ ~~Atlas Intelligence v2.0~~ — RecommendationEngine local + card Home (app 1.1.0)
+- 🟡 Atlas Intelligence v2.1 — chat consome recomendações no mock/system (servidor), dismiss/feedback, mais regras de comportamento, histórico de insights
 - 🟡 "Ver todas as contas" no `UpcomingBillsPanel` (hoje mostra só vencidas/vencendo em 7 dias; contas futuras distantes ou já pagas não aparecem)
 - 🟡 Conversão automática de conta paga (`bills`) em movimentação (`transactions`) — hoje os domínios ficam desacoplados
 - 🟡 Janela de "gastos do mês" (`receitasDoMes`/`despesasDoMes` em `useTransactions`) usa o prefixo `YYYY-MM` de `created_at`; revisitar com um corte de fuso horário mais preciso se necessário

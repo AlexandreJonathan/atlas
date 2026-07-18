@@ -447,6 +447,14 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Home: `FinancialPlannerSummaryCard`; stubs `serializePlanForIntelligence`.
 - Flag `financialPlanner` (`VITE_FF_FINANCIAL_PLANNER`).
 
+### Atlas Intelligence v2.0 (app 1.1.0)
+- `RecommendationEngine` em `atlas-intelligence/engine/recommendations/` — regras locais modulares, sem OpenAI.
+- Consome exclusivamente FDL + Budget + Smart Goals (via plan/forecasts) + Financial Planner.
+- Home card `AtlasInsights` (título Atlas Intelligence): prioridade, categoria, ação sugerida.
+- Chat/Edge permanece na trust boundary; recomendações **não** vão no payload do agente.
+- Flag `atlasIntelligenceV2` (`VITE_FF_ATLAS_INTELLIGENCE_V2`); fallback `insightEngine` se desligada.
+- Prep: `serializeRecommendationsForChat`.
+
 ### Atlas AI Tool Calling (Sprint 22) + Trust Boundary (Sprint 24)
 - Allowlist de tools no **servidor** (`SERVER_TOOL_DEFINITIONS` na Edge). Cliente não envia schemas nem resultados.
 - Fluxo: `OpenAIProvider` → Edge `mode=agent` → loop OpenAI + execução RLS no servidor → `reply` + `toolsUsed` (`contextSource: server_tools`).
@@ -464,7 +472,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Metas não têm histórico individual de aportes, apenas o valor acumulado (`current_amount`).
 - Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" do planejamento financeiro (sem ritmo mensal calculável).
 - Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
-- Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
+- Atlas Intelligence v2 gera recomendações locais via regras; chat OpenAI não produz recomendações proativas ainda. Planejamento continua no `planningEngine` (heurísticas).
 - Testes críticos + CI GitHub Actions (Missão 26); ainda sem E2E. Observabilidade: `x-request-id` Client↔Edge + logs JSON + Sentry tag; analytics sink ainda Noop.
 - Monitoramento de erros em produção: Sentry opcional via `VITE_SENTRY_DSN` (sem DSN o SDK não carrega).
 - Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.

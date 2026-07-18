@@ -4,6 +4,29 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [v1.1.0] — Atlas Intelligence v2.0
+
+Fase 2: assistente financeiro proativo com RecommendationEngine local.
+
+### Adicionado
+- `RecommendationEngine` modular (`Budget`, `Goal`, `Expense`, `Investment`, `Planner`, `Bill`, `Economy` rules).
+- `Recommendation` com título, descrição, prioridade, categoria, ação sugerida e `sourceRule`.
+- Contexto enriquecido (FDL + Budget Planner + Financial Planner / Smart Goals).
+- Card Home **Atlas Intelligence** (1–3 insights priorizados) + loading/empty/error/skeleton.
+- Flag `VITE_FF_ATLAS_INTELLIGENCE_V2` (default `true`).
+- Prep de chat: `serializeRecommendationsForChat` (sem enviar contexto à Edge).
+- Testes `RecommendationEngine.test.ts`.
+
+### Alterado
+- Versão do app `1.1.0`.
+- `useAtlasIntelligence` aceita enriquecimento de domínio; `insightEngine` permanece como fallback (flag off).
+- Trust boundary do chat/OpenAI **inalterada**.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [v1.0.2] — Financial Planner (Módulo 3)
 
 Terceiro módulo da linha 1.0: plano de ação financeiro composto.

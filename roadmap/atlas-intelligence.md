@@ -1,7 +1,41 @@
-# Atlas Intelligence 1.0 — Arquitetura
+# Atlas Intelligence — Arquitetura
 
-**Status:** Implementado (Sprint 12) + chat OpenAI (17) + Tool Calling (22) + Trust Boundary (24)  
-**Escopo:** cérebro da Atlas com Adapter/Provider. Chat real via OpenAI (Edge Function, tools no servidor); Insights/feed locais.
+**Status:** v2.0 (app 1.1.0) — RecommendationEngine proativo + chat OpenAI (trust boundary)  
+**Flag v2:** `VITE_FF_ATLAS_INTELLIGENCE_V2` (default `true`)
+
+---
+
+## 0. Atlas Intelligence v2.0
+
+Assistente **proativo**: analisa FDL + Budget + Smart Goals + Financial Planner e gera recomendações locais.
+
+### Princípios
+- Proativa, contextual, explicável (`sourceRule`), não invasiva, confiável
+- **Nunca inventa dados** — regra omite o insight se faltar evidência
+- **Sem OpenAI** para recomendações (chat permanece separado)
+
+### RecommendationEngine
+
+```
+FDL + Budget + Planner + Goals
+        ↓
+buildRecommendationContext
+        ↓
+RecommendationEngine (regras modulares)
+ ├── BillRecommendationRule
+ ├── BudgetRecommendationRule
+ ├── ExpenseRecommendationRule
+ ├── GoalRecommendationRule
+ ├── InvestmentRecommendationRule
+ ├── PlannerRecommendationRule
+ └── EconomyRecommendationRule
+        ↓
+Top 1–3 → Home (Atlas Intelligence card)
+```
+
+Cada `Recommendation`: `title`, `description`, `priority`, `category`, `suggestedAction`, `tone`, `sourceRule`.
+
+Chat futuro: `serializeRecommendationsForChat` — **não** enviar como `context` na Edge.
 
 ---
 
@@ -10,11 +44,11 @@
 A Atlas Intelligence é o módulo responsável por:
 
 1. Analisar o contexto financeiro do usuário (somente leitura).
-2. Gerar **insights** automáticos por regras.
+2. Gerar **insights/recomendações** automáticos por regras (v2: RecommendationEngine).
 3. Narrar **eventos** em um feed inteligente (evento → saldo → recomendação).
-4. Preparar o caminho para um provider de LLM (`OpenAIProvider` stub).
+4. Chat via OpenAI (Edge) com trust boundary — sem gerar recomendações proativas no LLM.
 
-O restante do sistema (Home, Contas, engines de planejamento/recomendação Sprint 4/5) **não é substituído** — a Intelligence consome dados já agregados pelos hooks existentes.
+O restante do sistema **não é substituído** — a Intelligence consome FDL e módulos de domínio.
 
 ---
 
@@ -23,17 +57,17 @@ O restante do sistema (Home, Contas, engines de planejamento/recomendação Spri
 ```
 UI (Home / Atlas IA)
         ↓
-useAtlasIntelligence / AtlasAIPage
+useAtlasIntelligence (+ enrichment Budget/Planner)
+        ↓
+RecommendationEngine (v2, local) ──→ card Atlas Intelligence
         ↓
 AtlasIntelligenceService
         ↓
 AtlasAIProvider (interface)
- ├── MockAtlasAIProvider     ← flag openai off / fallback
+ ├── MockAtlasAIProvider     ← chat limitado / narrate
  └── OpenAIProvider          ← flag openai on
         │   chat → Edge atlas-ai-chat (agent loop + tools RLS)
-        │   insights / narrate → delega ao mock (Sprint 17)
-        ↓
-Insight Engine (regras puras) — Home
+        │   insights legado → insightEngine (flag v2 off)
 ```
 
 Telas **nunca** importam `OpenAIProvider` diretamente.  
@@ -45,14 +79,17 @@ Telas **nunca** importam `OpenAIProvider` diretamente.
 
 ```
 apps/web/src/modules/atlas-intelligence/
-├── types/           # Insight, FeedItem, IntelligenceContext, FinancialEvent…
-├── engine/          # insightEngine.ts (gerarInsights)
-├── providers/       # AtlasAIProvider, Mock, OpenAI stub
+├── types/           # Insight, Recommendation, IntelligenceContext…
+├── engine/
+│   ├── insightEngine.ts              # legado (flag v2 off)
+│   └── recommendations/              # RecommendationEngine v2 + rules
+├── intelligence/    # serializeRecommendationsForChat
+├── providers/       # AtlasAIProvider, Mock, OpenAI
 ├── services/        # AtlasIntelligenceService
 ├── hooks/           # useAtlasIntelligence
 ├── prompts/         # templates
 ├── tools/           # schemas + registry local (legado; LLM usa Edge)
-├── security/        # agentTrustBoundary (payload seguro do cliente)
+├── security/        # agentTrustBoundary
 ├── components/      # AtlasInsights, IntelligenceFeed
 ├── utils/           # rankInsights, feedStore, format
 └── index.ts
