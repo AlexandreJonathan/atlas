@@ -66,6 +66,9 @@ function FinancialPlannerSummaryCard({
           <p className="atlas-fp-summary-note">
             Guardar/mês: {formatMoney(plan.requiredMonthlySave)} · Risco:{" "}
             {plan.risk}
+            {plan.installmentCommitment > 0
+              ? ` · Parcelas do mês: ${formatMoney(plan.installmentCommitment)}`
+              : ""}
           </p>
         </>
       )}

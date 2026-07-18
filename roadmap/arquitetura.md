@@ -447,10 +447,22 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Home: `FinancialPlannerSummaryCard`; stubs `serializePlanForIntelligence`.
 - Flag `financialPlanner` (`VITE_FF_FINANCIAL_PLANNER`).
 
+### Installment Intelligence (v1.2.0 → UX 1.2.1)
+- Módulo `apps/web/src/modules/installments/` — UI `/parcelas`.
+- Tabelas `installment_plans` + `installment_payments`; cronograma gerado na criação.
+- v1.2.1: marcar paga cria/vincula `transactions` + `transaction_id` (idempotente); hook lê do snapshot FDL.
+- FDL carrega planos; Budget e Planner consomem parcelas pending; Intelligence via `InstallmentRecommendationRule`.
+- Flag `installments` (`VITE_FF_INSTALLMENTS`).
+
+### Atlas Experience (v1.2.1)
+- `budgetMonthStore` — dedupe de fetch de orçamento entre Home/Planner.
+- `/contas-a-pagar` — agenda completa de bills (filtros status/período).
+- Insights: histórico local, dismiss, feedback (prep personalização via `getFeedbackSignals`).
+
 ### Atlas Intelligence v2.0 (app 1.1.0)
 - `RecommendationEngine` em `atlas-intelligence/engine/recommendations/` — regras locais modulares, sem OpenAI.
 - Consome exclusivamente FDL + Budget + Smart Goals (via plan/forecasts) + Financial Planner.
-- Home card `AtlasInsights` (título Atlas Intelligence): prioridade, categoria, ação sugerida.
+- Home card `AtlasInsights` (título Atlas Intelligence): prioridade, categoria, ação sugerida, dismiss/feedback (1.2.1).
 - Chat/Edge permanece na trust boundary; recomendações **não** vão no payload do agente.
 - Flag `atlasIntelligenceV2` (`VITE_FF_ATLAS_INTELLIGENCE_V2`); fallback `insightEngine` se desligada.
 - Prep: `serializeRecommendationsForChat`.
@@ -483,4 +495,6 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 
 ## 13. Próximos Passos Arquiteturais
 
-Ver `backlog.md` para o roadmap de evolução (IA real nas recomendações e no planejamento financeiro, histórico de aportes, edição de movimentações/despesas fixas, categorização, testes automatizados, monitoramento de erros, paginação, design system, deploy automatizado). O checklist de deploy manual para o primeiro Alpha privado está em `docs/deploy.md`.
+**Status oficial da plataforma (base da RC v1.3):** [`status-plataforma-v1.2.1.md`](./status-plataforma-v1.2.1.md).
+
+Ver `backlog.md` para o roadmap de evolução (personalização de insights, vínculo OF de cartão em parcelas, bills→transactions, edição de movimentações/despesas fixas, paginação, E2E). O checklist de deploy manual está em `docs/deploy.md` e no relatório de status.

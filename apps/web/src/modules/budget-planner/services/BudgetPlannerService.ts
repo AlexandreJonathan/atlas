@@ -8,11 +8,12 @@ import {
   type UpsertBudgetCategoryInput,
 } from "../../../services/budgetsService";
 import type { BudgetWithCategories, ExpenseCategory } from "../../../types/budget";
+import type { InstallmentPlanWithPayments } from "../../../types/installment";
 import type { Transaction } from "../../../types/transaction";
 import {
   buildBudgetMonthSummary,
   buildCategorySpendViews,
-  sumSpentByCategory,
+  mergeSpentByCategory,
   type BudgetMonthSummary,
   type CategorySpendView,
 } from "../utils/budgetMath";
@@ -95,17 +96,24 @@ export class BudgetPlannerService {
   buildViews(
     budget: BudgetWithCategories | null,
     transactions: Transaction[],
+    installmentPlans: InstallmentPlanWithPayments[] = [],
   ): CategorySpendView[] {
     if (!budget) return [];
-    const spent = sumSpentByCategory(transactions, budget.year, budget.month);
+    const spent = mergeSpentByCategory(
+      transactions,
+      budget.year,
+      budget.month,
+      installmentPlans,
+    );
     return buildCategorySpendViews(budget.categories, spent);
   }
 
   summarize(
     budget: BudgetWithCategories | null,
     transactions: Transaction[],
+    installmentPlans: InstallmentPlanWithPayments[] = [],
   ): BudgetMonthSummary | null {
-    return buildBudgetMonthSummary(budget, transactions);
+    return buildBudgetMonthSummary(budget, transactions, installmentPlans);
   }
 }
 

@@ -2,6 +2,8 @@
 
 Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas, organizadas por área e priorização. Itens podem ser reorganizados entre sprints conforme necessidade do produto.
 
+**Baseline atual:** plataforma **v1.2.1** (Atlas Experience ✅) — ver [`status-plataforma-v1.2.1.md`](./status-plataforma-v1.2.1.md). Próxima fase alvo: **RC v1.3**.
+
 ## Legenda de Prioridade
 
 - 🔴 Alta — bloqueante para produção ou uso real
@@ -48,8 +50,12 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Financial Planner~~ — v1.0.2 (`/planejamento`, composição FDL + Budget + Goals)
 - 🟡 Financial Planner v1.1 — cenários what-if, persistência de horizonte, IA de recomendações, prever gastos variáveis
 - ✅ ~~Atlas Intelligence v2.0~~ — RecommendationEngine local + card Home (app 1.1.0)
-- 🟡 Atlas Intelligence v2.1 — chat consome recomendações no mock/system (servidor), dismiss/feedback, mais regras de comportamento, histórico de insights
-- 🟡 "Ver todas as contas" no `UpcomingBillsPanel` (hoje mostra só vencidas/vencendo em 7 dias; contas futuras distantes ou já pagas não aparecem)
+- ✅ ~~Atlas Intelligence — dismiss/feedback/histórico~~ — v1.2.1 (`insightPreferencesStore`)
+- 🟡 Atlas Intelligence v2.1 — chat consome recomendações no mock/system (servidor), personalização por feedback, mais regras de comportamento
+- ✅ ~~Installment Intelligence~~ — v1.2.0 (`/parcelas`, FDL + Budget + Planner + regras IA)
+- ✅ ~~Installments — marcar paga com lançamento no ledger~~ — v1.2.1
+- 🟡 Installments v1.3 — vínculo OF cartão, antecipação/quitação, Bottom Nav
+- ✅ ~~"Ver todas as contas"~~ — v1.2.1 (`/contas-a-pagar`)
 - 🟡 Conversão automática de conta paga (`bills`) em movimentação (`transactions`) — hoje os domínios ficam desacoplados
 - 🟡 Janela de "gastos do mês" (`receitasDoMes`/`despesasDoMes` em `useTransactions`) usa o prefixo `YYYY-MM` de `created_at`; revisitar com um corte de fuso horário mais preciso se necessário
 - 🟡 Paginação ou filtro por período nas listagens (transações, contas, metas, despesas fixas) — hoje toda a lista é carregada de uma vez a cada acesso ao Dashboard; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado antes de um uso diário prolongado (a lista só cresce)

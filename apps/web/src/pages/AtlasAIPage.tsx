@@ -10,6 +10,8 @@ import Input from "../components/ui/Input";
 import { usePlanning } from "../hooks/usePlanning";
 import { analytics } from "../lib/analytics";
 import {
+  AtlasInsights,
+  InsightHistory,
   IntelligenceFeed,
   useAtlasIntelligence,
   type ChatMessage,
@@ -22,7 +24,17 @@ import "./AtlasAIPage.css";
 function AtlasAIPage() {
   const financial = useFinancialData();
   const { contas, perfil, despesasFixas, resumo, snapshot, loading, transacoes } = financial;
-  const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, financial.metas);
+  const planejamento = usePlanning(
+    perfil,
+    despesasFixas,
+    resumo,
+    contas,
+    financial.metas,
+    {
+      totalParcelasDoMes: snapshot?.totalParcelasDoMes ?? 0,
+      error: snapshot?.errors.installments ?? null,
+    },
+  );
   const budgetPlanner = useBudgetPlanner();
   const financialPlanner = useFinancialPlanner();
   const intelligence = useAtlasIntelligence(snapshot, loading, planejamento, {
@@ -125,6 +137,14 @@ function AtlasAIPage() {
 
       {mostrarAtividade && (
         <div className="atlas-ai-activity">
+          <AtlasInsights
+            recommendations={intelligence.topRecommendations}
+            insights={intelligence.topInsights}
+            loading={intelligence.loading}
+            error={intelligence.error}
+            onRetry={() => void intelligence.refresh()}
+          />
+          <InsightHistory limit={10} />
           <IntelligenceFeed items={intelligence.feed} limit={8} compact />
         </div>
       )}

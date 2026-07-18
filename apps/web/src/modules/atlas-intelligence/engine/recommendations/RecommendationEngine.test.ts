@@ -4,6 +4,7 @@ import type { RecommendationContext } from "../../types/recommendation";
 import { RecommendationEngine } from "./RecommendationEngine";
 import { BudgetRecommendationRule } from "./BudgetRecommendationRule";
 import { GoalRecommendationRule } from "./GoalRecommendationRule";
+import { InstallmentRecommendationRule } from "./InstallmentRecommendationRule";
 import { InvestmentRecommendationRule } from "./InvestmentRecommendationRule";
 
 function baseContext(
@@ -29,6 +30,10 @@ function baseContext(
     spentByCategoryCurrent: {},
     spentByCategoryPrevious: {},
     investimentosPatrimonio: 0,
+    installmentSummary: null,
+    installmentPlans: [],
+    installmentPressure: [],
+    plansEndingSoon: [],
     ...overrides,
   };
 }
@@ -107,6 +112,9 @@ describe("RecommendationEngine", () => {
           risk: "baixo",
           goalForecasts: [],
           projections: [],
+          installmentCommitment: 0,
+          pressureMonths: [],
+          releaseAfterInstallments: 0,
           generatedAt: "2026-07-15T00:00:00.000Z",
         },
       }),
@@ -139,6 +147,9 @@ describe("RecommendationEngine", () => {
           risk: "baixo",
           goalForecasts: [],
           projections: [],
+          installmentCommitment: 0,
+          pressureMonths: [],
+          releaseAfterInstallments: 0,
           generatedAt: "2026-07-15T00:00:00.000Z",
         },
       }),
@@ -158,5 +169,49 @@ describe("RecommendationEngine", () => {
     const result = engine.getTop(baseContext(), 3);
     expect(result).toHaveLength(1);
     expect(result[0]?.id).toBe("rec-all-clear");
+  });
+
+  it("gera insights de parcelas a partir do compromisso real", () => {
+    const engine = new RecommendationEngine([InstallmentRecommendationRule]);
+    const result = engine.evaluate(
+      baseContext({
+        installmentSummary: {
+          planCount: 2,
+          activePlanCount: 2,
+          totalCommitted: 1850,
+          remainingPayments: 8,
+          nextPayment: null,
+          nextPaymentPlanTitle: null,
+          releaseMonthLabel: "dezembro",
+          releaseAmount: 420,
+          currentMonthImpact: 300,
+        },
+        plansEndingSoon: [
+          {
+            planId: "p1",
+            title: "Celular",
+            lastDueDate: "2026-10-15",
+          },
+          {
+            planId: "p2",
+            title: "Sofá",
+            lastDueDate: "2026-10-20",
+          },
+        ],
+        installmentPressure: [
+          { label: "agosto", amount: 600 },
+          { label: "setembro", amount: 500 },
+          { label: "outubro", amount: 400 },
+        ],
+      }),
+    );
+
+    expect(result.some((r) => r.id === "rec-installments-committed")).toBe(true);
+    expect(
+      result.find((r) => r.id === "rec-installments-committed")?.description,
+    ).toContain("1.850");
+    expect(result.some((r) => r.id === "rec-installments-ending")).toBe(true);
+    expect(result.some((r) => r.id === "rec-installments-release")).toBe(true);
+    expect(result.some((r) => r.id === "rec-installments-pressure")).toBe(true);
   });
 });

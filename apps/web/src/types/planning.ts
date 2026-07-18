@@ -14,6 +14,8 @@ export type PlanningSnapshot = {
   reservaMinima: number;
   totalDespesasFixas: number;
   totalPendenteAPagar: number;
+  /** Parcelas pending do mês (Installment Intelligence) — default 0. */
+  totalParcelasDoMes?: number;
   diasRestantesNoMes: number;
   goals: Pick<Goal, "targetAmount" | "currentAmount" | "targetDate">[];
   hojeISO: string;

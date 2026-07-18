@@ -27,6 +27,7 @@ Todas as migrações em `supabase/migrations/` precisam existir no projeto Supab
 8. `20260716230000_create_pluggy_connections.sql` (itens Pluggy ↔ usuário; só service role na Edge)
 9. `20260718010000_smart_goals_columns.sql` (Smart Goals v1.0 — description, category, status, updated_at)
 10. `20260718020000_budget_planner.sql` (Budget Planner — `transactions.category`, `budgets`, `budget_categories`)
+11. `20260718030000_installment_intelligence.sql` (Installment Intelligence — `installment_plans`, `installment_payments`)
 
 Como aplicar:
 

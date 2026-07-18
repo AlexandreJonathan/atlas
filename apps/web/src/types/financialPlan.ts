@@ -1,4 +1,5 @@
 import type { BudgetMonthSummary } from "../modules/budget-planner/utils/budgetMath";
+import type { InstallmentPlanWithPayments } from "./installment";
 import type { Goal } from "./goal";
 import type { PlanningResult, PlanningSnapshot, RiscoFinanceiro } from "./planning";
 
@@ -48,6 +49,12 @@ export type FinancialPlan = {
   risk: RiscoFinanceiro;
   goalForecasts: GoalForecast[];
   projections: MonthlyProjection[];
+  /** Compromisso de parcelas no mês corrente. */
+  installmentCommitment: number;
+  /** Meses com maior pressão de parcelas no horizonte. */
+  pressureMonths: Array<{ label: string; amount: number }>;
+  /** Valor mensal liberado após o fim das parcelas ativas. */
+  releaseAfterInstallments: number;
   generatedAt: string;
 };
 
@@ -58,6 +65,7 @@ export type FinancialPlanBuildInput = {
   planningResult: PlanningResult;
   goals: Goal[];
   budgetSummary: BudgetMonthSummary | null;
+  installmentPlans?: InstallmentPlanWithPayments[];
   horizonMonths?: number;
   generatedAt?: string;
 };

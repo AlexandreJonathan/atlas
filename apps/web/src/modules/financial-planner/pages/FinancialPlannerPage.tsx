@@ -160,6 +160,35 @@ function FinancialPlannerPage() {
               )}
             </section>
 
+            {plan.installmentCommitment > 0 || plan.pressureMonths.length > 0 ? (
+              <section
+                className="atlas-surface atlas-surface-pad atlas-fp-section"
+                aria-labelledby="fp-parcelas-titulo"
+              >
+                <h2 id="fp-parcelas-titulo">Compromisso com parcelas</h2>
+                <div className="atlas-fp-grid">
+                  <div className="atlas-fp-stat">
+                    <span>Parcelas neste mês</span>
+                    <strong>{formatMoney(plan.installmentCommitment)}</strong>
+                  </div>
+                  <div className="atlas-fp-stat">
+                    <span>Liberação futura</span>
+                    <strong>{formatMoney(plan.releaseAfterInstallments)}</strong>
+                  </div>
+                </div>
+                {plan.pressureMonths.length > 0 ? (
+                  <p className="atlas-fp-goal-meta">
+                    Maior pressão:{" "}
+                    {plan.pressureMonths
+                      .map((m) => `${m.label} (${formatMoney(m.amount)})`)
+                      .join(" · ")}
+                    .{" "}
+                    <Link to="/parcelas">Ver parcelas</Link>
+                  </p>
+                ) : null}
+              </section>
+            ) : null}
+
             <section
               className="atlas-surface atlas-surface-pad atlas-fp-section"
               aria-labelledby="fp-evolucao-titulo"

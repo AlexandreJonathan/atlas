@@ -26,6 +26,10 @@ import {
   useFinancialPlanner,
 } from "../modules/financial-planner";
 import {
+  InstallmentsSummaryCard,
+  useInstallments,
+} from "../modules/installments";
+import {
   SmartGoalsSummaryCard,
   buildSmartGoalsSummary,
 } from "../modules/smart-goals";
@@ -44,15 +48,26 @@ function HomePage() {
   const financial = useFinancialData();
   const { transacoes, contas, metas, perfil, despesasFixas, resumo, snapshot, loading } = financial;
 
-  const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
+  const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas, {
+    totalParcelasDoMes: snapshot?.totalParcelasDoMes ?? 0,
+    error: snapshot?.errors.installments ?? null,
+  });
+  // Budget compartilhado (budgetMonthStore) — um fetch mesmo com useFinancialPlanner aninhado.
   const budgetPlanner = useBudgetPlanner();
   const financialPlanner = useFinancialPlanner();
-  const intelligence = useAtlasIntelligence(snapshot, loading, planejamento, {
-    budgetSummary: budgetPlanner.summary,
-    budgetViews: budgetPlanner.views,
-    plan: financialPlanner.plan,
-    transactions: transacoes.transactions,
-  });
+  // Parcelas vêm do snapshot FDL via useInstallments (sem list fetch paralelo).
+  const installments = useInstallments();
+  const intelligence = useAtlasIntelligence(
+    snapshot,
+    loading || budgetPlanner.loading,
+    planejamento,
+    {
+      budgetSummary: budgetPlanner.summary,
+      budgetViews: budgetPlanner.views,
+      plan: financialPlanner.plan,
+      transactions: transacoes.transactions,
+    },
+  );
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -102,6 +117,13 @@ function HomePage() {
           error={intelligence.error}
           onRetry={() => void intelligence.refresh()}
         />
+
+        {featureFlagService.isEnabled("installments") ? (
+          <InstallmentsSummaryCard
+            summary={installments.summary}
+            loading={installments.loading}
+          />
+        ) : null}
 
         {featureFlagService.isEnabled("budgetPlanner") ? (
           <BudgetSummaryCard

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import type { useBills } from "../../hooks/useBills";
 import AsyncStateView from "../AsyncStateView";
 import Button from "../ui/Button";
@@ -26,6 +28,10 @@ function BillsTimeline({ contas }: BillsTimelineProps) {
     <section className="atlas-surface atlas-surface-pad atlas-bills-timeline" aria-labelledby="timeline-titulo">
       <div className="atlas-home-block-header">
         <h2 id="timeline-titulo">Hoje e próximos</h2>
+        <Link to="/contas-a-pagar" className="atlas-bills-timeline-all">
+          Ver todas
+          <ChevronRight size={16} aria-hidden="true" />
+        </Link>
       </div>
 
       <AsyncStateView

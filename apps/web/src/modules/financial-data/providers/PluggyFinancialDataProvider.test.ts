@@ -20,6 +20,7 @@ const emptyLedger = {
   goals: [],
   profile: null,
   fixedExpenses: [],
+  installmentPlans: [],
   errors: {},
 };
 

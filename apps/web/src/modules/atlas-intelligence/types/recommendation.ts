@@ -1,6 +1,8 @@
 import type { BudgetMonthSummary, CategorySpendView } from "../../budget-planner/utils/budgetMath";
+import type { InstallmentSummary } from "../../installments/utils/installmentMath";
 import type { FinancialPlan, GoalForecast } from "../../../types/financialPlan";
 import type { Goal } from "../../../types/goal";
+import type { InstallmentPlanWithPayments } from "../../../types/installment";
 import type { Transaction } from "../../../types/transaction";
 import type { ExpenseCategory } from "../../../types/budget";
 import type { InsightTone } from "./index";
@@ -63,6 +65,10 @@ export type RecommendationContext = {
   spentByCategoryCurrent: Partial<Record<ExpenseCategory, number>>;
   spentByCategoryPrevious: Partial<Record<ExpenseCategory, number>>;
   investimentosPatrimonio: number;
+  installmentSummary: InstallmentSummary | null;
+  installmentPlans: InstallmentPlanWithPayments[];
+  installmentPressure: Array<{ label: string; amount: number }>;
+  plansEndingSoon: Array<{ planId: string; title: string; lastDueDate: string }>;
 };
 
 export type RecommendationRule = {

@@ -4,6 +4,11 @@ import {
   budgetCapacityForGoals,
   type BudgetMonthSummary,
 } from "../../budget-planner/utils/budgetMath";
+import {
+  buildInstallmentSummary,
+  monthlyCommitmentMap,
+  pressureMonths as computePressureMonths,
+} from "../../installments/utils/installmentMath";
 import type {
   FinancialPlan,
   FinancialPlanBuildInput,
@@ -44,7 +49,10 @@ export function computeMonthlySurplus(snapshot: PlanningSnapshot): {
   monthlySurplus: number;
 } {
   const monthlyIncome = snapshot.rendaMensal;
-  const monthlyExpenses = snapshot.totalDespesasFixas + snapshot.totalPendenteAPagar;
+  const monthlyExpenses =
+    snapshot.totalDespesasFixas +
+    snapshot.totalPendenteAPagar +
+    (snapshot.totalParcelasDoMes ?? 0);
   return {
     monthlyIncome,
     monthlyExpenses,
@@ -149,14 +157,18 @@ export function buildMonthlyProjections(input: {
   monthlyFixedExpenses: number;
   contributionCapacity: number;
   horizonMonths: number;
+  /** Compromisso de parcelas por YYYY-MM. */
+  installmentByMonth?: Record<string, number>;
 }): MonthlyProjection[] {
   const projections: MonthlyProjection[] = [];
   let balance = input.startingProjectedBalance;
 
   for (let i = 0; i < input.horizonMonths; i += 1) {
     const { year, month } = advanceMonth(input.year, input.month, i);
+    const key = `${year}-${String(month).padStart(2, "0")}`;
     const projectedIncome = input.monthlyIncome;
-    const projectedExpenses = input.monthlyFixedExpenses;
+    const installment = input.installmentByMonth?.[key] ?? 0;
+    const projectedExpenses = input.monthlyFixedExpenses + installment;
     const projectedSurplus = projectedIncome - projectedExpenses;
     const projectedContribution = Math.min(
       Math.max(0, projectedSurplus),
@@ -202,6 +214,25 @@ export function buildFinancialPlan(input: FinancialPlanBuildInput): FinancialPla
     contributionCapacity - planningResult.quantoPrecisaGuardar,
   );
 
+  const installmentPlans = input.installmentPlans ?? [];
+  const installmentByMonth = monthlyCommitmentMap(
+    installmentPlans,
+    year,
+    month,
+    horizon,
+  );
+  const installmentSummary = buildInstallmentSummary(
+    installmentPlans,
+    snapshot.hojeISO,
+  );
+  const pressure = computePressureMonths(
+    installmentPlans,
+    year,
+    month,
+    horizon,
+    3,
+  ).map((row) => ({ label: row.label, amount: row.amount }));
+
   return {
     id: `${input.userId}-${year}-${String(month).padStart(2, "0")}`,
     userId: input.userId,
@@ -231,7 +262,11 @@ export function buildFinancialPlan(input: FinancialPlanBuildInput): FinancialPla
       monthlyFixedExpenses: snapshot.totalDespesasFixas,
       contributionCapacity,
       horizonMonths: horizon,
+      installmentByMonth,
     }),
+    installmentCommitment: snapshot.totalParcelasDoMes ?? 0,
+    pressureMonths: pressure,
+    releaseAfterInstallments: installmentSummary.releaseAmount,
     generatedAt,
   };
 }

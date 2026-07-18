@@ -11,10 +11,12 @@ type ComposeInput = {
   despesasDoMes: number;
   totalDespesasFixas: number;
   totalPendenteAPagar: number;
+  totalParcelasDoMes?: number;
   goals: Goal[];
   fixedExpensesError?: string | null;
   billsError?: string | null;
   goalsError?: string | null;
+  installmentsError?: string | null;
   hojeISO?: string;
 };
 
@@ -36,6 +38,9 @@ export class FinancialPlannerRepository {
       reservaMinima: input.profile.minimumReserve,
       totalDespesasFixas: input.fixedExpensesError ? 0 : input.totalDespesasFixas,
       totalPendenteAPagar: input.billsError ? 0 : input.totalPendenteAPagar,
+      totalParcelasDoMes: input.installmentsError
+        ? 0
+        : (input.totalParcelasDoMes ?? 0),
       diasRestantesNoMes: getDiasRestantesNoMes(hojeISO),
       goals: input.goalsError ? [] : input.goals,
       hojeISO,

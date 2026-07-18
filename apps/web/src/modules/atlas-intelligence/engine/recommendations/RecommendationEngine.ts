@@ -10,6 +10,7 @@ import { BudgetRecommendationRule } from "./BudgetRecommendationRule";
 import { EconomyRecommendationRule } from "./EconomyRecommendationRule";
 import { ExpenseRecommendationRule } from "./ExpenseRecommendationRule";
 import { GoalRecommendationRule } from "./GoalRecommendationRule";
+import { InstallmentRecommendationRule } from "./InstallmentRecommendationRule";
 import { InvestmentRecommendationRule } from "./InvestmentRecommendationRule";
 import { PlannerRecommendationRule } from "./PlannerRecommendationRule";
 import { recommendation } from "./helpers";
@@ -22,6 +23,7 @@ const DEFAULT_RULES: RecommendationRule[] = [
   InvestmentRecommendationRule,
   PlannerRecommendationRule,
   EconomyRecommendationRule,
+  InstallmentRecommendationRule,
 ];
 
 /**
@@ -114,6 +116,7 @@ export {
   EconomyRecommendationRule,
   ExpenseRecommendationRule,
   GoalRecommendationRule,
+  InstallmentRecommendationRule,
   InvestmentRecommendationRule,
   PlannerRecommendationRule,
 };

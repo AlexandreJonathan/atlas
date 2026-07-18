@@ -60,6 +60,53 @@
   animation: atlas-rise var(--duration-slow) var(--ease-standard) both;
 }
 
+.atlas-insights-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-insights-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.atlas-insights-feedback,
+.atlas-insights-dismiss {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.atlas-insights-feedback:hover,
+.atlas-insights-dismiss:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong, var(--color-border-subtle));
+}
+
+.atlas-insights-feedback.is-active {
+  color: var(--color-brand);
+  border-color: var(--color-brand);
+  background: var(--color-brand-soft);
+}
+
+.atlas-insights-dismiss:hover {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
 .atlas-insights-rank {
   flex-shrink: 0;
   width: 24px;

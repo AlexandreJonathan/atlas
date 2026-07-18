@@ -4,6 +4,57 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [v1.2.1] — Atlas Experience ✅ Concluída
+
+**Status:** Concluída  
+**Versão do produto:** `1.2.1` (`apps/web/package.json` + `APP_VERSION`)  
+**Documento de status:** [`status-plataforma-v1.2.1.md`](./status-plataforma-v1.2.1.md)
+
+Fase 3.1: UX, performance e fechamento de ciclos — sem novo domínio de negócio.
+Inclui na mesma entrega a base Installment Intelligence (v1.2.0) ainda não publicada em `main`.
+
+### Adicionado
+- Marcar parcela paga cria/vincula despesa no FDL (`transaction_id`) com anti-duplicidade.
+- Preferências de insight: histórico, dismiss, feedback Útil/Não útil (`insightPreferencesStore`).
+- Tela `/contas-a-pagar` (futuras, vencidas, pagas + filtro de período) com link na Home.
+- `budgetMonthStore` — dedupe de fetch do orçamento entre mounts.
+- Testes: `InstallmentsService`, `InstallmentRecommendationRule`, `insightPreferencesStore`, `budgetMonthStore`.
+- Relatório oficial de plataforma (`roadmap/status-plataforma-v1.2.1.md`).
+
+### Alterado
+- `useInstallments` lê planos do snapshot FDL (elimina list fetch paralelo na Home).
+- Card Atlas Intelligence com ações de feedback/dismiss; histórico na página Atlas IA.
+- Versão do app `1.2.1`.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
+## [v1.2.0] — Installment Intelligence
+
+Fase 3: compras parceladas com impacto em FDL, Budget, Planner e Intelligence.
+
+### Adicionado
+- Migração `20260718030000_installment_intelligence.sql` (`installment_plans`, `installment_payments` + RLS).
+- Módulo `modules/installments/` (service, hook, tela `/parcelas`, summary card, math).
+- Integração FDL (`totalParcelasDoMes` / `totalParcelasPendentes`).
+- Budget: gastos do mês incluem parcelas pending (sem double-count).
+- Financial Planner: compromisso, pressão e liberação futura.
+- `InstallmentRecommendationRule` no RecommendationEngine.
+- Flag `VITE_FF_INSTALLMENTS` (default `true`).
+- Testes `installmentMath.test.ts`.
+- `roadmap/installments.md`.
+
+### Alterado
+- Versão do app `1.2.0`.
+- `planningEngine` / `PlanningSnapshot` com `totalParcelasDoMes`.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [v1.1.0] — Atlas Intelligence v2.0
 
 Fase 2: assistente financeiro proativo com RecommendationEngine local.

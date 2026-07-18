@@ -26,12 +26,18 @@ const INTERVALO_ATUALIZACAO_MS = 5 * 60 * 1000;
 // único PlanningSnapshot e delega ao motor de regras (hoje) ou a um
 // provider de IA (no futuro) por trás do mesmo contrato PlanningProvider —
 // mesmo padrão de useRecommendations.
+type ParcelasSlice = {
+  totalParcelasDoMes?: number;
+  error?: string | null;
+};
+
 export function usePlanning(
   perfil: PerfilSlice,
   despesasFixas: DespesasFixasSlice,
   resumo: ResumoSlice,
   contas: ContasSlice,
   metas: MetasSlice,
+  parcelas: ParcelasSlice = {},
 ) {
   const [resultado, setResultado] = useState<PlanningResult | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -63,6 +69,7 @@ export function usePlanning(
       reservaMinima: perfil.profile.minimumReserve,
       totalDespesasFixas: despesasFixas.error ? 0 : despesasFixas.totalDespesasFixas,
       totalPendenteAPagar: contas.error ? 0 : contas.totalPendenteAPagar,
+      totalParcelasDoMes: parcelas.error ? 0 : (parcelas.totalParcelasDoMes ?? 0),
       diasRestantesNoMes: getDiasRestantesNoMes(hojeISO),
       goals: metas.error ? [] : metas.goals,
       hojeISO,
@@ -78,6 +85,8 @@ export function usePlanning(
     contas.error,
     metas.goals,
     metas.error,
+    parcelas.totalParcelasDoMes,
+    parcelas.error,
     hojeISO,
   ]);
 

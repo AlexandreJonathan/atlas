@@ -43,6 +43,20 @@ export {
 
 export { default as AtlasInsights } from "./components/AtlasInsights";
 export { default as IntelligenceFeed } from "./components/IntelligenceFeed";
+export { default as InsightHistory } from "./components/InsightHistory";
+export { useInsightPreferences } from "./hooks/useInsightPreferences";
+export {
+  dismissInsight,
+  filterActiveInsights,
+  getFeedbackSignals,
+  getInsightHistory,
+  recordInsightsSeen,
+  setInsightFeedback,
+} from "./utils/insightPreferencesStore";
+export type {
+  InsightFeedbackValue,
+  InsightHistoryEntry,
+} from "./utils/insightPreferencesStore";
 
 export {
   AtlasToolRegistry,

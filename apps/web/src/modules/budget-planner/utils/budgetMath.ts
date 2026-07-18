@@ -4,7 +4,9 @@ import type {
   BudgetWithCategories,
   ExpenseCategory,
 } from "../../../types/budget";
+import type { InstallmentPlanWithPayments } from "../../../types/installment";
 import type { Transaction } from "../../../types/transaction";
+import { sumPendingByCategory } from "../../installments/utils/installmentMath";
 
 export const BUDGET_WARNING_RATIO = 0.8;
 
@@ -96,16 +98,39 @@ export function buildCategorySpendViews(
     .sort((a, b) => b.usedRatio - a.usedRatio);
 }
 
+/** Une gastos de transactions + parcelas pending (sem double-count via transaction_id). */
+export function mergeSpentByCategory(
+  transactions: Transaction[],
+  year: number,
+  month: number,
+  installmentPlans: InstallmentPlanWithPayments[] = [],
+): Partial<Record<ExpenseCategory, number>> {
+  const spent = sumSpentByCategory(transactions, year, month);
+  const fromInstallments = sumPendingByCategory(
+    installmentPlans.filter((p) => p.status !== "cancelled"),
+    year,
+    month,
+  );
+  const merged: Partial<Record<ExpenseCategory, number>> = { ...spent };
+  for (const [key, value] of Object.entries(fromInstallments)) {
+    const cat = key as ExpenseCategory;
+    merged[cat] = (merged[cat] ?? 0) + (value ?? 0);
+  }
+  return merged;
+}
+
 export function buildBudgetMonthSummary(
   budget: BudgetWithCategories | null,
   transactions: Transaction[],
+  installmentPlans: InstallmentPlanWithPayments[] = [],
 ): BudgetMonthSummary | null {
   if (!budget) return null;
 
-  const spentByCategory = sumSpentByCategory(
+  const spentByCategory = mergeSpentByCategory(
     transactions,
     budget.year,
     budget.month,
+    installmentPlans,
   );
   const views = buildCategorySpendViews(budget.categories, spentByCategory);
 

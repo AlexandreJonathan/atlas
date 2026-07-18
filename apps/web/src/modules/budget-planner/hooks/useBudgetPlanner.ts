@@ -2,10 +2,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFriendlyErrorMessage } from "../../../lib/errorMessages";
 import { useAuth } from "../../../hooks/useAuth";
 import type { ExpenseCategory } from "../../../types/budget";
-import type { BudgetWithCategories } from "../../../types/budget";
 import { useFinancialData } from "../../financial-data";
 import { budgetPlannerService } from "../services/BudgetPlannerService";
 import type { BudgetMonthSummary, CategorySpendView } from "../utils/budgetMath";
+import {
+  budgetMonthKey,
+  getSharedBudgetState,
+  loadSharedBudgetMonth,
+  reloadSharedBudgetMonth,
+  setSharedBudget,
+  subscribeSharedBudget,
+} from "../utils/budgetMonthStore";
 
 export type SetBudgetCategoryInput = {
   category: ExpenseCategory;
@@ -19,62 +26,71 @@ function currentPeriod(now = new Date()) {
 
 /**
  * Hook da tela Budget Planner.
- * Gastos vêm da FDL (transactions); mutações de limite só tocam budgets.
+ * Gastos vêm da FDL; limites do mês são compartilhados entre mounts (Home + Planner).
  */
 export function useBudgetPlanner() {
   const { user } = useAuth();
   const userId = user?.id;
   const financial = useFinancialData();
   const transactions = financial.transacoes.transactions;
+  const installmentPlans = useMemo(
+    () => financial.snapshot?.installmentPlans ?? [],
+    [financial.snapshot?.installmentPlans],
+  );
 
   const period = useMemo(() => currentPeriod(), []);
-  const [budget, setBudget] = useState<BudgetWithCategories | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const key = userId
+    ? budgetMonthKey(userId, period.year, period.month)
+    : "";
+
+  const [tick, setTick] = useState(0);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  useEffect(() => subscribeSharedBudget(() => setTick((n) => n + 1)), []);
+
+  const shared = getSharedBudgetState();
+  const budget = key && shared.key === key ? shared.budget : null;
+  const loading = Boolean(key) && (shared.key !== key || shared.loading || !shared.loaded);
+  const error =
+    key && shared.key === key && shared.error
+      ? getFriendlyErrorMessage(shared.error, "Não foi possível carregar o orçamento.")
+      : null;
+
   const reload = useCallback(async () => {
-    if (!userId) {
-      setBudget(null);
-      setLoading(false);
+    if (!userId || !key) {
       return;
     }
-    setLoading(true);
-    setError(null);
-    try {
-      const row = await budgetPlannerService.getMonth(
-        userId,
-        period.year,
-        period.month,
-      );
-      setBudget(row);
-    } catch (erro) {
-      setError(
-        getFriendlyErrorMessage(erro, "Não foi possível carregar o orçamento."),
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, period.year, period.month]);
+    await reloadSharedBudgetMonth(key, () =>
+      budgetPlannerService.getMonth(userId, period.year, period.month),
+    );
+  }, [userId, key, period.year, period.month]);
 
   useEffect(() => {
+    if (!userId || !key) return;
     let active = true;
     Promise.resolve().then(() => {
-      if (active) void reload();
+      if (active) {
+        void loadSharedBudgetMonth(key, () =>
+          budgetPlannerService.getMonth(userId, period.year, period.month),
+        );
+      }
     });
     return () => {
       active = false;
     };
-  }, [reload]);
+  }, [userId, key, period.year, period.month]);
+
+  void tick;
 
   const views: CategorySpendView[] = useMemo(
-    () => budgetPlannerService.buildViews(budget, transactions),
-    [budget, transactions],
+    () => budgetPlannerService.buildViews(budget, transactions, installmentPlans),
+    [budget, transactions, installmentPlans],
   );
 
   const summary: BudgetMonthSummary | null = useMemo(
-    () => budgetPlannerService.summarize(budget, transactions),
-    [budget, transactions],
+    () =>
+      budgetPlannerService.summarize(budget, transactions, installmentPlans),
+    [budget, transactions, installmentPlans],
   );
 
   return {
@@ -89,7 +105,7 @@ export function useBudgetPlanner() {
     transactionsLoading: financial.transacoes.loading,
     reload,
     setCategoryLimit: async (input: SetBudgetCategoryInput) => {
-      if (!userId) throw new Error("Usuário não autenticado.");
+      if (!userId || !key) throw new Error("Usuário não autenticado.");
       setActionError(null);
       try {
         const next = await budgetPlannerService.setCategoryLimit({
@@ -98,7 +114,7 @@ export function useBudgetPlanner() {
           month: period.month,
           ...input,
         });
-        setBudget(next);
+        setSharedBudget(key, { budget: next, loaded: true, loading: false, error: null });
       } catch (erro) {
         const message = getFriendlyErrorMessage(
           erro,
@@ -109,7 +125,7 @@ export function useBudgetPlanner() {
       }
     },
     removeCategoryLimit: async (categoryId: string) => {
-      if (!userId) return;
+      if (!userId || !key) return;
       setActionError(null);
       try {
         const next = await budgetPlannerService.removeCategoryLimit(
@@ -118,7 +134,7 @@ export function useBudgetPlanner() {
           period.year,
           period.month,
         );
-        setBudget(next);
+        setSharedBudget(key, { budget: next, loaded: true, loading: false, error: null });
       } catch (erro) {
         setActionError(
           getFriendlyErrorMessage(erro, "Não foi possível remover o limite."),

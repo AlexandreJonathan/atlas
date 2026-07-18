@@ -9,6 +9,10 @@ import {
   sumReceitas,
   sumReceitasDoMes,
 } from "./aggregate";
+import {
+  pendingUnlinkedPayments,
+  sumPendingInMonth,
+} from "../../installments/utils/installmentMath";
 import type { LedgerBundle } from "./loadLedger";
 
 export function buildFinancialSnapshot(input: {
@@ -20,7 +24,14 @@ export function buildFinancialSnapshot(input: {
   investments?: MockInvestmentsSnapshot;
 }): FinancialSnapshot {
   const investments = input.investments ?? MOCK_INVESTMENTS;
-  const { transactions, bills, goals, profile, fixedExpenses } = input.ledger;
+  const {
+    transactions,
+    bills,
+    goals,
+    profile,
+    fixedExpenses,
+    installmentPlans,
+  } = input.ledger;
   const billSlices = deriveBillSlices(bills);
   const receitas = sumReceitas(transactions);
   const despesas = sumDespesas(transactions);
@@ -30,6 +41,15 @@ export function buildFinancialSnapshot(input: {
   if (input.openFinanceError) {
     errors.openFinance = input.openFinanceError;
   }
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const activePlans = installmentPlans.filter((p) => p.status !== "cancelled");
+  const totalParcelasDoMes = sumPendingInMonth(activePlans, year, month);
+  const totalParcelasPendentes = activePlans
+    .flatMap((p) => pendingUnlinkedPayments(p.payments))
+    .reduce((acc, p) => acc + p.amount, 0);
 
   return {
     userId: input.userId,
@@ -42,12 +62,15 @@ export function buildFinancialSnapshot(input: {
     despesas,
     receitasDoMes: sumReceitasDoMes(transactions),
     despesasDoMes: sumDespesasDoMes(transactions),
-    quantoPossoGastar: saldo - billSlices.totalPendenteAPagar,
+    quantoPossoGastar: saldo - billSlices.totalPendenteAPagar - totalParcelasDoMes,
     transactions,
     bills,
     goals,
     profile,
     fixedExpenses,
+    installmentPlans,
+    totalParcelasDoMes,
+    totalParcelasPendentes,
     totalDespesasFixas: sumFixedExpenses(fixedExpenses),
     totalPendenteAPagar: billSlices.totalPendenteAPagar,
     contasVencidas: billSlices.contasVencidas,

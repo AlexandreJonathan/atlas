@@ -53,11 +53,14 @@ export function useFinancialPlanner() {
       despesasDoMes: financial.resumo.despesasDoMes,
       totalDespesasFixas: financial.despesasFixas.totalDespesasFixas,
       totalPendenteAPagar: financial.contas.totalPendenteAPagar,
+      totalParcelasDoMes: financial.snapshot?.totalParcelasDoMes ?? 0,
       goals: financial.metas.goals,
       budgetSummary: budget.summary,
+      installmentPlans: financial.snapshot?.installmentPlans ?? [],
       fixedExpensesError: financial.despesasFixas.error,
       billsError: financial.contas.error,
       goalsError: financial.metas.error,
+      installmentsError: financial.snapshot?.errors?.installments ?? null,
       hojeISO,
     });
   }, [
@@ -72,6 +75,9 @@ export function useFinancialPlanner() {
     financial.contas.error,
     financial.metas.goals,
     financial.metas.error,
+    financial.snapshot?.totalParcelasDoMes,
+    financial.snapshot?.installmentPlans,
+    financial.snapshot?.errors,
     budget.summary,
     hojeISO,
   ]);

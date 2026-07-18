@@ -4,6 +4,7 @@ import { calcularPlanejamento } from "../../../lib/planningEngine";
 import type { FinancialPlan, FinancialPlanBuildInput } from "../../../types/financialPlan";
 import type { BudgetMonthSummary } from "../../budget-planner/utils/budgetMath";
 import type { Goal } from "../../../types/goal";
+import type { InstallmentPlanWithPayments } from "../../../types/installment";
 import type { PlanningSnapshot } from "../../../types/planning";
 import { financialPlannerRepository } from "../repository/FinancialPlannerRepository";
 import { buildFinancialPlan } from "../utils/planMath";
@@ -33,11 +34,14 @@ export class FinancialPlannerService {
     despesasDoMes: number;
     totalDespesasFixas: number;
     totalPendenteAPagar: number;
+    totalParcelasDoMes?: number;
     goals: Goal[];
     budgetSummary: BudgetMonthSummary | null;
+    installmentPlans?: InstallmentPlanWithPayments[];
     fixedExpensesError?: string | null;
     billsError?: string | null;
     goalsError?: string | null;
+    installmentsError?: string | null;
     hojeISO?: string;
     horizonMonths?: number;
   }): FinancialPlan | null {
@@ -48,10 +52,12 @@ export class FinancialPlannerService {
       despesasDoMes: input.despesasDoMes,
       totalDespesasFixas: input.totalDespesasFixas,
       totalPendenteAPagar: input.totalPendenteAPagar,
+      totalParcelasDoMes: input.totalParcelasDoMes,
       goals: input.goals,
       fixedExpensesError: input.fixedExpensesError,
       billsError: input.billsError,
       goalsError: input.goalsError,
+      installmentsError: input.installmentsError,
       hojeISO: input.hojeISO,
     });
 
@@ -66,6 +72,7 @@ export class FinancialPlannerService {
       budgetSummary: financialPlannerRepository.normalizeBudgetSummary(
         input.budgetSummary,
       ),
+      installmentPlans: input.installmentPlans,
       horizonMonths: input.horizonMonths,
     });
   }

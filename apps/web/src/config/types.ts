@@ -19,7 +19,8 @@ export type FeatureFlagKey =
   | "smartGoals"
   | "budgetPlanner"
   | "financialPlanner"
-  | "atlasIntelligenceV2";
+  | "atlasIntelligenceV2"
+  | "installments";
 
 export type FeatureFlags = Record<FeatureFlagKey, boolean>;
 

@@ -205,6 +205,7 @@ export class FinancialDataService {
         goals: next.goals ?? current.goals,
         profile: next.profile !== undefined ? next.profile : current.profile,
         fixedExpenses: next.fixedExpenses ?? current.fixedExpenses,
+        installmentPlans: current.installmentPlans,
         errors: current.errors,
       },
       openFinance: current.openFinance,

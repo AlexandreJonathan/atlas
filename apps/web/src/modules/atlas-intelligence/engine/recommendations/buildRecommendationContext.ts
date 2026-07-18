@@ -2,6 +2,10 @@ import { getTodayISO } from "../../../../lib/dateUtils";
 import { sumSpentByCategory } from "../../../budget-planner/utils/budgetMath";
 import type { BudgetMonthSummary, CategorySpendView } from "../../../budget-planner/utils/budgetMath";
 import type { FinancialSnapshot } from "../../../financial-data";
+import {
+  buildInstallmentSummary,
+  pressureMonths,
+} from "../../../installments/utils/installmentMath";
 import type { FinancialPlan } from "../../../../types/financialPlan";
 import type { Transaction } from "../../../../types/transaction";
 import type { RecommendationContext } from "../../types/recommendation";
@@ -31,8 +35,7 @@ export type RecommendationEnrichment = {
 };
 
 /**
- * Monta RecommendationContext a partir da FDL + Budget + Financial Planner.
- * Sem inventar números: campos ausentes ficam vazios/nulos.
+ * Monta RecommendationContext a partir da FDL + Budget + Financial Planner + Parcelas.
  */
 export function buildRecommendationContext(
   snapshot: FinancialSnapshot | null,
@@ -44,6 +47,7 @@ export function buildRecommendationContext(
   const month = m!;
   const prev = previousMonth(year, month);
   const transactions = enrichment.transactions;
+  const installmentPlans = snapshot?.installmentPlans ?? [];
 
   const spentByCategoryCurrent = sumSpentByCategory(transactions, year, month);
   const spentByCategoryPrevious = sumSpentByCategory(
@@ -55,9 +59,57 @@ export function buildRecommendationContext(
   const hasPreviousActivity =
     previousTotals.receitas > 0 || previousTotals.despesas > 0;
 
+  const installmentSummary =
+    installmentPlans.length > 0
+      ? buildInstallmentSummary(installmentPlans, hojeISO)
+      : null;
+
+  const installmentPressure = pressureMonths(
+    installmentPlans,
+    year,
+    month,
+    6,
+    3,
+  ).map((row) => ({ label: row.label, amount: row.amount }));
+
+  const plansEndingSoon = installmentPlans
+    .filter((plan) => plan.status === "active")
+    .map((plan) => {
+      const last = plan.payments
+        .slice()
+        .sort((a, b) => b.sequence - a.sequence)[0];
+      if (!last) return null;
+      const due = last.dueDate;
+      const [dy, dm] = due.split("-").map(Number);
+      const monthsAhead = (dy! - year) * 12 + (dm! - month);
+      if (monthsAhead < 0 || monthsAhead > 3) return null;
+      return {
+        planId: plan.id,
+        title: plan.description,
+        lastDueDate: due,
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row != null);
+
+  const base = {
+    hojeISO,
+    goalForecasts: enrichment.plan?.goalForecasts ?? [],
+    budgetSummary: enrichment.budgetSummary,
+    budgetViews: enrichment.budgetViews,
+    plan: enrichment.plan,
+    risco: enrichment.plan?.risk ?? null,
+    transactions,
+    spentByCategoryCurrent,
+    spentByCategoryPrevious,
+    installmentSummary,
+    installmentPlans,
+    installmentPressure,
+    plansEndingSoon,
+  };
+
   if (!snapshot) {
     return {
-      hojeISO,
+      ...base,
       saldo: 0,
       patrimonio: 0,
       receitasDoMes: 0,
@@ -67,14 +119,6 @@ export function buildRecommendationContext(
       contasProximas: [],
       contasVencidas: [],
       goals: [],
-      goalForecasts: enrichment.plan?.goalForecasts ?? [],
-      budgetSummary: enrichment.budgetSummary,
-      budgetViews: enrichment.budgetViews,
-      plan: enrichment.plan,
-      risco: enrichment.plan?.risk ?? null,
-      transactions,
-      spentByCategoryCurrent,
-      spentByCategoryPrevious,
       investimentosPatrimonio: 0,
     };
   }
@@ -83,7 +127,7 @@ export function buildRecommendationContext(
   const goalsError = Boolean(snapshot.errors.goals);
 
   return {
-    hojeISO,
+    ...base,
     saldo: snapshot.saldo,
     patrimonio: snapshot.patrimonio,
     receitasDoMes: snapshot.receitasDoMes,
@@ -102,14 +146,6 @@ export function buildRecommendationContext(
       amount: c.amount,
     })),
     goals: goalsError ? [] : snapshot.goals,
-    goalForecasts: enrichment.plan?.goalForecasts ?? [],
-    budgetSummary: enrichment.budgetSummary,
-    budgetViews: enrichment.budgetViews,
-    plan: enrichment.plan,
-    risco: enrichment.plan?.risk ?? null,
-    transactions,
-    spentByCategoryCurrent,
-    spentByCategoryPrevious,
     investimentosPatrimonio: snapshot.investimentosPatrimonio,
   };
 }

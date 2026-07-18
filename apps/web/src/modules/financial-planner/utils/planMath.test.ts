@@ -105,5 +105,7 @@ describe("planMath", () => {
     expect(plan.projections).toHaveLength(4);
     expect(plan.goalForecasts).toHaveLength(1);
     expect(plan.investmentCapacity).toBeGreaterThanOrEqual(0);
+    expect(plan.installmentCommitment).toBe(0);
+    expect(plan.pressureMonths).toEqual([]);
   });
 });

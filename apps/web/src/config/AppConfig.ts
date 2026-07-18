@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.2.1";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;
@@ -41,6 +41,7 @@ function resolveFeatureFlags(): FeatureFlags {
       import.meta.env.VITE_FF_ATLAS_INTELLIGENCE_V2,
       true,
     ),
+    installments: parseBool(import.meta.env.VITE_FF_INSTALLMENTS, true),
   };
 }
 

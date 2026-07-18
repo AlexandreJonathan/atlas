@@ -8,6 +8,7 @@ import type { Bill } from "../../../types/bill";
 import type { FinancialProfile } from "../../../types/financialProfile";
 import type { FixedExpense } from "../../../types/fixedExpense";
 import type { Goal } from "../../../types/goal";
+import type { InstallmentPlanWithPayments } from "../../../types/installment";
 import type { Transaction } from "../../../types/transaction";
 
 /** Escopos de invalidação de cache da Financial Data Layer. */
@@ -19,6 +20,7 @@ export type FinancialDataErrors = {
   goals?: string;
   profile?: string;
   fixedExpenses?: string;
+  installments?: string;
   openFinance?: string;
 };
 
@@ -49,6 +51,12 @@ export type FinancialSnapshot = {
   goals: Goal[];
   profile: FinancialProfile | null;
   fixedExpenses: FixedExpense[];
+  /** Planos parcelados com cronograma (Installment Intelligence). */
+  installmentPlans: InstallmentPlanWithPayments[];
+  /** Soma de parcelas pending do mês corrente (sem transaction vinculada). */
+  totalParcelasDoMes: number;
+  /** Soma de todas as parcelas pending futuras. */
+  totalParcelasPendentes: number;
   totalDespesasFixas: number;
   totalPendenteAPagar: number;
   contasVencidas: Bill[];

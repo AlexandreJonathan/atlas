@@ -9,8 +9,14 @@ const LIMITE_RISCO_MEDIO = 0.5;
 export function calcularPlanejamento(snapshot: PlanningSnapshot): PlanningResult {
   const rendaAReceber = Math.max(0, snapshot.rendaMensal - snapshot.receitasDoMes);
 
+  const parcelasDoMes = snapshot.totalParcelasDoMes ?? 0;
+
   const saldoPrevistoFimDoMes =
-    snapshot.saldo + rendaAReceber - snapshot.totalDespesasFixas - snapshot.totalPendenteAPagar;
+    snapshot.saldo +
+    rendaAReceber -
+    snapshot.totalDespesasFixas -
+    snapshot.totalPendenteAPagar -
+    parcelasDoMes;
 
   const quantoPossoGastarHoje =
     Math.max(0, saldoPrevistoFimDoMes - snapshot.reservaMinima) / snapshot.diasRestantesNoMes;
