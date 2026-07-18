@@ -22,8 +22,17 @@ export type Insight = {
   /** 1 = mais importante. */
   priority: number;
   category: InsightCategory;
+  /** Ação sugerida (Atlas Intelligence v2). */
+  suggestedAction?: string;
   createdAt: string;
 };
+
+export type {
+  Recommendation,
+  RecommendationCategory,
+  RecommendationContext,
+  RecommendationRule,
+} from "./recommendation";
 
 export type FeedItemKind =
   | "pix"
