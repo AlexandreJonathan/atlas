@@ -2,6 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { getFriendlyErrorMessage } from "../lib/errorMessages";
+import type { ExpenseCategory } from "../types/budget";
+import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_LABELS } from "../types/budget";
 import type { TransactionFormData, TransactionType } from "../types/transaction";
 import { transactionSchema } from "../validations/transactionSchema";
 import Button from "./ui/Button";
@@ -11,7 +13,11 @@ import Modal from "./ui/Modal";
 type TransactionModalProps = {
   tipo: TransactionType;
   onFechar: () => void;
-  onSalvar: (dados: { description: string; amount: number }) => Promise<void>;
+  onSalvar: (dados: {
+    description: string;
+    amount: number;
+    category?: ExpenseCategory | null;
+  }) => Promise<void>;
 };
 
 const TITULOS: Record<TransactionType, string> = {
@@ -28,6 +34,9 @@ function TransactionModal({ tipo, onFechar, onSalvar }: TransactionModalProps) {
     formState: { errors },
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      category: tipo === "despesa" ? "other" : undefined,
+    },
   });
 
   async function onSubmit(dados: TransactionFormData) {
@@ -35,7 +44,14 @@ function TransactionModal({ tipo, onFechar, onSalvar }: TransactionModalProps) {
     setSalvando(true);
 
     try {
-      await onSalvar({ description: dados.description, amount: Number(dados.amount) });
+      await onSalvar({
+        description: dados.description,
+        amount: Number(dados.amount),
+        category:
+          tipo === "despesa"
+            ? ((dados.category as ExpenseCategory | undefined) ?? "other")
+            : null,
+      });
       onFechar();
     } catch (erro) {
       setErroGeral(getFriendlyErrorMessage(erro, "Não foi possível salvar a movimentação."));
@@ -64,6 +80,26 @@ function TransactionModal({ tipo, onFechar, onSalvar }: TransactionModalProps) {
           error={errors.description?.message}
           {...register("description")}
         />
+
+        {tipo === "despesa" ? (
+          <label className="atlas-field">
+            <span className="atlas-field-label">Categoria</span>
+            <select
+              className="atlas-input"
+              aria-label="Categoria da despesa"
+              {...register("category")}
+            >
+              {EXPENSE_CATEGORIES.map((key) => (
+                <option key={key} value={key}>
+                  {EXPENSE_CATEGORY_LABELS[key]}
+                </option>
+              ))}
+            </select>
+            {errors.category?.message ? (
+              <span className="atlas-field-error">{errors.category.message}</span>
+            ) : null}
+          </label>
+        ) : null}
 
         {erroGeral && <span className="atlas-erro-geral">{erroGeral}</span>}
 

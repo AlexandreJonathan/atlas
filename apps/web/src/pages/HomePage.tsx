@@ -20,6 +20,7 @@ import { usePlanning } from "../hooks/usePlanning";
 import { triggerMicrointeraction } from "../lib/microinteractions";
 import { AtlasInsights, useAtlasIntelligence } from "../modules/atlas-intelligence";
 import { useFinancialData } from "../modules/financial-data";
+import { BudgetSummaryCard, useBudgetPlanner } from "../modules/budget-planner";
 import {
   SmartGoalsSummaryCard,
   buildSmartGoalsSummary,
@@ -41,6 +42,7 @@ function HomePage() {
 
   const planejamento = usePlanning(perfil, despesasFixas, resumo, contas, metas);
   const intelligence = useAtlasIntelligence(snapshot, loading, planejamento);
+  const budgetPlanner = useBudgetPlanner();
 
   const [modalAberto, setModalAberto] = useState<ModalAberto>(null);
 
@@ -84,6 +86,13 @@ function HomePage() {
         <TransactionsPreview transacoes={transacoes} />
 
         <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
+
+        {featureFlagService.isEnabled("budgetPlanner") ? (
+          <BudgetSummaryCard
+            summary={budgetPlanner.summary}
+            loading={budgetPlanner.loading || transacoes.loading}
+          />
+        ) : null}
 
         {featureFlagService.isEnabled("smartGoals") ? (
           <SmartGoalsSummaryCard

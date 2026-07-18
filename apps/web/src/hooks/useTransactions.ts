@@ -6,6 +6,7 @@ import {
   deleteTransaction,
   listTransactions,
 } from "../services/transactionsService";
+import type { ExpenseCategory } from "../types/budget";
 import type { Transaction, TransactionType } from "../types/transaction";
 import { useAuth } from "./useAuth";
 
@@ -13,6 +14,7 @@ type NovaTransacao = {
   type: TransactionType;
   description: string;
   amount: number;
+  category?: ExpenseCategory | null;
 };
 
 export function useTransactions() {

@@ -18,6 +18,11 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const SmartGoalsPage = lazy(() =>
   import("./modules/smart-goals").then((m) => ({ default: m.SmartGoalsPage })),
 );
+const BudgetPlannerPage = lazy(() =>
+  import("./modules/budget-planner").then((m) => ({
+    default: m.BudgetPlannerPage,
+  })),
+);
 
 function PageFallback() {
   return <div className="atlas-page-loader">Carregando...</div>;
@@ -46,6 +51,7 @@ function App() {
           <Route path="/contas/conectadas" element={<ConnectedAccountsPage />} />
           <Route path="/investimentos" element={<InvestmentsPage />} />
           <Route path="/metas" element={<SmartGoalsPage />} />
+          <Route path="/orcamento" element={<BudgetPlannerPage />} />
           <Route path="/atlas-ia" element={<AtlasAIPage />} />
           <Route path="/perfil" element={<ProfilePage />} />
         </Route>

@@ -37,6 +37,7 @@ function makeSnapshot(): FinancialSnapshot {
         type: "receita",
         description: "Salário",
         amount: 3000,
+        category: null,
         createdAt: "2026-07-01T10:00:00.000Z",
       },
     ],

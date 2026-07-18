@@ -28,7 +28,11 @@ export type AnalyticsEventName =
   | "smart_goal_created"
   | "smart_goal_contribution"
   | "smart_goal_updated"
-  | "smart_goal_deleted";
+  | "smart_goal_deleted"
+  | "budget_planner_opened"
+  | "budget_month_ensured"
+  | "budget_category_limit_set"
+  | "budget_category_limit_removed";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 

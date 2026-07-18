@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFriendlyErrorMessage } from "../../../lib/errorMessages";
 import { useAuth } from "../../../hooks/useAuth";
+import type { ExpenseCategory } from "../../../types/budget";
 import type { BillType } from "../../../types/bill";
 import type { TransactionType } from "../../../types/transaction";
 import { financialDataService } from "../services/FinancialDataService";
@@ -71,6 +72,7 @@ export function useFinancialData() {
         type: TransactionType;
         description: string;
         amount: number;
+        category?: ExpenseCategory | null;
       }) => {
         if (!userId) throw new Error("Usuário não autenticado.");
         await financialDataService.addTransaction({ userId, ...input });
