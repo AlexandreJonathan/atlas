@@ -4,6 +4,24 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 27] — Alpha Deployment & Validation (Missão 27)
+
+Auditoria operacional do Alpha — **GO negado** até ambiente remoto válido.
+
+### Adicionado
+- `roadmap/sprint-27.md` com checklist aprovado/reprovado, riscos e critério de GO.
+
+### Validado nesta sessão
+- CI GitHub `success` (commit Sprint 26).
+- Testes locais (38) + instrumentação `x-request-id` no código.
+
+### Bloqueadores encontrados
+- Host Supabase do `.env.local` sem resolução DNS.
+- Sem `supabase login` — Edges/secrets não listáveis nem deployáveis.
+- `VITE_SENTRY_DSN` / flags IA/Pluggy ausentes no front local.
+
+---
+
 ## [Sprint 26] — Production Readiness P0 (Missão 26)
 
 CI, testes críticos, correlação `x-request-id` e checklist de produção. Versão `0.9.6`.
