@@ -1,0 +1,57 @@
+.atlas-budget-summary {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.atlas-budget-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (min-width: 720px) {
+  .atlas-budget-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.atlas-budget-summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.atlas-budget-summary-stat span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.atlas-budget-summary-stat strong {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.atlas-budget-summary-hot {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.atlas-budget-summary-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand);
+  text-decoration: none;
+}
+
+.atlas-budget-summary-link:hover {
+  color: var(--color-brand-strong);
+}

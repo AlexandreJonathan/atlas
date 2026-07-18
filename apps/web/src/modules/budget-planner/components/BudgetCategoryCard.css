@@ -1,0 +1,81 @@
+.atlas-budget-category-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.atlas-budget-category-card.is-warning {
+  border-color: var(--color-warning, #d4a017);
+}
+
+.atlas-budget-category-card.is-exceeded {
+  border-color: var(--color-danger);
+}
+
+.atlas-budget-category-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.atlas-budget-category-card-top h3 {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.atlas-budget-category-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.atlas-budget-category-card-pct {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.atlas-budget-category-card-amounts {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.atlas-budget-category-card-amounts strong {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.atlas-budget-category-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.atlas-budget-category-card-alert {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.atlas-budget-category-card-alert.is-warning {
+  color: var(--color-warning, #d4a017);
+  font-weight: var(--font-weight-medium);
+}
+
+.atlas-budget-category-card-alert.is-exceeded {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
