@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { useGoals } from "../../hooks/useGoals";
 import { getFriendlyErrorMessage } from "../../lib/errorMessages";
-import type { GoalFormData } from "../../types/goal";
-import { goalSchema } from "../../validations/goalSchema";
+import { goalQuickSchema } from "../../validations/goalSchema";
+import type { z } from "zod";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
+
+type QuickGoalForm = z.infer<typeof goalQuickSchema>;
 
 type FirstGoalStepProps = {
   metas: ReturnType<typeof useGoals>;
@@ -23,11 +25,11 @@ function FirstGoalStep({ metas, onVoltar, onAvancar }: FirstGoalStepProps) {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<GoalFormData>({
-    resolver: zodResolver(goalSchema),
+  } = useForm<QuickGoalForm>({
+    resolver: zodResolver(goalQuickSchema),
   });
 
-  async function onSubmit(dados: GoalFormData) {
+  async function onSubmit(dados: QuickGoalForm) {
     setErroGeral("");
     setSalvando(true);
 
@@ -36,6 +38,7 @@ function FirstGoalStep({ metas, onVoltar, onAvancar }: FirstGoalStepProps) {
         title: dados.title,
         targetAmount: Number(dados.targetAmount),
         targetDate: dados.targetDate && dados.targetDate.length > 0 ? dados.targetDate : null,
+        category: "other",
       });
       reset();
     } catch (erro) {

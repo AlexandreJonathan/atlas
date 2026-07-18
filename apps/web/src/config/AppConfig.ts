@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 /** Manter alinhado a `apps/web/package.json`. */
-export const APP_VERSION = "0.9.6";
+export const APP_VERSION = "1.0.0";
 
 function resolveEnvironment(): AppEnvironment {
   const mode = import.meta.env.MODE;
@@ -34,6 +34,7 @@ function resolveFeatureFlags(): FeatureFlags {
     openFinance: parseBool(import.meta.env.VITE_FF_OPEN_FINANCE, true),
     investments: parseBool(import.meta.env.VITE_FF_INVESTMENTS, true),
     notifications: parseBool(import.meta.env.VITE_FF_NOTIFICATIONS, false),
+    smartGoals: parseBool(import.meta.env.VITE_FF_SMART_GOALS, true),
   };
 }
 

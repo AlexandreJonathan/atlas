@@ -144,6 +144,8 @@ export function useFinancialData() {
         title: string;
         targetAmount: number;
         targetDate: string | null;
+        description?: string | null;
+        category?: import("../../../types/goal").GoalCategory;
       }) => {
         if (!userId) throw new Error("Usuário não autenticado.");
         await financialDataService.addGoal({ userId, ...input });

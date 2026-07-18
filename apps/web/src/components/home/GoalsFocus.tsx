@@ -1,5 +1,6 @@
 import { Target } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { useGoals } from "../../hooks/useGoals";
 import AsyncStateView from "../AsyncStateView";
 import GoalModal from "../GoalModal";
@@ -25,9 +26,14 @@ function GoalsFocus({ metas }: GoalsFocusProps) {
         <h2 id="metas-focus-titulo">
           <Target size={18} aria-hidden="true" /> Metas
         </h2>
-        <Button size="sm" variant="ghost" onClick={() => setModalAberto(true)}>
-          Nova
-        </Button>
+        <div className="atlas-goals-focus-actions">
+          <Link to="/metas" className="atlas-smart-goals-summary-link">
+            Ver todas
+          </Link>
+          <Button size="sm" variant="ghost" onClick={() => setModalAberto(true)}>
+            Nova
+          </Button>
+        </div>
       </div>
 
       <AsyncStateView

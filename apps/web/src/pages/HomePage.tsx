@@ -20,6 +20,11 @@ import { usePlanning } from "../hooks/usePlanning";
 import { triggerMicrointeraction } from "../lib/microinteractions";
 import { AtlasInsights, useAtlasIntelligence } from "../modules/atlas-intelligence";
 import { useFinancialData } from "../modules/financial-data";
+import {
+  SmartGoalsSummaryCard,
+  buildSmartGoalsSummary,
+} from "../modules/smart-goals";
+import { featureFlagService } from "../config";
 import type { TransactionType } from "../types/transaction";
 import "./HomePage.css";
 
@@ -79,6 +84,13 @@ function HomePage() {
         <TransactionsPreview transacoes={transacoes} />
 
         <AtlasInsights insights={intelligence.topInsights} loading={intelligence.loading} />
+
+        {featureFlagService.isEnabled("smartGoals") ? (
+          <SmartGoalsSummaryCard
+            summary={buildSmartGoalsSummary(metas.goals)}
+            loading={metas.loading}
+          />
+        ) : null}
 
         <GoalsFocus metas={metas} />
 

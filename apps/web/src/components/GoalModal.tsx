@@ -2,17 +2,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { getFriendlyErrorMessage } from "../lib/errorMessages";
-import type { GoalFormData } from "../types/goal";
-import { goalSchema } from "../validations/goalSchema";
+import type { GoalCategory } from "../types/goal";
+import { goalQuickSchema } from "../validations/goalSchema";
+import type { z } from "zod";
 import Button from "./ui/Button";
 import Input from "./ui/Input";
 import Modal from "./ui/Modal";
 
+type QuickGoalForm = z.infer<typeof goalQuickSchema>;
+
 type GoalModalProps = {
   onFechar: () => void;
-  onSalvar: (dados: { title: string; targetAmount: number; targetDate: string | null }) => Promise<void>;
+  onSalvar: (dados: {
+    title: string;
+    targetAmount: number;
+    targetDate: string | null;
+    category?: GoalCategory;
+    description?: string | null;
+  }) => Promise<void>;
 };
 
+/** Modal rápido (Home / onboarding). Cadastro completo: Smart Goals `/metas`. */
 function GoalModal({ onFechar, onSalvar }: GoalModalProps) {
   const [erroGeral, setErroGeral] = useState("");
   const [salvando, setSalvando] = useState(false);
@@ -20,11 +30,11 @@ function GoalModal({ onFechar, onSalvar }: GoalModalProps) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<GoalFormData>({
-    resolver: zodResolver(goalSchema),
+  } = useForm<QuickGoalForm>({
+    resolver: zodResolver(goalQuickSchema),
   });
 
-  async function onSubmit(dados: GoalFormData) {
+  async function onSubmit(dados: QuickGoalForm) {
     setErroGeral("");
     setSalvando(true);
 
@@ -33,6 +43,8 @@ function GoalModal({ onFechar, onSalvar }: GoalModalProps) {
         title: dados.title,
         targetAmount: Number(dados.targetAmount),
         targetDate: dados.targetDate && dados.targetDate.length > 0 ? dados.targetDate : null,
+        category: dados.category ?? "other",
+        description: dados.description?.trim() ? dados.description.trim() : null,
       });
       onFechar();
     } catch (erro) {

@@ -23,7 +23,12 @@ export type AnalyticsEventName =
   | "pluggy_disconnect"
   | "pluggy_sync_started"
   | "pluggy_sync_success"
-  | "pluggy_sync_error";
+  | "pluggy_sync_error"
+  | "smart_goals_opened"
+  | "smart_goal_created"
+  | "smart_goal_contribution"
+  | "smart_goal_updated"
+  | "smart_goal_deleted";
 
 export type AnalyticsProperties = Record<string, string | number | boolean | null | undefined>;
 
