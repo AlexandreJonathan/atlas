@@ -4,6 +4,26 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [v1.0.2] — Financial Planner (Módulo 3)
+
+Terceiro módulo da linha 1.0: plano de ação financeiro composto.
+
+### Adicionado
+- Módulo `modules/financial-planner/` (repository, service, hook, tela `/planejamento`, summary card, stubs de IA).
+- Entidades de domínio `FinancialPlan` e `MonthlyProjection` (derivadas; sem tabela própria).
+- Flag `VITE_FF_FINANCIAL_PLANNER` (default `true`).
+- Testes `planMath.test.ts`.
+- `roadmap/financial-planner.md`.
+
+### Alterado
+- Versão do app `1.0.2`.
+- Home com card de planejamento financeiro (compõe FDL + Budget + Smart Goals via `planningEngine`).
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [v1.0.1] — Budget Planner (Módulo 2)
 
 Segundo módulo da linha 1.0: orçamento mensal inteligente por categoria.

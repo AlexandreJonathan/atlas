@@ -440,6 +440,13 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Hooks de Intelligence (`serializeBudgetForIntelligence`) sem recomendações automáticas ainda.
 - Flag `budgetPlanner` (`VITE_FF_BUDGET_PLANNER`).
 
+### Financial Planner (v1.0.2)
+- Módulo `apps/web/src/modules/financial-planner/` — UI `/planejamento`.
+- Compõe `planningEngine` + FDL + Budget (`budgetCapacityForGoals`) + metas (Smart Goals) — **não** reimplementa fórmulas do motor.
+- Entidades `FinancialPlan` / `MonthlyProjection` derivadas (sem persistência na v1.0).
+- Home: `FinancialPlannerSummaryCard`; stubs `serializePlanForIntelligence`.
+- Flag `financialPlanner` (`VITE_FF_FINANCIAL_PLANNER`).
+
 ### Atlas AI Tool Calling (Sprint 22) + Trust Boundary (Sprint 24)
 - Allowlist de tools no **servidor** (`SERVER_TOOL_DEFINITIONS` na Edge). Cliente não envia schemas nem resultados.
 - Fluxo: `OpenAIProvider` → Edge `mode=agent` → loop OpenAI + execução RLS no servidor → `reply` + `toolsUsed` (`contextSource: server_tools`).
