@@ -443,7 +443,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" do planejamento financeiro (sem ritmo mensal calculável).
 - Despesas fixas não têm "dia de vencimento" — o valor total é sempre considerado "a ocorrer" no mês, sem distinguir o que já foi pago.
 - Recomendações e planejamento financeiro são gerados por regras fixas (heurísticas); não há IA real integrada ainda em nenhum dos dois (contratos `RecommendationProvider`/`PlanningProvider` prontos, implementação pendente).
-- Cobertura de testes ainda mínima (Vitest cobre trust boundary da IA; sem E2E/CI completo) — o checklist de deploy (`docs/deploy.md`) ainda depende em grande parte de verificação manual.
+- Testes críticos + CI GitHub Actions (Missão 26); ainda sem E2E. Observabilidade: `x-request-id` Client↔Edge + logs JSON + Sentry tag; analytics sink ainda Noop.
 - Monitoramento de erros em produção: Sentry opcional via `VITE_SENTRY_DSN` (sem DSN o SDK não carrega).
 - Não há paginação nas listagens (transações, contas, metas, despesas fixas) — toda a lista é carregada de uma vez; aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado com o crescimento do histórico.
 - Não há gerenciamento de estado global genérico nem camada de cache/dados (React Query, etc.).

@@ -4,6 +4,22 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Sprint 26] — Production Readiness P0 (Missão 26)
+
+CI, testes críticos, correlação `x-request-id` e checklist de produção. Versão `0.9.6`.
+
+### Adicionado
+- GitHub Actions CI (`lint` → `test` → `build`).
+- Testes Vitest: FinancialDataService, AtlasToolRegistry, OpenAIProvider, PluggyProvider, Edge trust, requestId.
+- `lib/observability` (`x-request-id`) + logs estruturados JSON + tag Sentry `request_id`.
+- Echo `requestId` nas Edges `atlas-ai-chat` e `pluggy-proxy`.
+- `roadmap/sprint-26.md` + checklist produção em `docs/deploy.md`.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [Sprint 24] — Atlas AI Trust Boundary (Missão 24)
 
 Fecha a trust boundary do agente: tools, schemas e resultados financeiros só no servidor. Versão `0.9.5`.

@@ -146,23 +146,59 @@ Qualquer provedor de hosting estático/CDN com suporte a SPA (fallback de todas 
 - Modais / Onboarding ainda são candidatos a lazy adicional se o aviso de chunk voltar a aparecer.
 - **Cache**: `vercel.json` (seção 5) já cobre `/assets/*` com cache imutável de longa duração.
 
-## 6. Checklist de Deploy
+## 6. Checklist de Deploy (Alpha privado — Missão 26)
 
-- [ ] Migrações SQL aplicadas no projeto Supabase de produção/staging (seção 2.1), incluindo `ai_chat_rate_buckets` e `pluggy_connections`.
-- [ ] Row Level Security confirmado habilitado nas tabelas de produto; Edges `atlas-ai-chat` e `pluggy-proxy` deployadas quando forem usadas.
-- [ ] "Site URL" e "Redirect URLs" configurados no Supabase Auth (seção 2.2), incluindo `/redefinir-senha`.
-- [ ] Decisão tomada e configurada sobre exigir confirmação de e-mail ou não.
-- [ ] Variáveis `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` configuradas no ambiente de build de produção (nunca a `service_role`).
-- [ ] "Root Directory" do projeto na plataforma de hospedagem configurado como `apps/web` (o repositório não tem `package.json` na raiz — é `apps/web` que contém a aplicação real).
-- [ ] `npm run lint` e `npm run build` executados sem erros a partir de uma checkout limpa (não só localmente).
-- [ ] Deploy publicado com HTTPS e fallback de SPA funcionando (`apps/web/vercel.json` já define a regra de rewrite `/(.*) → /index.html` para Vercel) — testar recarregar a página em `/inicio` (e em `/perfil`) diretamente pela URL.
-- [ ] Teste manual completo em produção: cadastro → (confirmação de e-mail, se habilitada) → login → esqueci minha senha → redefinição → onboarding guiado → transações/contas/metas/planejamento → logout.
-- [ ] Teste manual em pelo menos um dispositivo mobile real (não apenas emulação) para os fluxos de login/cadastro/onboarding.
-- [ ] Canal definido para os alpha testers reportarem bugs/feedback (ex: formulário, e-mail dedicado, ou canal de chat).
-- [ ] (Recomendado) `VITE_SENTRY_DSN` configurado no ambiente de build antes de convidar os primeiros usuários.
+### 6.1 Front + Auth
+- [ ] Migrações SQL aplicadas no projeto Supabase (seção 2.1), incluindo `ai_chat_rate_buckets` e `pluggy_connections`.
+- [ ] RLS habilitado nas tabelas de produto.
+- [ ] Site URL + Redirect URLs (incl. `/redefinir-senha`).
+- [ ] Decisão sobre confirmação de e-mail.
+- [ ] `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` no build (nunca `service_role`).
+- [ ] Root Directory = `apps/web`.
+- [ ] CI verde no GitHub (`.github/workflows/ci.yml`: lint → test → build).
+- [ ] HTTPS + SPA fallback (`vercel.json`) — smoke `/inicio`, `/perfil`.
+- [ ] `VITE_SENTRY_DSN` **obrigatório** para Alpha de alta qualidade (tag `request_id` correlaciona com Edges).
+
+### 6.2 Edge Functions + secrets (obrigatório se IA / Pluggy ligados)
+```bash
+npx supabase login
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase functions deploy atlas-ai-chat
+npx supabase functions deploy pluggy-proxy
+```
+
+| Secret / env | Obrigatório | Notas |
+|---|---|---|
+| `OPENAI_API_KEY` | Se `VITE_FF_OPENAI=true` | Só Supabase Secrets |
+| `OPENAI_MODEL` | Não | Default `gpt-4.1-mini` |
+| `ALLOWED_ORIGINS` | **Sim em produção** | CSV das origens do front (ex: `https://app.vercel.app`). Sem isso, `atlas-ai-chat` só aceita localhost |
+| `AI_RATE_LIMIT_USER` / `IP` / `WINDOW_MS` | Não | Defaults 20 / 40 / 1h |
+| `PLUGGY_CLIENT_ID` / `PLUGGY_CLIENT_SECRET` | Se provider `pluggy` | Só Supabase Secrets |
+| `PLUGGY_INCLUDE_SANDBOX` | Não | Default true |
+
+Smoke pós-deploy:
+- [ ] Chat IA com JWT válido responde; payload com `tools`/`role=tool` retorna `trust_violation`.
+- [ ] Respostas Edge incluem `requestId` (body + header `x-request-id`).
+- [ ] Pluggy Connect (se ligado) não retorna 503.
+
+### 6.3 Flags front (produção)
+| Variável | Alpha típico |
+|---|---|
+| `VITE_FF_OPENAI` | `true` (com Edge + secret) |
+| `VITE_FINANCIAL_DATA_PROVIDER` | `mock` ou `pluggy` |
+| `VITE_OF_PROVIDER` | alinhado ao FDL |
+| `VITE_SENTRY_DSN` | preenchido |
+
+### 6.4 QA manual
+- [ ] Cadastro → login → onboarding → transações/contas/metas → logout.
+- [ ] Mobile real.
+- [ ] Canal de feedback dos alpha testers.
+
+### 6.5 Backups
+- [ ] Confirmar backups/PITR do projeto Supabase (Dashboard → Database → Backups) antes de convidar usuários.
 
 ## 7. Limitações Conhecidas Pós-Deploy
 
-- Sem testes automatizados (unitários/E2E) — todo o checklist acima depende de verificação manual.
-- Monitoramento de erros depende de configurar `VITE_SENTRY_DSN` no deploy (integração pronta na Sprint 19).
-- Sem paginação nas listagens (transações/contas/metas/despesas fixas) — aceitável para o volume inicial de um Alpha privado, mas deve ser revisitado antes de uma abertura mais ampla (ver `roadmap/backlog.md`, seção 8).
+- Testes unitários críticos + CI existem (Missão 26); ainda sem E2E Playwright.
+- Observabilidade: logs JSON + `x-request-id` Client↔Edge; analytics sink ainda Noop (métricas de produto P1).
+- Sem paginação nas listagens — aceitável para Alpha privado (ver `roadmap/backlog.md`).

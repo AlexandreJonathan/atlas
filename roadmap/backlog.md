@@ -80,6 +80,8 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - 🟡 Webhooks Pluggy (`item/updated`) para sync push em vez de só pull sob demanda
 - 🟡 Merge opcional de transações Pluggy no ledger Atlas (hoje OF não altera saldo da Home)
 - ✅ ~~IA real (LLM) na aba Atlas IA~~ — Sprint 17 OpenAI + Sprint 22 Tool Calling + Sprint 24 Trust Boundary (tools só na Edge)
+- ✅ ~~CI lint/test/build + testes críticos P0~~ — Sprint 26
+- ✅ ~~Correlação x-request-id Client↔Edge~~ — Sprint 26
 - 🟡 Expandir tools (planejamento, bills mark paid) e webhooks Pluggy → feed IA
 - 🟡 Investimentos reais (somente leitura/estudo primeiro; a Atlas não vende investimentos) — estrutura na Sprint 8
 
