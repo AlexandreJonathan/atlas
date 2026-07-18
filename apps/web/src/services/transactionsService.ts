@@ -1,4 +1,6 @@
 import { getSupabaseClient } from "../lib/supabase";
+import type { ExpenseCategory } from "../types/budget";
+import { EXPENSE_CATEGORIES } from "../types/budget";
 import type { Transaction, TransactionType } from "../types/transaction";
 
 const TABLE = "transactions";
@@ -14,8 +16,16 @@ type TransactionRow = {
   type: TransactionType;
   description: string;
   amount: number;
+  category: string | null;
   created_at: string;
 };
+
+function asExpenseCategory(value: string | null | undefined): ExpenseCategory | null {
+  if (value == null || value === "") return null;
+  return (EXPENSE_CATEGORIES as readonly string[]).includes(value)
+    ? (value as ExpenseCategory)
+    : "other";
+}
 
 function mapRowToTransaction(row: TransactionRow): Transaction {
   return {
@@ -24,6 +34,7 @@ function mapRowToTransaction(row: TransactionRow): Transaction {
     type: row.type,
     description: row.description,
     amount: Number(row.amount),
+    category: asExpenseCategory(row.category),
     createdAt: row.created_at,
   };
 }
@@ -47,10 +58,17 @@ export type NewTransactionInput = {
   type: TransactionType;
   description: string;
   amount: number;
+  /** Obrigatório para despesas no Budget Planner; receitas podem omitir. */
+  category?: ExpenseCategory | null;
 };
 
 export async function createTransaction(input: NewTransactionInput): Promise<Transaction> {
   const client = getSupabaseClient();
+
+  const category =
+    input.type === "despesa"
+      ? (input.category ?? "other")
+      : (input.category ?? null);
 
   const { data, error } = await client
     .from(TABLE)
@@ -59,6 +77,7 @@ export async function createTransaction(input: NewTransactionInput): Promise<Tra
       type: input.type,
       description: input.description,
       amount: input.amount,
+      category,
     })
     .select("*")
     .single();

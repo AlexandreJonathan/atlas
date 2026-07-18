@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EXPENSE_CATEGORIES } from "../types/budget";
 
 export const transactionSchema = z.object({
   // .trim() garante que espaços em branco não contem para o mínimo de
@@ -13,4 +14,5 @@ export const transactionSchema = z.object({
     .string()
     .min(1, "O valor é obrigatório")
     .refine((valor) => Number(valor) > 0, "Informe um valor maior que zero"),
+  category: z.enum(EXPENSE_CATEGORIES).optional(),
 });
