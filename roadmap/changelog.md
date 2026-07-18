@@ -4,6 +4,28 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [v1.0.1] — Budget Planner (Módulo 2)
+
+Segundo módulo da linha 1.0: orçamento mensal inteligente por categoria.
+
+### Adicionado
+- Migração `20260718020000_budget_planner.sql` (`transactions.category`, `budgets`, `budget_categories` + RLS).
+- Módulo `modules/budget-planner/` (service, hook, tela `/orcamento`, summary card, stubs de IA).
+- Flag `VITE_FF_BUDGET_PLANNER` (default `true`).
+- Testes `budgetMath.test.ts`.
+- `roadmap/budget-planner.md`.
+- Categoria no cadastro de despesas (`TransactionModal`).
+
+### Alterado
+- Versão do app `1.0.1`.
+- `transactionsService` / tipo `Transaction` com `category`.
+- Home com resumo de orçamento; ponte leve com Smart Goals na tela `/orcamento`.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [v1.0.0] — Smart Goals (Módulo 1)
 
 Primeiro módulo da linha 1.0: metas financeiras inteligentes.

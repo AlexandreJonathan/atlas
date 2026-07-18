@@ -38,10 +38,13 @@ Este documento lista funcionalidades e melhorias futuras planejadas para o Atlas
 - ✅ ~~Implementar modal "Nova Despesa" (atualmente é apenas um `alert`)~~ — concluído na Sprint 3
 - 🟡 Editar movimentações existentes (exclusão já implementada na Sprint 3)
 - 🟡 Filtros de movimentações por período, tipo e categoria
-- 🟡 Categorização de receitas e despesas (ex: alimentação, transporte, salário)
+- ✅ ~~Categorização de despesas~~ — Budget Planner v1.0.1 (`transactions.category` + limites); receitas ainda sem categoria de produto
+- 🟡 Edição de categoria em lançamentos existentes + filtros por categoria
 - 🟢 Gráficos de evolução financeira (mensal/anual)
 - 🟢 Exportação de relatórios (PDF/CSV)
-- ✅ ~~Metas financeiras e orçamento mensal~~ — metas concluídas na Sprint 4 (`goals`, `GoalsPanel`); orçamento mensal (limites de gasto por categoria) ainda não implementado
+- ✅ ~~Metas financeiras~~ — Smart Goals v1.0 (`/metas`)
+- ✅ ~~Orçamento mensal~~ — Budget Planner v1.0.1 (`/orcamento`)
+- 🟡 Budget Planner v1.1 — recomendações IA, templates de orçamento, histórico multi-mês, Bottom Nav
 - 🟡 "Ver todas as contas" no `UpcomingBillsPanel` (hoje mostra só vencidas/vencendo em 7 dias; contas futuras distantes ou já pagas não aparecem)
 - 🟡 Conversão automática de conta paga (`bills`) em movimentação (`transactions`) — hoje os domínios ficam desacoplados
 - 🟡 Janela de "gastos do mês" (`receitasDoMes`/`despesasDoMes` em `useTransactions`) usa o prefixo `YYYY-MM` de `created_at`; revisitar com um corte de fuso horário mais preciso se necessário

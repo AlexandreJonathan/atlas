@@ -26,6 +26,7 @@ Todas as migrações em `supabase/migrations/` precisam existir no projeto Supab
 7. `20260716220000_create_ai_chat_rate_buckets.sql` (rate limit da Edge `atlas-ai-chat`; sem policies para anon/auth — só service role)
 8. `20260716230000_create_pluggy_connections.sql` (itens Pluggy ↔ usuário; só service role na Edge)
 9. `20260718010000_smart_goals_columns.sql` (Smart Goals v1.0 — description, category, status, updated_at)
+10. `20260718020000_budget_planner.sql` (Budget Planner — `transactions.category`, `budgets`, `budget_categories`)
 
 Como aplicar:
 

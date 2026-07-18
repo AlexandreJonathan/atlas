@@ -432,6 +432,14 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Hooks de Intelligence preparados (`serializeGoalsForIntelligence`) sem sugestões automáticas ainda.
 - Flag `smartGoals` (`VITE_FF_SMART_GOALS`).
 
+### Budget Planner (v1.0.1)
+- Módulo `apps/web/src/modules/budget-planner/` — UI `/orcamento`, `BudgetPlannerService` → `budgetsService`.
+- Tabelas `public.budgets` + `public.budget_categories`; `transactions.category` para despesas.
+- Gasto/restante/alertas derivados das transactions do mês (FDL) — sem coluna `spent` persistida.
+- Home: `BudgetSummaryCard`; ponte com Smart Goals (capacidade residual → `/metas`).
+- Hooks de Intelligence (`serializeBudgetForIntelligence`) sem recomendações automáticas ainda.
+- Flag `budgetPlanner` (`VITE_FF_BUDGET_PLANNER`).
+
 ### Atlas AI Tool Calling (Sprint 22) + Trust Boundary (Sprint 24)
 - Allowlist de tools no **servidor** (`SERVER_TOOL_DEFINITIONS` na Edge). Cliente não envia schemas nem resultados.
 - Fluxo: `OpenAIProvider` → Edge `mode=agent` → loop OpenAI + execução RLS no servidor → `reply` + `toolsUsed` (`contextSource: server_tools`).
@@ -444,7 +452,7 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 ## 12. Limitações Conhecidas da Arquitetura Atual
 
 - Edição (update) de movimentações financeiras e despesas fixas ainda não implementada na UI.
-- Não há categorização de receitas/despesas nem orçamento mensal por categoria.
+- Categorização de despesas + orçamento mensal (Budget Planner v1.0.1); receitas ainda sem categoria de produto; edição de categoria em lançamentos antigos ainda não tem UI dedicada.
 - Contas pagas (`bills`) não geram automaticamente uma movimentação (`transactions`) — domínios desacoplados por decisão de escopo.
 - Metas não têm histórico individual de aportes, apenas o valor acumulado (`current_amount`).
 - Metas sem `targetDate` não entram no cálculo de "quanto precisa guardar" do planejamento financeiro (sem ritmo mensal calculável).
