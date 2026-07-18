@@ -4,6 +4,27 @@ Todas as alterações relevantes do projeto são documentadas neste arquivo, em 
 
 Formato inspirado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [v1.0.0] — Smart Goals (Módulo 1)
+
+Primeiro módulo da linha 1.0: metas financeiras inteligentes.
+
+### Adicionado
+- Migração `20260718010000_smart_goals_columns.sql` (description, category, status, updated_at).
+- Módulo `modules/smart-goals/` (service, hook, tela `/metas`, summary card, stubs de IA).
+- Flag `VITE_FF_SMART_GOALS` (default `true`).
+- Testes `goalMath.test.ts`.
+- `roadmap/smart-goals.md`.
+
+### Alterado
+- Versão do app `1.0.0`.
+- `goalsService` / tipos / schemas de meta.
+- Home com resumo Smart Goals + link “Ver todas”.
+
+### Validado
+- `npm run lint`, `npm run test`, `npm run build`.
+
+---
+
 ## [Sprint 28] — Alpha Deployment Preparation (Missão 28)
 
 Preparação operacional do Alpha — documentação e validador de ambiente. Sem features.

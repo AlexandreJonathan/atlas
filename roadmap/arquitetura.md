@@ -425,6 +425,13 @@ Camada transversal — **não altera UX, regras de negócio, auth, schema nem ad
 - Timeout + retry no client (`pluggyEdgeClient`); logs + analytics (`pluggy_*`).
 - Saldo/receitas/despesas da Home continuam no ledger Atlas (não misturam txs Pluggy no cálculo) — evita mudança de UX; OF Pluggy alimenta contas/cartões/investimentos do snapshot.
 
+### Smart Goals (v1.0)
+- Módulo `apps/web/src/modules/smart-goals/` — UI `/metas`, `SmartGoalsService` → `goalsService` (Supabase).
+- Extensão de `public.goals` (category, status, description, updated_at); deadline = `target_date`.
+- Home: `SmartGoalsSummaryCard`; FDL invalidada após mutações.
+- Hooks de Intelligence preparados (`serializeGoalsForIntelligence`) sem sugestões automáticas ainda.
+- Flag `smartGoals` (`VITE_FF_SMART_GOALS`).
+
 ### Atlas AI Tool Calling (Sprint 22) + Trust Boundary (Sprint 24)
 - Allowlist de tools no **servidor** (`SERVER_TOOL_DEFINITIONS` na Edge). Cliente não envia schemas nem resultados.
 - Fluxo: `OpenAIProvider` → Edge `mode=agent` → loop OpenAI + execução RLS no servidor → `reply` + `toolsUsed` (`contextSource: server_tools`).
